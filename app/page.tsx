@@ -1,8 +1,10 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
+import { ProjectDetailView } from '@/components/ProjectDetail/ProjectDetailView'
+import type { UserType } from '@/lib/types'
 
-type User = 'fabio' | 'lidia'
+type User = UserType
 type Tab = 'dashboard' | 'progetti' | 'task' | 'campagne' | 'clienti' | 'lab_idee' | 'spese' | 'personale'
 
 export default function Home() {
@@ -75,47 +77,6 @@ export default function Home() {
   const sc = (s: string) => { if (!s) return 'gray'; const sl = s.toLowerCase(); if (['attivo','completato','fatto'].includes(sl)) return 'green'; if (['in corso','aperto','in_corso'].includes(sl)) return 'blue'; if (['pausa','bloccato'].includes(sl)) return 'amber'; if (['urgente','alta'].includes(sl)) return 'red'; return 'gray' }
   const pc = (p: any) => { const n = Number(p); if (n === 1) return 'red'; if (n === 2) return 'amber'; return 'blue' }
 
-  function renderProjectDetail(p: any) {
-    const ptasks = (data.tasks || []).filter((t: any) => t.progetto_id === p.id || t.progetto === p.nome)
-    const pcampagne = (data.campagne || []).filter((c: any) => c.progetto_id === p.id)
-    return (
-      <div>
-        <button onClick={() => setSelectedProject(null)} className="text-sm text-gray-500 hover:text-gray-800 mb-4 block">← Tutti i progetti</button>
-        <div className="bg-white border border-gray-200 rounded-xl p-6 mb-4">
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <div className="flex items-center gap-2">{p.colore && <div className="w-4 h-4 rounded-full" style={{ background: p.colore }} />}<div className="text-xl font-semibold">{p.nome}</div></div>
-              <div className="text-sm text-gray-500 mt-1">{p.descrizione}</div>
-            </div>
-            <Badge text={p.stato} color={sc(p.stato)} />
-          </div>
-          <div className="grid grid-cols-4 gap-3 mt-4">
-            <div className="bg-gray-50 rounded-lg p-3 text-center"><div className="text-lg font-semibold text-green-600">€{p.mrr || 0}/mo</div><div className="text-xs text-gray-400 mt-1">MRR</div></div>
-            <div className="bg-gray-50 rounded-lg p-3 text-center"><div className="text-lg font-semibold text-blue-600">{p.beta_clienti || 0}</div><div className="text-xs text-gray-400 mt-1">Clienti</div></div>
-            <div className="bg-gray-50 rounded-lg p-3 text-center"><div className="text-lg font-semibold text-purple-600">€{p.prezzo || 0}/mo</div><div className="text-xs text-gray-400 mt-1">Prezzo</div></div>
-            <div className="bg-gray-50 rounded-lg p-3 text-center"><div className="text-lg font-semibold text-gray-600">#{p.priorita || '-'}</div><div className="text-xs text-gray-400 mt-1">Priorità</div></div>
-          </div>
-          {p.repo && <div className="mt-3 text-xs text-gray-400">📦 {p.repo}</div>}
-          {p.url && <div className="mt-1 text-xs text-blue-500">{p.url}</div>}
-        </div>
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <SH title="Task del progetto" onAdd={() => setShowForm('task_p')} />
-            {ptasks.length === 0 ? <div className="text-xs text-gray-400 text-center py-4 bg-white border border-gray-200 rounded-xl">Nessun task</div> :
-              ptasks.map((t: any) => <Card key={t.id}><div className="flex items-start justify-between gap-2"><div className="flex-1"><div className="text-sm font-medium">{t.titolo || t.testo}</div>{t.dettaglio && <div className="text-xs text-gray-500 mt-1">{t.dettaglio}</div>}</div><div className="flex gap-1">{t.stato && <Badge text={t.stato} color={sc(t.stato)} />}<button onClick={() => deleteItem('tasks', t.id)} className="text-xs text-gray-300 hover:text-red-400">✕</button></div></div><div className="flex gap-2 mt-2">{t.chi && <span className="text-xs text-gray-400">{t.chi}</span>}{t.scadenza && <span className="text-xs text-gray-400">· {t.scadenza}</span>}</div></Card>)
-            }
-          </div>
-          <div>
-            <SH title="Campagne" onAdd={() => setShowForm('campagna')} />
-            {pcampagne.length === 0 ? <div className="text-xs text-gray-400 text-center py-4 bg-white border border-gray-200 rounded-xl">Nessuna campagna</div> :
-              pcampagne.map((c: any) => <Card key={c.id}><div className="flex items-start justify-between gap-2"><div><div className="text-sm font-medium">{c.nome}</div><div className="text-xs text-gray-500 mt-1">{c.tipo}{c.canale ? ' · ' + c.canale : ''}</div></div><div className="flex gap-1">{c.stato && <Badge text={c.stato} color={sc(c.stato)} />}<button onClick={() => deleteItem('campagne', c.id)} className="text-xs text-gray-300 hover:text-red-400">✕</button></div></div>{(c.leads_totali != null || c.email_inviate != null) && <div className="grid grid-cols-3 gap-2 mt-3">{c.leads_totali != null && <div className="bg-gray-50 rounded-lg p-2 text-center"><div className="text-sm font-semibold">{c.leads_totali}</div><div className="text-xs text-gray-400">Leads</div></div>}{c.email_inviate != null && <div className="bg-gray-50 rounded-lg p-2 text-center"><div className="text-sm font-semibold">{c.email_inviate}</div><div className="text-xs text-gray-400">Email</div></div>}{c.risposte != null && <div className="bg-gray-50 rounded-lg p-2 text-center"><div className="text-sm font-semibold">{c.risposte}</div><div className="text-xs text-gray-400">Risposte</div></div>}</div>}</Card>)
-            }
-          </div>
-        </div>
-      </div>
-    )
-  }
-
   function renderDashboard() {
     const urgenti = (data.tasks || []).filter((t: any) => (Number(t.priorita) <= 2 || t.priorita === 'Alta') && t.stato !== 'completato' && t.stato !== 'Fatto').slice(0, 4)
     return (
@@ -147,7 +108,13 @@ export default function Home() {
   }
 
   function renderProgetti() {
-    if (selectedProject) return renderProjectDetail(selectedProject)
+    if (selectedProject) return (
+      <ProjectDetailView
+        progettoId={selectedProject.id}
+        currentUser={user}
+        onBack={() => setSelectedProject(null)}
+      />
+    )
     return (
       <div>
         <SH title="Tutti i progetti" onAdd={() => setShowForm('progetto')} />
