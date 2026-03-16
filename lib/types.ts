@@ -70,12 +70,36 @@ export interface Cliente {
   ragione_sociale?: string
   ruolo?: string
   settore?: string
+  azienda?: string
   citta?: string
+  paese?: string
   email?: string
   telefono?: string
   tipo?: string
   note?: string
   stato?: string
+  // Pipeline CRM
+  pipeline_stage?: PipelineStage
+  deal_value?: number
+  follow_up_date?: string
+  progetto_interesse?: string
+  fonte?: string
+  ultimo_contatto?: string
+  note_pipeline?: string
+  created_at?: string
+}
+
+export type PipelineStage = 'lead' | 'contatto' | 'demo' | 'proposta' | 'chiuso_vinto' | 'chiuso_perso'
+
+export interface CrmAttivita {
+  id: string
+  cliente_id: string
+  tipo: 'chiamata' | 'email' | 'demo' | 'whatsapp' | 'meeting' | 'nota'
+  titolo: string
+  contenuto?: string
+  autore: string
+  data_attivita?: string
+  esito?: 'positivo' | 'neutro' | 'negativo'
   created_at?: string
 }
 

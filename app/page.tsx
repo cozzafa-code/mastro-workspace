@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { ProjectDetailView } from '@/components/ProjectDetail/ProjectDetailView'
+import { CrmView } from '@/components/CRM/CrmView'
 import type { UserType } from '@/lib/types'
 
 type User = UserType
@@ -168,13 +169,7 @@ export default function Home() {
   }
 
   function renderClienti() {
-    const cols = [['bg-blue-100','text-blue-800'],['bg-rose-100','text-rose-800'],['bg-green-100','text-green-800'],['bg-purple-100','text-purple-800']]
-    return (
-      <div>
-        <SH title="Clienti & Aziende" onAdd={() => setShowForm('cliente')} />
-        {(data.clienti || []).map((c: any, i: number) => { const nome = c.nome || c.ragione_sociale || 'N/A'; const init = nome.split(' ').map((w: string) => w[0]).join('').substring(0, 2).toUpperCase(); const col = cols[i % cols.length]; return <Card key={c.id}><div className="flex items-center gap-3"><div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold flex-shrink-0 ${col[0]} ${col[1]}`}>{init}</div><div className="flex-1"><div className="text-sm font-medium">{nome}</div><div className="text-xs text-gray-500">{c.ruolo || c.settore || ''}{c.citta ? ' — ' + c.citta : ''}</div><div className="text-xs text-gray-400 mt-1">{c.email || ''}{c.telefono ? ' · ' + c.telefono : ''}</div></div><div className="flex flex-col items-end gap-1">{c.tipo && <Badge text={c.tipo} color="teal" />}<button onClick={() => deleteItem('clienti', c.id)} className="text-xs text-gray-300 hover:text-red-400">✕</button></div></div>{c.note && <div className="text-xs text-gray-400 mt-2 italic">{c.note}</div>}</Card> })}
-      </div>
-    )
+    return <CrmView currentUser={user} />
   }
 
   function renderLabIdee() {
