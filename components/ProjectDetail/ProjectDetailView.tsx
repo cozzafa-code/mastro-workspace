@@ -202,7 +202,7 @@ export const ProjectDetailView: FC<Props> = ({ progettoId, currentUser, onBack }
                   {c.leads_totali != null && <div style={{ textAlign: 'center' }}><div style={{ fontSize: 16, fontWeight: 700 }}>{c.leads_totali}</div><div style={{ fontSize: 10, color: DS.colors.textMuted }}>LEADS</div></div>}
                   {c.email_inviate != null && <div style={{ textAlign: 'center' }}><div style={{ fontSize: 16, fontWeight: 700 }}>{c.email_inviate}</div><div style={{ fontSize: 10, color: DS.colors.textMuted }}>EMAIL</div></div>}
                   {c.risposte != null && <div style={{ textAlign: 'center' }}><div style={{ fontSize: 16, fontWeight: 700 }}>{c.risposte}</div><div style={{ fontSize: 10, color: DS.colors.textMuted }}>RISPOSTE</div></div>}
-                  {c.email_inviate > 0 && c.risposte != null && <div style={{ textAlign: 'center' }}><div style={{ fontSize: 16, fontWeight: 700, color: DS.colors.teal }}>{((c.risposte / c.email_inviate) * 100).toFixed(1)}%</div><div style={{ fontSize: 10, color: DS.colors.textMuted }}>TASSO RISP.</div></div>}
+                  {(c.email_inviate ?? 0) > 0 && c.risposte != null && <div style={{ textAlign: 'center' }}><div style={{ fontSize: 16, fontWeight: 700, color: DS.colors.teal }}>{((c.risposte / (c.email_inviate!)) * 100).toFixed(1)}%</div><div style={{ fontSize: 10, color: DS.colors.textMuted }}>TASSO RISP.</div></div>}
                 </div>
               )}
             </div>
