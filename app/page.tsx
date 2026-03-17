@@ -16,6 +16,7 @@ import { ContabilitaView } from '@/components/Contabilita/ContabilitaView'
 import { ImportExportPanel } from '@/components/ImportExport/ImportExportPanel'
 import { TemplatePicker } from '@/components/Progetti/ProgettoTemplates'
 import { PersonaleView } from '@/components/Personale/PersonaleView'
+import { DashboardView } from '@/components/Dashboard/DashboardView'
 import { usePanel } from '@/context/PanelContext'
 import type { PanelObject, PanelObjectType } from '@/components/Universal/DetailPanel'
 import { useDevice } from '@/hooks/useDevice'
@@ -485,7 +486,7 @@ export default function Home() {
           {loading
             ? <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}><span style={{ fontSize: 13, color: '#9CA3AF' }}>Caricamento...</span></div>
             : <>
-              {tab === 'dashboard' && renderDashboard()}
+              {tab === 'dashboard' && <DashboardView data={data} user={user} onNavigate={(t, extra) => { setTab(t as any); if (extra) setSelectedProject(extra) }} />}
               {tab === 'progetti' && renderProgetti()}
               {tab === 'task' && renderTask()}
               {tab === 'campagne' && renderCampagne()}
