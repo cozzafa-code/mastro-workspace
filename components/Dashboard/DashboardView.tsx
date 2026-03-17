@@ -175,10 +175,114 @@ export const DashboardView: FC<{ data: any; user: string; onNavigate: (tab: stri
   const col2 = { display: 'grid', gridTemplateColumns: isMob ? '1fr' : '1fr 1fr', gap: 16 } as any
   const col3 = { display: 'grid', gridTemplateColumns: isMob ? '1fr 1fr' : 'repeat(4, 1fr)', gap: 10 } as any
 
+  // ── Briefing data ──────────────────────────────────────
+  const NOME = (u: string) => u === 'fabio' ? 'Fabio' : 'Lidia'
+  const ACCENT = (u: string) => u === 'fabio' ? '#0A8A7A' : '#BE185D'
+  const altro = user === 'fabio' ? 'lidia' : 'fabio'
+
+  // Top 5 cose da fare oggi per l'utente attivo — priorità + scadenza oggi + deleghe urgenti
+  const daFareOggi = [
+    ...taskOggi.filter((t: any) => t.chi === user || t.chi === 'entrambi'),
+    ...taskUrgenti.filter((t: any) => (t.chi === user || t.chi === 'entrambi') && !taskOggi.find((x: any) => x.id === t.id)),
+    ...taskScadute.filter((t: any) => (t.chi === user || t.chi === 'entrambi') && !taskOggi.find((x: any) => x.id === t.id) && !taskUrgenti.find((x: any) => x.id === t.id)),
+    ...delegateAme.filter((t: any) => t.stato !== 'completato'),
+  ].slice(0, 5)
+
+  // Cosa sta facendo l'altro
+  const taskAltro = taskAperti.filter((t: any) => t.chi === altro).slice(0, 3)
+  const delegateAltro = personalTasks.filter((t: any) => t.assegnato_a === altro && t.creato_da === user && t.stato !== 'completato').slice(0, 2)
+
+  // Ora del giorno
+  const ora = new Date().getHours()
+  const saluto = ora < 12 ? 'Buongiorno' : ora < 18 ? 'Buon pomeriggio' : 'Buonasera'
+  const giornoSettimana = new Date().toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long' })
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
 
-      {/* ── METEO FINANZIARIO ── */}
+      {/* ── BRIEFING PERSONALE ── */}
+      <div style={{ background: `linear-gradient(135deg, ${ACCENT(user)}18 0%, ${S.surface} 60%)`, border: `1px solid ${ACCENT(user)}30`, borderRadius: 14, padding: '20px 22px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16, flexWrap: 'wrap', gap: 8 }}>
+          <div>
+            <div style={{ fontSize: 20, fontWeight: 700, color: S.textPrimary, letterSpacing: '-0.3px' }}>
+              {saluto}, {NOME(user)} 👋
+            </div>
+            <div style={{ fontSize: 12, color: S.textMuted, marginTop: 3, textTransform: 'capitalize' }}>{giornoSettimana}</div>
+          </div>
+          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+            {taskScadute.length > 0 && <div style={{ background: S.redLight, border: `1px solid ${S.red}40`, borderRadius: 8, padding: '6px 12px', fontSize: 12, fontWeight: 700, color: S.red }}>{taskScadute.length} scadute</div>}
+            {delegateAme.length > 0 && <div style={{ background: ACCENT(altro) + '20', border: `1px solid ${ACCENT(altro)}40`, borderRadius: 8, padding: '6px 12px', fontSize: 12, fontWeight: 700, color: ACCENT(altro) }}>{delegateAme.length} delegate da {NOME(altro)}</div>}
+            {scaduteNonPagate.length > 0 && <div style={{ background: S.amberLight, border: `1px solid ${S.amber}40`, borderRadius: 8, padding: '6px 12px', fontSize: 12, fontWeight: 700, color: S.amber }}>{scaduteNonPagate.length} pagamenti scaduti</div>}
+          </div>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: isMob ? '1fr' : '1fr 1fr', gap: 14 }}>
+          {/* DA FARE OGGI */}
+          <div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: ACCENT(user), textTransform: 'uppercase', letterSpacing: 0.6, marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
+              <span style={{ width: 6, height: 6, borderRadius: '50%', background: ACCENT(user), display: 'inline-block' }} />
+              Le tue priorità oggi
+            </div>
+            {daFareOggi.length === 0 ? (
+              <div style={{ fontSize: 13, color: S.textMuted, padding: '12px 14px', background: S.greenLight, borderRadius: 9, fontWeight: 500 }}>
+                🎉 Nessuna priorità urgente — ottimo lavoro!
+              </div>
+            ) : daFareOggi.map((t: any, i: number) => {
+              const isDelega = t.creato_da && t.creato_da !== user
+              const isScaduta = t.scadenza && t.scadenza < today
+              return (
+                <div key={t.id || i} onClick={() => openPanel({ type: 'task', id: t.id, data: t })}
+                  style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '9px 12px', background: S.surface, border: `1px solid ${isScaduta ? S.red + '40' : S.border}`, borderRadius: 8, marginBottom: 6, cursor: 'pointer' }}>
+                  <div style={{ width: 20, height: 20, borderRadius: '50%', background: ACCENT(user) + '20', color: ACCENT(user), fontSize: 11, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>{i + 1}</div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: S.textPrimary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.titolo || t.testo}</div>
+                    <div style={{ display: 'flex', gap: 8, marginTop: 2, flexWrap: 'wrap' }}>
+                      {isDelega && <span style={{ fontSize: 10, color: ACCENT(t.creato_da), fontWeight: 700 }}>da {NOME(t.creato_da)}</span>}
+                      {t.scadenza && <span style={{ fontSize: 10, color: isScaduta ? S.red : S.textMuted, fontWeight: isScaduta ? 700 : 400 }}>{isScaduta ? '⚠ ' : ''}📅 {t.scadenza}</span>}
+                      {t.progetto && <span style={{ fontSize: 10, color: S.textMuted }}>{t.progetto}</span>}
+                      {Number(t.priorita) <= 2 && <span style={{ fontSize: 9, background: S.redLight, color: S.red, padding: '1px 5px', borderRadius: 20, fontWeight: 700 }}>URG</span>}
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+
+          {/* COSA FA L'ALTRO */}
+          <div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: ACCENT(altro), textTransform: 'uppercase', letterSpacing: 0.6, marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
+              <span style={{ width: 6, height: 6, borderRadius: '50%', background: ACCENT(altro), display: 'inline-block' }} />
+              Cosa sta facendo {NOME(altro)}
+            </div>
+            {taskAltro.length === 0 && delegateAltro.length === 0 ? (
+              <div style={{ fontSize: 12, color: S.textMuted, padding: '12px 14px', background: S.surface, border: `1px solid ${S.border}`, borderRadius: 9 }}>
+                Nessuna task assegnata a {NOME(altro)}
+              </div>
+            ) : (
+              <>
+                {taskAltro.map((t: any) => (
+                  <div key={t.id} style={{ padding: '8px 12px', background: S.surface, border: `1px solid ${ACCENT(altro)}20`, borderRadius: 8, marginBottom: 6, borderLeft: `3px solid ${ACCENT(altro)}` }}>
+                    <div style={{ fontSize: 12, fontWeight: 500, color: S.textPrimary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.titolo || t.testo}</div>
+                    <div style={{ display: 'flex', gap: 8, marginTop: 2 }}>
+                      {t.scadenza && <span style={{ fontSize: 10, color: S.textMuted }}>📅 {t.scadenza}</span>}
+                      {t.progetto && <span style={{ fontSize: 10, color: S.textMuted }}>{t.progetto}</span>}
+                      <span style={{ fontSize: 10, color: ACCENT(altro), fontWeight: 600 }}>{t.stato}</span>
+                    </div>
+                  </div>
+                ))}
+                {delegateAltro.length > 0 && (
+                  <div style={{ padding: '8px 12px', background: ACCENT(altro) + '10', border: `1px solid ${ACCENT(altro)}20`, borderRadius: 8, marginBottom: 6 }}>
+                    <div style={{ fontSize: 11, fontWeight: 600, color: ACCENT(altro), marginBottom: 4 }}>Hai delegato a {NOME(altro)}:</div>
+                    {delegateAltro.map((t: any) => (
+                      <div key={t.id} style={{ fontSize: 12, color: S.textSecondary, padding: '2px 0' }}>· {t.titolo}</div>
+                    ))}
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        </div>
+      </div>
       <MeteoFinanziario ricavi={fattureMese.ricavi} costi={fattureMese.costi} runway={runwayMesi} ivaDebito={fattureMese.ivaDebito} />
 
       {/* ── KPI PRINCIPALI ── */}
