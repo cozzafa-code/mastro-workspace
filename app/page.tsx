@@ -18,6 +18,7 @@ import { TemplatePicker } from '@/components/Progetti/ProgettoTemplates'
 import { PersonaleView } from '@/components/Personale/PersonaleView'
 import { DashboardView } from '@/components/Dashboard/DashboardView'
 import { DelegheView } from '@/components/Deleghe/DelegheView'
+import { LabIdeeView } from '@/components/LabIdee/LabIdeeView'
 import { WorkspacePanel } from '@/components/WorkspaceIntelligence/WorkspacePanel'
 import { usePanel } from '@/context/PanelContext'
 import type { PanelObject, PanelObjectType } from '@/components/Universal/DetailPanel'
@@ -526,7 +527,7 @@ export default function Home() {
               {tab === 'gantt' && <GanttView />}
               {tab === 'contabilita' && <ContabilitaView />}
               {tab === 'deleghe' && <DelegheView currentUser={user} progetti={data.progetti || []} />}
-              {tab === 'lab_idee' && renderLabIdee()}
+              {tab === 'lab_idee' && <LabIdeeView currentUser={user} progetti={data.progetti || []} />}
               {tab === 'spese' && renderSpese()}
               {tab === 'personale' && <PersonaleView currentUser={user} />}
             </>
