@@ -12,6 +12,8 @@ import { GanttView } from '@/components/Gantt/GanttView'
 import { NotificheBell } from '@/components/Notifiche/NotificheBell'
 import { DetailPanel } from '@/components/Universal/DetailPanel'
 import { ContabilitaView } from '@/components/Contabilita/ContabilitaView'
+import { ImportExportPanel } from '@/components/ImportExport/ImportExportPanel'
+import { TemplatePicker } from '@/components/Progetti/ProgettoTemplates'
 import { usePanel } from '@/context/PanelContext'
 import type { PanelObject, PanelObjectType } from '@/components/Universal/DetailPanel'
 import { useDevice } from '@/hooks/useDevice'
@@ -31,6 +33,8 @@ export default function Home() {
   const device = useDevice()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const { panelObj, openPanel, closePanel, navigatePanel } = usePanel()
+  const [showImportExport, setShowImportExport] = useState(false)
+  const [showTemplatePicker, setShowTemplatePicker] = useState(false)
 
   const tables = ['progetti', 'tasks', 'campagne', 'clienti', 'lab_idee', 'spese_correnti', 'personale', 'mrr_snapshots']
 
@@ -182,7 +186,10 @@ export default function Home() {
       <div>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
           <div style={{ fontSize: isMob ? 16 : 18, fontWeight: 700, color: '#0D1117' }}>Tutti i progetti</div>
-          <button onClick={() => setShowForm('progetto')} style={{ padding: '7px 14px', background: '#0A8A7A', color: '#fff', border: 'none', borderRadius: 7, fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>+ Aggiungi</button>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button onClick={() => setShowTemplatePicker(true)} style={{ padding: '7px 12px', background: '#F0F7F6', color: '#0A8A7A', border: '1px solid #B2E8E3', borderRadius: 7, fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>+ Da template</button>
+            <button onClick={() => setShowForm('progetto')} style={{ padding: '7px 14px', background: '#0A8A7A', color: '#fff', border: 'none', borderRadius: 7, fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>+ Aggiungi</button>
+          </div>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: isMob ? '1fr' : '1fr 1fr', gap: 10 }}>
           {(data.progetti || []).map((p: any) => (
@@ -452,6 +459,11 @@ export default function Home() {
             <span style={{ fontSize: device.isMobile ? 14 : 13, fontWeight: 600, color: '#0D1117' }}>{tabTitles[tab]}</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            {!device.isMobile && (
+              <button onClick={() => setShowImportExport(true)} style={{ padding: '5px 10px', border: `1px solid ${S.border}`, borderRadius: 7, background: 'none', cursor: 'pointer', fontSize: 11, color: S.textSecondary, fontFamily: DS.fonts.ui, fontWeight: 500 }}>
+                Import / Export
+              </button>
+            )}
             <div style={{ display: 'flex', alignItems: 'center', gap: 5, background: '#F0F7F6', border: '1px solid #B2E8E3', borderRadius: 20, padding: '3px 8px 3px 6px' }}>
               <div style={{ width: 5, height: 5, borderRadius: '50%', background: '#0A8A7A' }} />
               <span style={{ fontSize: device.isMobile ? 10 : 11.5, fontWeight: 500, color: '#0A8A7A' }}>live</span>
@@ -504,6 +516,12 @@ export default function Home() {
 
       {/* Universal Detail Panel */}
       <DetailPanel obj={panelObj} onClose={closePanel} currentUser={user} onNavigate={navigatePanel} />
+
+      {/* Import/Export */}
+      {showImportExport && <ImportExportPanel onClose={() => setShowImportExport(false)} onSuccess={() => { setShowImportExport(false); loadData() }} />}
+
+      {/* Template Picker */}
+      {showTemplatePicker && <TemplatePicker currentUser={user} onClose={() => setShowTemplatePicker(false)} onSuccess={(id) => { setShowTemplatePicker(false); loadData(); setTab('progetti') }} />}
 
       {/* Modal */}
       {showForm && cf && (
