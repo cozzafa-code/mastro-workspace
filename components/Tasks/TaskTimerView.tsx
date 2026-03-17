@@ -71,7 +71,7 @@ const TaskCard: FC<{ t: Task; isActive: boolean; elapsed: number; formatElapsed:
               <StatoBadge stato={t.stato} />
               {t.chi && <span style={{ fontSize: 10, color: S.textMuted }}>{t.chi}</span>}
               {t.scadenza && <span style={{ fontSize: 10, color: S.textMuted }}>· {t.scadenza}</span>}
-              {(t.tempo_totale || 0) > 0 && <span style={{ fontSize: 10, color: S.teal, fontFamily: DS.fonts.mono }}>⏱ {formatMin(t.tempo_totale)}</span>}
+              {(t.tempo_totale || 0) > 0 && <span style={{ fontSize: 10, color: S.teal, fontFamily: DS.fonts.mono }}>⏱ {formatMin(t.tempo_totale || 0)}</span>}
               {sessioni > 0 && <span style={{ fontSize: 10, color: S.textMuted }}>{sessioni} sess.</span>}
             </div>
           </div>
