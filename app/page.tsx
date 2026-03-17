@@ -11,13 +11,14 @@ import { CalendarioView } from '@/components/Calendario/CalendarioView'
 import { GanttView } from '@/components/Gantt/GanttView'
 import { NotificheBell } from '@/components/Notifiche/NotificheBell'
 import { DetailPanel } from '@/components/Universal/DetailPanel'
+import { ContabilitaView } from '@/components/Contabilita/ContabilitaView'
 import { usePanel } from '@/context/PanelContext'
 import type { PanelObject, PanelObjectType } from '@/components/Universal/DetailPanel'
 import { useDevice } from '@/hooks/useDevice'
 import type { UserType } from '@/lib/types'
 
 type User = UserType
-type Tab = 'dashboard' | 'progetti' | 'task' | 'campagne' | 'clienti' | 'mrr' | 'calendario' | 'gantt' | 'lab_idee' | 'spese' | 'personale'
+type Tab = 'dashboard' | 'progetti' | 'task' | 'campagne' | 'clienti' | 'mrr' | 'calendario' | 'gantt' | 'contabilita' | 'lab_idee' | 'spese' | 'personale'
 
 export default function Home() {
   const [user, setUser] = useState<User>('fabio')
@@ -357,13 +358,14 @@ export default function Home() {
     { id: 'gantt',     iconKey: 'gantt',     label: 'Gantt' },
     { id: 'lab_idee',  iconKey: 'ideas',     label: 'Lab Idee',    section: 'Idee' },
     { id: 'spese',     iconKey: 'finance',   label: 'Finanze',     section: 'Finanze' },
+    { id: 'contabilita', iconKey: 'receipt', label: 'Contabilità' },
     { id: 'personale', iconKey: 'personal',  label: 'La mia area', section: 'Personale' },
   ]
 
   const tabTitles: any = {
     dashboard: 'Dashboard', progetti: selectedProject ? selectedProject.nome : 'Progetti',
     task: 'Task', campagne: 'Campagne', clienti: 'Pipeline CRM',
-    mrr: 'MRR Tracker', calendario: 'Calendario', gantt: 'Gantt Timeline', lab_idee: 'Lab Idee', spese: 'Finanze', personale: 'La mia area'
+    mrr: 'MRR Tracker', calendario: 'Calendario', gantt: 'Gantt Timeline', contabilita: 'Contabilità', lab_idee: 'Lab Idee', spese: 'Finanze', personale: 'La mia area'
   }
   const cf = showForm ? forms[showForm] : null
 
@@ -377,6 +379,7 @@ export default function Home() {
       mrr:       <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M2 12l3.5-4 3 2.5L12 5l2 2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>,
       calendar:  <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="1.5" stroke="currentColor" strokeWidth="1.5"/><path d="M5 1v3M11 1v3M2 7h12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>,
       gantt:     <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M2 4h6M2 8h9M2 12h5" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>,
+      receipt:   <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M3 2h10v12l-2-1.5L9 14l-2-1.5L5 14l-2-1.5V2z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/><path d="M6 6h4M6 9h4M6 12h2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>,
       ideas:     <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M8 2a4 4 0 014 4c0 1.5-.8 2.8-2 3.5V11H6v-1.5C4.8 8.8 4 7.5 4 6a4 4 0 014-4z" stroke="currentColor" strokeWidth="1.5"/><path d="M6 13h4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>,
       finance:   <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><rect x="2" y="4" width="12" height="9" rx="1.5" stroke="currentColor" strokeWidth="1.5"/><path d="M5 4V3a1 1 0 011-1h4a1 1 0 011 1v1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>,
       personal:  <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="5.5" r="2.5" stroke="currentColor" strokeWidth="1.5"/><path d="M2.5 13.5c0-3.038 2.462-5.5 5.5-5.5s5.5 2.462 5.5 5.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>,
@@ -475,6 +478,7 @@ export default function Home() {
               {tab === 'mrr' && <MrrTrackerView />}
               {tab === 'calendario' && <CalendarioView currentUser={user} />}
               {tab === 'gantt' && <GanttView />}
+              {tab === 'contabilita' && <ContabilitaView />}
               {tab === 'lab_idee' && renderLabIdee()}
               {tab === 'spese' && renderSpese()}
               {tab === 'personale' && renderPersonale()}
