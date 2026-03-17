@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
+import { DS } from '@/constants/design-system'
 import { ProjectDetailView } from '@/components/ProjectDetail/ProjectDetailView'
 import { CrmView } from '@/components/CRM/CrmView'
 import { MrrTrackerView } from '@/components/MRR/MrrTrackerView'
@@ -14,6 +15,7 @@ import { DetailPanel } from '@/components/Universal/DetailPanel'
 import { ContabilitaView } from '@/components/Contabilita/ContabilitaView'
 import { ImportExportPanel } from '@/components/ImportExport/ImportExportPanel'
 import { TemplatePicker } from '@/components/Progetti/ProgettoTemplates'
+import { PersonaleView } from '@/components/Personale/PersonaleView'
 import { usePanel } from '@/context/PanelContext'
 import type { PanelObject, PanelObjectType } from '@/components/Universal/DetailPanel'
 import { useDevice } from '@/hooks/useDevice'
@@ -23,6 +25,7 @@ type User = UserType
 type Tab = 'dashboard' | 'progetti' | 'task' | 'campagne' | 'clienti' | 'mrr' | 'calendario' | 'gantt' | 'contabilita' | 'lab_idee' | 'spese' | 'personale'
 
 export default function Home() {
+  const S = DS.colors
   const [user, setUser] = useState<User>('fabio')
   const [tab, setTab] = useState<Tab>('dashboard')
   const [data, setData] = useState<any>({})
@@ -493,7 +496,7 @@ export default function Home() {
               {tab === 'contabilita' && <ContabilitaView />}
               {tab === 'lab_idee' && renderLabIdee()}
               {tab === 'spese' && renderSpese()}
-              {tab === 'personale' && renderPersonale()}
+              {tab === 'personale' && <PersonaleView currentUser={user} />}
             </>
           }
         </div>
