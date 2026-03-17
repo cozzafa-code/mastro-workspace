@@ -453,3 +453,7 @@ export const DashboardView: FC<{ data: any; user: string; onNavigate: (tab: stri
           </div>
         </div>
       )}
+
+    </div>
+  )
+}
