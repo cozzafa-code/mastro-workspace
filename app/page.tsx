@@ -174,30 +174,6 @@ export default function Home() {
     )
   }
 
-  function renderSpese() {
-    const uscite = (data.spese_correnti || []).filter((s: any) => s.tipo !== 'entrata' && s.tipo !== 'Entrata')
-    const entrate = (data.spese_correnti || []).filter((s: any) => s.tipo === 'entrata' || s.tipo === 'Entrata')
-    const totE = entrate.reduce((a: number, s: any) => a + Number(s.importo || 0), 0)
-    const totU = uscite.reduce((a: number, s: any) => a + Number(s.importo || 0), 0)
-    return (
-      <div>
-        <SH title="Finanze" onAdd={() => setShowForm('spesa')} />
-        <div className="grid grid-cols-3 gap-3 mb-5">
-          <StatCard num={`€${totMRR}`} label="MRR da progetti" sub="ricorrente mensile" color="text-green-600" />
-          <StatCard num={`+€${totE}`} label="Entrate correnti" sub="mensili" color="text-green-600" />
-          <StatCard num={`-€${totU}`} label="Uscite correnti" sub="mensili" color="text-red-500" />
-        </div>
-        <Sep label="Uscite" />
-        {uscite.map((s: any) => <div key={s.id} className="flex items-center justify-between py-2.5 border-b border-gray-100"><div><div className="text-sm text-gray-900">{s.nome || s.voce}</div><div className="text-xs text-gray-400">{s.categoria || s.cat} · {s.frequenza || s.freq}</div></div><div className="flex items-center gap-3"><span className="text-sm font-semibold text-red-500">-€{s.importo}</span><button onClick={() => deleteItem('spese_correnti', s.id)} className="text-xs text-gray-300 hover:text-red-400">✕</button></div></div>)}
-        {entrate.length > 0 && <><Sep label="Entrate" />{entrate.map((s: any) => <div key={s.id} className="flex items-center justify-between py-2.5 border-b border-gray-100"><div><div className="text-sm text-gray-900">{s.nome || s.voce}</div><div className="text-xs text-gray-400">{s.categoria || s.cat}</div></div><div className="flex items-center gap-3"><span className="text-sm font-semibold text-green-600">+€{s.importo}</span><button onClick={() => deleteItem('spese_correnti', s.id)} className="text-xs text-gray-300 hover:text-red-400">✕</button></div></div>)}</>}
-        <div className="bg-white border border-gray-200 rounded-xl p-5 text-center mt-4">
-          <div className="text-xs text-gray-400 mb-1">Saldo mensile</div>
-          <div className={`text-2xl font-semibold ${totMRR + totE - totU >= 0 ? 'text-green-600' : 'text-red-500'}`}>{totMRR + totE - totU >= 0 ? '+' : ''}€{totMRR + totE - totU}/mese</div>
-        </div>
-      </div>
-    )
-  }
-
   function renderPersonale() {
     const d = (data.personale || []).filter((p: any) => p.utente === user)
     const ac = user === 'fabio' ? 'bg-blue-500' : 'bg-rose-500'
