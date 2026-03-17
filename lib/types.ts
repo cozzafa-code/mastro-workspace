@@ -51,6 +51,21 @@ export interface Task {
   tempo_totale?: number
   categoria?: string
   tags?: string[]
+  dipende_da?: string
+  bloccata?: boolean
+  created_at?: string
+}
+
+export interface Notifica {
+  id: string
+  utente: string
+  titolo: string
+  messaggio?: string
+  tipo: 'reminder' | 'scadenza' | 'followup' | 'sistema'
+  ref_tipo?: string
+  ref_id?: string
+  data_invio?: string
+  letta: boolean
   created_at?: string
 }
 

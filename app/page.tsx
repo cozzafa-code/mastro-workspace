@@ -8,11 +8,13 @@ import { CampagneProView } from '@/components/Campagne/CampagneProView'
 import { TaskTimerView } from '@/components/Tasks/TaskTimerView'
 import { FinanceRunwayView } from '@/components/Finance/FinanceRunwayView'
 import { CalendarioView } from '@/components/Calendario/CalendarioView'
+import { GanttView } from '@/components/Gantt/GanttView'
+import { NotificheBell } from '@/components/Notifiche/NotificheBell'
 import { useDevice } from '@/hooks/useDevice'
 import type { UserType } from '@/lib/types'
 
 type User = UserType
-type Tab = 'dashboard' | 'progetti' | 'task' | 'campagne' | 'clienti' | 'mrr' | 'calendario' | 'lab_idee' | 'spese' | 'personale'
+type Tab = 'dashboard' | 'progetti' | 'task' | 'campagne' | 'clienti' | 'mrr' | 'calendario' | 'gantt' | 'lab_idee' | 'spese' | 'personale'
 
 export default function Home() {
   const [user, setUser] = useState<User>('fabio')
@@ -294,6 +296,7 @@ export default function Home() {
     { id: 'clienti',   iconKey: 'clients',   label: 'Pipeline CRM' },
     { id: 'mrr',       iconKey: 'mrr',       label: 'MRR Tracker', section: 'Metriche' },
     { id: 'calendario', iconKey: 'calendar',  label: 'Calendario' },
+    { id: 'gantt',     iconKey: 'gantt',     label: 'Gantt' },
     { id: 'lab_idee',  iconKey: 'ideas',     label: 'Lab Idee',    section: 'Idee' },
     { id: 'spese',     iconKey: 'finance',   label: 'Finanze',     section: 'Finanze' },
     { id: 'personale', iconKey: 'personal',  label: 'La mia area', section: 'Personale' },
@@ -302,7 +305,7 @@ export default function Home() {
   const tabTitles: any = {
     dashboard: 'Dashboard', progetti: selectedProject ? selectedProject.nome : 'Progetti',
     task: 'Task', campagne: 'Campagne', clienti: 'Pipeline CRM',
-    mrr: 'MRR Tracker', calendario: 'Calendario', lab_idee: 'Lab Idee', spese: 'Finanze', personale: 'La mia area'
+    mrr: 'MRR Tracker', calendario: 'Calendario', gantt: 'Gantt Timeline', lab_idee: 'Lab Idee', spese: 'Finanze', personale: 'La mia area'
   }
   const cf = showForm ? forms[showForm] : null
 
@@ -315,6 +318,7 @@ export default function Home() {
       clients:   <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><circle cx="6" cy="5" r="2.5" stroke="currentColor" strokeWidth="1.5"/><path d="M1.5 13c0-2.485 2.015-4.5 4.5-4.5s4.5 2.015 4.5 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/><path d="M10.5 7.5c1.38 0 2.5 1.12 2.5 2.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>,
       mrr:       <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M2 12l3.5-4 3 2.5L12 5l2 2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>,
       calendar:  <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="1.5" stroke="currentColor" strokeWidth="1.5"/><path d="M5 1v3M11 1v3M2 7h12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>,
+      gantt:     <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M2 4h6M2 8h9M2 12h5" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>,
       ideas:     <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M8 2a4 4 0 014 4c0 1.5-.8 2.8-2 3.5V11H6v-1.5C4.8 8.8 4 7.5 4 6a4 4 0 014-4z" stroke="currentColor" strokeWidth="1.5"/><path d="M6 13h4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>,
       finance:   <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><rect x="2" y="4" width="12" height="9" rx="1.5" stroke="currentColor" strokeWidth="1.5"/><path d="M5 4V3a1 1 0 011-1h4a1 1 0 011 1v1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>,
       personal:  <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="5.5" r="2.5" stroke="currentColor" strokeWidth="1.5"/><path d="M2.5 13.5c0-3.038 2.462-5.5 5.5-5.5s5.5 2.462 5.5 5.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>,
@@ -391,6 +395,7 @@ export default function Home() {
               <div style={{ width: 5, height: 5, borderRadius: '50%', background: '#0A8A7A' }} />
               <span style={{ fontSize: device.isMobile ? 10 : 11.5, fontWeight: 500, color: '#0A8A7A' }}>live</span>
             </div>
+            {!device.isMobile && <NotificheBell utente={user} />}
             {device.isMobile && (
               <button onClick={() => setUser(user === 'fabio' ? 'lidia' : 'fabio')} style={{ width: 28, height: 28, borderRadius: '50%', background: user === 'fabio' ? '#0A8A7A' : '#BE185D', border: 'none', color: '#fff', fontSize: 10, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'inherit' }}>
                 {user === 'fabio' ? 'FA' : 'LI'}
@@ -411,6 +416,7 @@ export default function Home() {
               {tab === 'clienti' && renderClienti()}
               {tab === 'mrr' && <MrrTrackerView />}
               {tab === 'calendario' && <CalendarioView currentUser={user} />}
+              {tab === 'gantt' && <GanttView />}
               {tab === 'lab_idee' && renderLabIdee()}
               {tab === 'spese' && renderSpese()}
               {tab === 'personale' && renderPersonale()}
