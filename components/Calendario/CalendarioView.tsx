@@ -95,7 +95,7 @@ export const CalendarioView: FC<{ currentUser?: string }> = ({ currentUser = 'fa
             return (
               <div key={i} onClick={()=>setSelectedDay(ds)}
                 style={{minHeight:76,background:isSel?'#EDF7F6':S.surface,border:`1px solid ${isSel?S.teal:isT?S.tealMid:S.border}`,borderRadius:8,padding:'5px 4px',cursor:'pointer'}}>
-                <div style={{fontSize:11,fontWeight:isT?700:400,color:isT?'#fff':S.textSecondary,background:isT?S.teal:'transparent',width:18,height:18,borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',marginBottom:3,fontSize:11}}>{d}</div>
+                <div style={{fontSize:11,fontWeight:isT?700:400,color:isT?'#fff':S.textSecondary,background:isT?S.teal:'transparent',width:18,height:18,borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',marginBottom:3}}>{d}</div>
                 {de.slice(0,2).map(e=>{const c=TIPO_CFG[e.tipo]||TIPO_CFG.evento;return<div key={e.id} style={{fontSize:8,background:c.bg,color:c.text,borderRadius:3,padding:'1px 3px',marginBottom:1,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',fontWeight:600}}>{e.titolo}</div>})}
                 {de.length>2&&<div style={{fontSize:8,color:S.textMuted,fontWeight:600}}>+{de.length-2}</div>}
               </div>
