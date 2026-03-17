@@ -17,13 +17,14 @@ import { ImportExportPanel } from '@/components/ImportExport/ImportExportPanel'
 import { TemplatePicker } from '@/components/Progetti/ProgettoTemplates'
 import { PersonaleView } from '@/components/Personale/PersonaleView'
 import { DashboardView } from '@/components/Dashboard/DashboardView'
+import { DelegheView } from '@/components/Deleghe/DelegheView'
 import { usePanel } from '@/context/PanelContext'
 import type { PanelObject, PanelObjectType } from '@/components/Universal/DetailPanel'
 import { useDevice } from '@/hooks/useDevice'
 import type { UserType } from '@/lib/types'
 
 type User = UserType
-type Tab = 'dashboard' | 'progetti' | 'task' | 'campagne' | 'clienti' | 'mrr' | 'calendario' | 'gantt' | 'contabilita' | 'lab_idee' | 'spese' | 'personale'
+type Tab = 'dashboard' | 'progetti' | 'task' | 'campagne' | 'clienti' | 'mrr' | 'calendario' | 'gantt' | 'contabilita' | 'deleghe' | 'lab_idee' | 'spese' | 'personale'
 
 export default function Home() {
   const S = DS.colors
@@ -362,6 +363,7 @@ export default function Home() {
     { id: 'dashboard', iconKey: 'dashboard', label: 'Dashboard', section: 'Overview' },
     { id: 'progetti',  iconKey: 'projects',  label: 'Progetti',  section: 'Lavoro' },
     { id: 'task',      iconKey: 'tasks',     label: 'Task' },
+    { id: 'deleghe',   iconKey: 'deleghe',   label: 'Deleghe' },
     { id: 'campagne',  iconKey: 'campaigns', label: 'Campagne' },
     { id: 'clienti',   iconKey: 'clients',   label: 'Pipeline CRM' },
     { id: 'mrr',       iconKey: 'mrr',       label: 'MRR Tracker', section: 'Metriche' },
@@ -376,7 +378,7 @@ export default function Home() {
   const tabTitles: any = {
     dashboard: 'Dashboard', progetti: selectedProject ? selectedProject.nome : 'Progetti',
     task: 'Task', campagne: 'Campagne', clienti: 'Pipeline CRM',
-    mrr: 'MRR Tracker', calendario: 'Calendario', gantt: 'Gantt Timeline', contabilita: 'Contabilità', lab_idee: 'Lab Idee', spese: 'Finanze', personale: 'La mia area'
+    mrr: 'MRR Tracker', calendario: 'Calendario', gantt: 'Gantt Timeline', contabilita: 'Contabilità', deleghe: 'Deleghe', lab_idee: 'Lab Idee', spese: 'Finanze', personale: 'La mia area'
   }
   const cf = showForm ? forms[showForm] : null
 
@@ -391,6 +393,7 @@ export default function Home() {
       calendar:  <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="1.5" stroke="currentColor" strokeWidth="1.5"/><path d="M5 1v3M11 1v3M2 7h12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>,
       gantt:     <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M2 4h6M2 8h9M2 12h5" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>,
       receipt:   <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M3 2h10v12l-2-1.5L9 14l-2-1.5L5 14l-2-1.5V2z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/><path d="M6 6h4M6 9h4M6 12h2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>,
+      deleghe:   <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M3 8l3 3 7-7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/><circle cx="12" cy="4" r="2.5" stroke="currentColor" strokeWidth="1.2"/></svg>,
       ideas:     <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M8 2a4 4 0 014 4c0 1.5-.8 2.8-2 3.5V11H6v-1.5C4.8 8.8 4 7.5 4 6a4 4 0 014-4z" stroke="currentColor" strokeWidth="1.5"/><path d="M6 13h4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>,
       finance:   <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><rect x="2" y="4" width="12" height="9" rx="1.5" stroke="currentColor" strokeWidth="1.5"/><path d="M5 4V3a1 1 0 011-1h4a1 1 0 011 1v1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>,
       personal:  <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="5.5" r="2.5" stroke="currentColor" strokeWidth="1.5"/><path d="M2.5 13.5c0-3.038 2.462-5.5 5.5-5.5s5.5 2.462 5.5 5.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>,
@@ -428,8 +431,10 @@ export default function Home() {
                 <div key={item.id}>
                   {item.section && !collapsed && <div style={{ fontSize: 9.5, fontWeight: 600, color: '#C4C9D4', textTransform: 'uppercase', letterSpacing: '0.8px', padding: '14px 10px 5px' }}>{item.section}</div>}
                   <button onClick={() => { setTab(item.id as Tab); setSelectedProject(null) }} title={collapsed ? item.label : undefined}
-                    style={{ width: '100%', display: 'flex', alignItems: 'center', gap: collapsed ? 0 : 9, justifyContent: collapsed ? 'center' : 'flex-start', padding: collapsed ? '9px 0' : '7px 10px', borderRadius: 7, border: 'none', cursor: 'pointer', background: isActive ? '#EDF7F6' : 'transparent', color: isActive ? '#0A8A7A' : '#5C6370', fontSize: 13, fontWeight: isActive ? 500 : 400, marginBottom: 1, textAlign: 'left', fontFamily: 'inherit' }}>
-                    <span style={{ opacity: isActive ? 1 : 0.6, flexShrink: 0 }}>{iconSvg(item.iconKey, isActive)}</span>
+                    style={{ width: '100%', display: 'flex', alignItems: 'center', gap: collapsed ? 0 : 9, justifyContent: collapsed ? 'center' : 'flex-start', padding: collapsed ? '9px 0' : '7px 10px', borderRadius: 7, border: 'none', cursor: 'pointer', background: isActive ? '#EDF7F6' : 'transparent', color: isActive ? '#0A8A7A' : '#5C6370', fontSize: 13, fontWeight: isActive ? 500 : 400, marginBottom: 1, textAlign: 'left', fontFamily: 'inherit', position: 'relative' }}>
+                    <span style={{ opacity: isActive ? 1 : 0.6, flexShrink: 0, position: 'relative' }}>
+                      {iconSvg(item.iconKey, isActive)}
+                    </span>
                     {!collapsed && <span>{item.label}</span>}
                     {!collapsed && isActive && <div style={{ marginLeft: 'auto', width: 5, height: 5, borderRadius: '50%', background: '#0A8A7A' }} />}
                   </button>
@@ -495,6 +500,7 @@ export default function Home() {
               {tab === 'calendario' && <CalendarioView currentUser={user} />}
               {tab === 'gantt' && <GanttView />}
               {tab === 'contabilita' && <ContabilitaView />}
+              {tab === 'deleghe' && <DelegheView currentUser={user} progetti={data.progetti || []} />}
               {tab === 'lab_idee' && renderLabIdee()}
               {tab === 'spese' && renderSpese()}
               {tab === 'personale' && <PersonaleView currentUser={user} />}
