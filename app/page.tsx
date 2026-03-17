@@ -521,10 +521,10 @@ export default function Home() {
       <DetailPanel obj={panelObj} onClose={closePanel} currentUser={user} onNavigate={navigatePanel} />
 
       {/* Import/Export */}
-      {showImportExport && <ImportExportPanel onClose={() => setShowImportExport(false)} onSuccess={() => { setShowImportExport(false); loadData() }} />}
+      {showImportExport && <ImportExportPanel onClose={() => setShowImportExport(false)} onSuccess={() => { setShowImportExport(false); loadAll() }} />}
 
       {/* Template Picker */}
-      {showTemplatePicker && <TemplatePicker currentUser={user} onClose={() => setShowTemplatePicker(false)} onSuccess={(id) => { setShowTemplatePicker(false); loadData(); setTab('progetti') }} />}
+      {showTemplatePicker && <TemplatePicker currentUser={user} onClose={() => setShowTemplatePicker(false)} onSuccess={(id) => { setShowTemplatePicker(false); loadAll(); setTab('progetti') }} />}
 
       {/* Modal */}
       {showForm && cf && (
