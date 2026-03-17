@@ -436,6 +436,8 @@ export default function Home() {
 
   const [showMobileMenu, setShowMobileMenu] = useState(false)
   const [showFab, setShowFab] = useState(false)
+  const [fabSide, setFabSide] = useState<'right' | 'left'>('right')
+  const [fabTop, setFabTop] = useState('40%')
 
   const altroItems = [
     { id: 'progetti',   iconKey: 'projects',  label: 'Progetti' },
@@ -548,61 +550,59 @@ export default function Home() {
           }
         </div>
 
-        {/* FAB LATERALE — mobile e tablet */}
+        {/* FAB LATERALE draggabile — mobile e tablet */}
         {!device.isDesktop && (
           <>
             {showFab && <div style={{ position: 'fixed', inset: 0, zIndex: 79, background: 'rgba(0,0,0,0.3)' }} onClick={() => setShowFab(false)} />}
 
-            <div style={{ position: 'fixed', right: 0, top: '40%', transform: 'translateY(-50%)', zIndex: 80, display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-
+            <div style={{ position: 'fixed', [fabSide]: 0, top: fabTop, zIndex: 80, display: 'flex', flexDirection: fabSide === 'right' ? 'row' : 'row-reverse', alignItems: 'center' }}>
               {/* Menu espanso */}
               {showFab && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 14, padding: '20px 16px 20px 20px', background: 'rgba(13,27,42,0.97)', borderRadius: '16px 0 0 16px', boxShadow: '-8px 0 32px rgba(0,0,0,0.3)', backdropFilter: 'blur(10px)' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 14, padding: '20px 16px 20px 20px', background: 'rgba(13,27,42,0.97)', borderRadius: fabSide === 'right' ? '16px 0 0 16px' : '0 16px 16px 0', boxShadow: '-8px 0 32px rgba(0,0,0,0.3)', backdropFilter: 'blur(10px)', maxHeight: '70vh', overflowY: 'auto' }}>
                   {[
-                    { label: '+ Task',    color: '#2563EB', bg: '#2563EB', icon: <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 10l4 4 8-8" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>, action: () => { setShowForm('task'); setShowFab(false) } },
-                    { label: '+ Delega',  color: '#BE185D', bg: '#BE185D', icon: <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 4v12M4 10h12" stroke="white" strokeWidth="2" strokeLinecap="round"/></svg>, action: () => { setTab('deleghe'); setShowFab(false) } },
-                    { label: '+ Idea',    color: '#7C3AED', bg: '#7C3AED', icon: <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="8" r="4" stroke="white" strokeWidth="2"/><path d="M8 14h4M9 16h2" stroke="white" strokeWidth="2" strokeLinecap="round"/></svg>, action: () => { setTab('lab_idee'); setShowFab(false) } },
-                    { label: 'Agenda',    color: '#059669', bg: '#059669', icon: <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="3" y="4" width="14" height="13" rx="2" stroke="white" strokeWidth="2"/><path d="M7 2v3M13 2v3M3 9h14" stroke="white" strokeWidth="2" strokeLinecap="round"/></svg>, action: () => { setTab('calendario'); setShowFab(false) } },
-                    { label: 'Chat AI',   color: '#D97706', bg: '#D97706', icon: <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 2a8 8 0 100 16 8 8 0 000-16z" stroke="white" strokeWidth="2"/><path d="M7 10h6M7 7h4" stroke="white" strokeWidth="2" strokeLinecap="round"/></svg>, action: () => setShowFab(false) },
-                    { label: user === 'fabio' ? '→ Lidia' : '→ Fabio', color: user === 'fabio' ? '#BE185D' : '#0A8A7A', bg: user === 'fabio' ? '#BE185D' : '#0A8A7A', icon: <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="7" r="3" stroke="white" strokeWidth="2"/><path d="M4 17c0-3.314 2.686-6 6-6s6 2.686 6 6" stroke="white" strokeWidth="2" strokeLinecap="round"/></svg>, action: () => { setUser(user === 'fabio' ? 'lidia' : 'fabio'); setShowFab(false) } },
+                    { label: '+ Task',   color: '#2563EB', icon: <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 10l4 4 8-8" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>, action: () => { setShowForm('task'); setShowFab(false) } },
+                    { label: '+ Delega', color: '#BE185D', icon: <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 4v12M4 10h12" stroke="white" strokeWidth="2" strokeLinecap="round"/></svg>, action: () => { setTab('deleghe'); setShowFab(false) } },
+                    { label: '+ Idea',   color: '#7C3AED', icon: <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="8" r="4" stroke="white" strokeWidth="2"/><path d="M8 14h4M9 16h2" stroke="white" strokeWidth="2" strokeLinecap="round"/></svg>, action: () => { setTab('lab_idee'); setShowFab(false) } },
+                    { label: 'Agenda',   color: '#059669', icon: <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="3" y="4" width="14" height="13" rx="2" stroke="white" strokeWidth="2"/><path d="M7 2v3M13 2v3M3 9h14" stroke="white" strokeWidth="2" strokeLinecap="round"/></svg>, action: () => { setTab('calendario'); setShowFab(false) } },
+                    { label: 'Chat AI',  color: '#D97706', icon: <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 2a8 8 0 100 16 8 8 0 000-16z" stroke="white" strokeWidth="2"/><path d="M7 10h6M7 7h4" stroke="white" strokeWidth="2" strokeLinecap="round"/></svg>, action: () => setShowFab(false) },
+                    { label: user === 'fabio' ? '→ Lidia' : '→ Fabio', color: user === 'fabio' ? '#BE185D' : '#0A8A7A', icon: <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="7" r="3" stroke="white" strokeWidth="2"/><path d="M4 17c0-3.314 2.686-6 6-6s6 2.686 6 6" stroke="white" strokeWidth="2" strokeLinecap="round"/></svg>, action: () => { setUser(user === 'fabio' ? 'lidia' : 'fabio'); setShowFab(false) } },
                   ].map(a => (
                     <div key={a.label} onClick={a.action} style={{ display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer' }}>
-                      <div style={{ width: 48, height: 48, borderRadius: '50%', background: a.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: `0 4px 12px ${a.bg}60` }}>
-                        {a.icon}
-                      </div>
+                      <div style={{ width: 48, height: 48, borderRadius: '50%', background: a.color, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: `0 4px 12px ${a.color}60` }}>{a.icon}</div>
                       <span style={{ fontSize: 14, fontWeight: 700, color: '#fff', whiteSpace: 'nowrap' }}>{a.label}</span>
                     </div>
                   ))}
-
-                  {/* Moduli rapidi */}
-                  <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: 12, marginTop: 2 }}>
-                    <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 8 }}>Moduli</div>
-                    <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                      {['Progetti','CRM','MRR','Finanze','Contabilità'].map(m => {
+                  <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: 10, marginTop: 2 }}>
+                    <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', marginBottom: 8 }}>
+                      {['Progetti','CRM','MRR','Finanze','Contabilità','Task'].map(m => {
                         const id = m === 'CRM' ? 'clienti' : m === 'Finanze' ? 'spese' : m === 'Contabilità' ? 'contabilita' : m.toLowerCase().replace('à','a')
-                        return (
-                          <button key={m} onClick={() => { setTab(id as Tab); setShowFab(false) }}
-                            style={{ padding: '4px 10px', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 20, fontSize: 11, color: '#fff', cursor: 'pointer', fontFamily: 'inherit' }}>
-                            {m}
-                          </button>
-                        )
+                        return <button key={m} onClick={() => { setTab(id as Tab); setShowFab(false) }} style={{ padding: '3px 9px', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 20, fontSize: 11, color: '#fff', cursor: 'pointer', fontFamily: 'inherit' }}>{m}</button>
                       })}
                     </div>
+                    <button onClick={() => { setFabSide(s => s === 'right' ? 'left' : 'right'); setShowFab(false) }}
+                      style={{ width: '100%', padding: '6px', background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 7, color: 'rgba(255,255,255,0.5)', fontSize: 11, cursor: 'pointer', fontFamily: 'inherit' }}>
+                      {fabSide === 'right' ? '← Sposta a sinistra' : 'Sposta a destra →'}
+                    </button>
                   </div>
                 </div>
               )}
 
-              {/* Tab laterale verticale */}
-              <button onClick={() => setShowFab(!showFab)}
-                style={{ width: 28, height: 96, background: '#0A8A7A', border: 'none', borderRadius: '8px 0 0 8px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '-3px 0 12px rgba(10,138,122,0.4)', padding: 0, flexShrink: 0 }}>
-                <span style={{ fontSize: 10, fontWeight: 800, color: '#fff', letterSpacing: 2, textTransform: 'uppercase', writingMode: 'vertical-rl', textOrientation: 'mixed', transform: 'rotate(180deg)' }}>
-                  {showFab ? 'CHIUDI' : 'MASTRO'}
-                </span>
-              </button>
+              {/* Tab verticale con frecce su/giù */}
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <button onClick={() => setFabTop(t => `${Math.max(10, parseInt(t) - 10)}%`)}
+                  style={{ width: 28, height: 20, background: '#065f46', border: 'none', borderRadius: fabSide === 'right' ? '8px 0 0 0' : '0 8px 0 0', cursor: 'pointer', color: 'rgba(255,255,255,0.8)', fontSize: 11, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>▲</button>
+                <button onClick={() => setShowFab(!showFab)}
+                  style={{ width: 28, height: 80, background: '#0A8A7A', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>
+                  <span style={{ fontSize: 9, fontWeight: 800, color: '#fff', letterSpacing: 2, textTransform: 'uppercase', writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}>
+                    {showFab ? 'CHIUDI' : 'MASTRO'}
+                  </span>
+                </button>
+                <button onClick={() => setFabTop(t => `${Math.min(80, parseInt(t) + 10)}%`)}
+                  style={{ width: 28, height: 20, background: '#065f46', border: 'none', borderRadius: fabSide === 'right' ? '0 0 0 8px' : '0 0 8px 0', cursor: 'pointer', color: 'rgba(255,255,255,0.8)', fontSize: 11, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>▼</button>
+              </div>
             </div>
 
-            {/* Bottom nav 4 tab — mobile e tablet */}
-            {!device.isDesktop && (
+            {/* Bottom nav 4 tab */}
             <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: '#FFFFFF', borderTop: '1px solid #EFEFEF', display: 'flex', zIndex: 70, paddingBottom: 'env(safe-area-inset-bottom)' }}>
               {bottomNavItems.map((item: any) => {
                 const isActive = tab === item.id
@@ -615,7 +615,6 @@ export default function Home() {
                 )
               })}
             </div>
-            )}
           </>
         )}
       </div>
