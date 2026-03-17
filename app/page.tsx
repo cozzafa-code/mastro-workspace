@@ -527,7 +527,7 @@ export default function Home() {
         </div>
 
         {/* Content */}
-        <div style={{ flex: 1, overflowY: 'auto', padding: device.isMobile ? '16px 16px 80px' : '28px 32px' }}>
+        <div style={{ flex: 1, overflowY: 'auto', padding: device.isMobile ? '16px 16px 80px' : device.isTablet ? '20px 24px 80px' : '28px 32px' }}>
           {loading
             ? <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}><span style={{ fontSize: 13, color: '#9CA3AF' }}>Caricamento...</span></div>
             : <>
@@ -548,8 +548,8 @@ export default function Home() {
           }
         </div>
 
-        {/* FAB LATERALE stile MASTRO — mobile only */}
-        {device.isMobile && (
+        {/* FAB LATERALE — mobile e tablet */}
+        {!device.isDesktop && (
           <>
             {showFab && <div style={{ position: 'fixed', inset: 0, zIndex: 79, background: 'rgba(0,0,0,0.3)' }} onClick={() => setShowFab(false)} />}
 
@@ -601,7 +601,8 @@ export default function Home() {
               </button>
             </div>
 
-            {/* Bottom nav 4 tab */}
+            {/* Bottom nav 4 tab — mobile e tablet */}
+            {!device.isDesktop && (
             <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: '#FFFFFF', borderTop: '1px solid #EFEFEF', display: 'flex', zIndex: 70, paddingBottom: 'env(safe-area-inset-bottom)' }}>
               {bottomNavItems.map((item: any) => {
                 const isActive = tab === item.id
@@ -614,6 +615,7 @@ export default function Home() {
                 )
               })}
             </div>
+            )}
           </>
         )}
       </div>
