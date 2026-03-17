@@ -214,10 +214,21 @@ export const FatturaForm: FC<{ c: any }> = ({ c }) => {
           <button onClick={generateXML} style={{ padding: '8px 16px', border: `1px solid ${S.purple}`, borderRadius: 7, background: S.purpleLight, color: S.purple, cursor: 'pointer', fontSize: 13, fontWeight: 600, fontFamily: DS.fonts.ui }}>
             Scarica XML SDI
           </button>
-          <div style={{ display: 'flex', gap: 8 }}>
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            {(!f.numero || !f.controparte_nome) && (
+              <span style={{ fontSize: 11, color: S.red }}>* Numero e Cliente obbligatori</span>
+            )}
             <button onClick={c.closeFatturaForm} style={{ padding: '8px 16px', border: `1px solid ${S.border}`, borderRadius: 7, background: 'none', cursor: 'pointer', fontSize: 13, fontFamily: DS.fonts.ui }}>Annulla</button>
-            <button onClick={() => { c.setFatturaForm({ stato: 'bozza' }); c.saveFattura() }} style={{ padding: '8px 16px', border: `1px solid ${S.border}`, borderRadius: 7, background: S.background, color: S.textSecondary, cursor: 'pointer', fontSize: 13, fontFamily: DS.fonts.ui }}>Salva bozza</button>
-            <button onClick={() => { c.setFatturaForm({ stato: 'emessa' }); c.saveFattura() }} style={{ padding: '8px 20px', background: S.teal, color: '#fff', border: 'none', borderRadius: 7, cursor: 'pointer', fontSize: 13, fontWeight: 600, fontFamily: DS.fonts.ui }}>Emetti fattura</button>
+            <button onClick={() => { c.setFatturaForm({ stato: 'bozza' }); c.saveFattura() }}
+              disabled={!f.numero || !f.controparte_nome}
+              style={{ padding: '8px 16px', border: `1px solid ${S.border}`, borderRadius: 7, background: S.background, color: S.textSecondary, cursor: f.numero && f.controparte_nome ? 'pointer' : 'not-allowed', fontSize: 13, fontFamily: DS.fonts.ui, opacity: f.numero && f.controparte_nome ? 1 : 0.5 }}>
+              Salva bozza
+            </button>
+            <button onClick={() => { c.setFatturaForm({ stato: 'emessa' }); c.saveFattura() }}
+              disabled={!f.numero || !f.controparte_nome}
+              style={{ padding: '8px 20px', background: f.numero && f.controparte_nome ? S.teal : S.borderLight, color: f.numero && f.controparte_nome ? '#fff' : S.textMuted, border: 'none', borderRadius: 7, cursor: f.numero && f.controparte_nome ? 'pointer' : 'not-allowed', fontSize: 13, fontWeight: 600, fontFamily: DS.fonts.ui }}>
+              Emetti fattura
+            </button>
           </div>
         </div>
       </div>

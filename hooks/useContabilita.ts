@@ -54,13 +54,30 @@ export function useContabilita() {
   useEffect(() => { load() }, [load])
 
   // ── Fattura CRUD ──────────────────────────────────────
-  const openFatturaForm = useCallback((fattura?: Fattura) => {
+  const openFatturaForm = useCallback(async (fattura?: Fattura) => {
     const defaultRiga: RigaFattura = { descrizione: '', quantita: 1, prezzo_unit: 0, iva_aliquota: 22, imponibile: 0, iva_importo: 0, totale: 0 }
+
+    let nextNumero = ''
+    if (!fattura) {
+      // Calcola prossimo numero automatico
+      const anno = new Date().getFullYear()
+      const { data } = await supabase
+        .from('fatture')
+        .select('numero')
+        .like('numero', `${anno}/%`)
+        .order('numero', { ascending: false })
+        .limit(1)
+      const last = data?.[0]?.numero
+      const lastNum = last ? parseInt(last.split('/')[1] || '0') : 0
+      nextNumero = `${anno}/${String(lastNum + 1).padStart(3, '0')}`
+    }
+
     setState(s => ({
       ...s,
       showFatturaForm: true,
       fatturaForm: fattura ? { ...fattura } : {
         tipo: 'attiva', stato: 'bozza',
+        numero: nextNumero,
         data_emissione: new Date().toISOString().split('T')[0],
         emittente_regime: 'ordinario', iva_aliquota: 22,
         valuta: 'EUR', paese_fiscale: 'IT',
