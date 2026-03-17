@@ -428,11 +428,25 @@ export default function Home() {
   }
 
   const bottomNavItems = [
-    { id: 'dashboard', iconKey: 'dashboard', label: 'Home' },
-    { id: 'progetti',  iconKey: 'projects',  label: 'Progetti' },
-    { id: 'task',      iconKey: 'tasks',     label: 'Task' },
-    { id: 'clienti',   iconKey: 'clients',   label: 'CRM' },
-    { id: 'spese',     iconKey: 'finance',   label: 'Finanze' },
+    { id: 'dashboard',  iconKey: 'dashboard', label: 'Home' },
+    { id: 'task',       iconKey: 'tasks',     label: 'Task' },
+    { id: 'clienti',    iconKey: 'clients',   label: 'CRM' },
+    { id: 'personale',  iconKey: 'personal',  label: 'La mia' },
+  ]
+
+  const [showMobileMenu, setShowMobileMenu] = useState(false)
+  const [showFab, setShowFab] = useState(false)
+
+  const altroItems = [
+    { id: 'progetti',   iconKey: 'projects',  label: 'Progetti' },
+    { id: 'deleghe',    iconKey: 'deleghe',   label: 'Deleghe' },
+    { id: 'campagne',   iconKey: 'campaigns', label: 'Campagne' },
+    { id: 'mrr',        iconKey: 'mrr',       label: 'MRR' },
+    { id: 'calendario', iconKey: 'calendar',  label: 'Calendario' },
+    { id: 'gantt',      iconKey: 'gantt',     label: 'Gantt' },
+    { id: 'lab_idee',   iconKey: 'ideas',     label: 'Lab Idee' },
+    { id: 'spese',      iconKey: 'finance',   label: 'Finanze' },
+    { id: 'contabilita',iconKey: 'receipt',   label: 'Contabilità' },
   ]
 
   return (
@@ -534,19 +548,71 @@ export default function Home() {
           }
         </div>
 
-        {/* BOTTOM NAV — mobile only */}
+        {/* BOTTOM NAV + FAB laterale — mobile only */}
         {device.isMobile && (
-          <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: '#FFFFFF', borderTop: '1px solid #EFEFEF', display: 'flex', zIndex: 50, paddingBottom: 'env(safe-area-inset-bottom)' }}>
-            {bottomNavItems.map((item: any) => {
-              const isActive = tab === item.id
-              return (
-                <button key={item.id} onClick={() => { setTab(item.id as Tab); setSelectedProject(null) }} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '8px 0 6px', border: 'none', background: 'none', cursor: 'pointer', color: isActive ? '#0A8A7A' : '#9CA3AF' }}>
-                  <span style={{ opacity: isActive ? 1 : 0.5 }}>{iconSvg(item.iconKey, isActive)}</span>
-                  <span style={{ fontSize: 9, fontWeight: isActive ? 600 : 400, marginTop: 3, fontFamily: 'inherit' }}>{item.label}</span>
-                </button>
-              )
-            })}
-          </div>
+          <>
+            {/* Overlay chiudi FAB */}
+            {showFab && <div style={{ position: 'fixed', inset: 0, zIndex: 79 }} onClick={() => setShowFab(false)} />}
+
+            {/* FAB laterale — tab che sporge dal bordo destro */}
+            <div style={{ position: 'fixed', right: 0, top: '50%', transform: 'translateY(-50%)', zIndex: 80, display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+              {showFab && (
+                <div style={{ background: '#fff', borderRadius: '12px 0 0 12px', boxShadow: '-4px 0 24px rgba(0,0,0,0.18)', padding: '14px 10px', display: 'flex', flexDirection: 'column', gap: 6, maxHeight: '80vh', overflowY: 'auto' }}>
+                  {/* Azioni rapide */}
+                  {[
+                    { label: '+ Task rapida', color: '#2563EB', action: () => { setShowForm('task'); setShowFab(false) } },
+                    { label: '+ Delega', color: '#BE185D', action: () => { setTab('deleghe'); setShowFab(false) } },
+                    { label: '+ Idea', color: '#6D28D9', action: () => { setTab('lab_idee'); setShowFab(false) } },
+                    { label: '✨ AI', color: '#0A8A7A', action: () => setShowFab(false) },
+                  ].map(a => (
+                    <button key={a.label} onClick={a.action}
+                      style={{ padding: '8px 14px', background: a.color + '15', border: `1px solid ${a.color}30`, borderRadius: 8, cursor: 'pointer', fontFamily: 'inherit', fontSize: 12, fontWeight: 600, color: a.color, whiteSpace: 'nowrap', textAlign: 'left' }}>
+                      {a.label}
+                    </button>
+                  ))}
+                  <div style={{ height: 1, background: '#F3F4F6', margin: '4px 0' }} />
+                  {/* Switch utente */}
+                  <div style={{ display: 'flex', gap: 4 }}>
+                    {[{ id: 'fabio', label: 'Fabio', color: '#0A8A7A' }, { id: 'lidia', label: 'Lidia', color: '#BE185D' }].map(u => (
+                      <button key={u.id} onClick={() => { setUser(u.id as 'fabio' | 'lidia'); setShowFab(false) }}
+                        style={{ flex: 1, padding: '6px 8px', border: `1px solid ${user === u.id ? u.color : '#E5E7EB'}`, borderRadius: 7, background: user === u.id ? u.color : 'transparent', cursor: 'pointer', fontSize: 11, fontWeight: 700, color: user === u.id ? '#fff' : '#9CA3AF', fontFamily: 'inherit' }}>
+                        {u.label}
+                      </button>
+                    ))}
+                  </div>
+                  <div style={{ height: 1, background: '#F3F4F6', margin: '4px 0' }} />
+                  {/* Tutti i moduli */}
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 4 }}>
+                    {altroItems.map(item => (
+                      <button key={item.id} onClick={() => { setTab(item.id as Tab); setSelectedProject(null); setShowFab(false) }}
+                        style={{ padding: '6px 8px', background: tab === item.id ? '#EDF7F6' : '#F9FAFB', border: `1px solid ${tab === item.id ? '#0A8A7A' : '#E5E7EB'}`, borderRadius: 7, cursor: 'pointer', fontSize: 10, fontWeight: tab === item.id ? 600 : 400, color: tab === item.id ? '#0A8A7A' : '#6B7280', fontFamily: 'inherit' }}>
+                        {item.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {/* Il tab fisico che sporge */}
+              <button onClick={() => setShowFab(!showFab)}
+                style={{ width: 40, height: 52, background: showFab ? '#0D1117' : '#0A8A7A', border: 'none', borderRadius: '10px 0 0 10px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '-3px 0 12px rgba(0,0,0,0.2)', fontSize: 18, flexShrink: 0 }}>
+                {showFab ? '✕' : '⚡'}
+              </button>
+            </div>
+
+            {/* Bottom nav 4 tab puliti */}
+            <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: '#FFFFFF', borderTop: '1px solid #EFEFEF', display: 'flex', zIndex: 70, paddingBottom: 'env(safe-area-inset-bottom)' }}>
+              {bottomNavItems.map((item: any) => {
+                const isActive = tab === item.id
+                return (
+                  <button key={item.id} onClick={() => { setTab(item.id as Tab); setSelectedProject(null) }}
+                    style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '8px 0 6px', border: 'none', background: 'none', cursor: 'pointer', color: isActive ? '#0A8A7A' : '#9CA3AF' }}>
+                    <span style={{ opacity: isActive ? 1 : 0.5 }}>{iconSvg(item.iconKey, isActive)}</span>
+                    <span style={{ fontSize: 9, fontWeight: isActive ? 600 : 400, marginTop: 3, fontFamily: 'inherit' }}>{item.label}</span>
+                  </button>
+                )
+              })}
+            </div>
+          </>
         )}
       </div>
 
