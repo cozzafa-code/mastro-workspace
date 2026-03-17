@@ -7,11 +7,12 @@ import { MrrTrackerView } from '@/components/MRR/MrrTrackerView'
 import { CampagneProView } from '@/components/Campagne/CampagneProView'
 import { TaskTimerView } from '@/components/Tasks/TaskTimerView'
 import { FinanceRunwayView } from '@/components/Finance/FinanceRunwayView'
+import { CalendarioView } from '@/components/Calendario/CalendarioView'
 import { useDevice } from '@/hooks/useDevice'
 import type { UserType } from '@/lib/types'
 
 type User = UserType
-type Tab = 'dashboard' | 'progetti' | 'task' | 'campagne' | 'clienti' | 'mrr' | 'lab_idee' | 'spese' | 'personale'
+type Tab = 'dashboard' | 'progetti' | 'task' | 'campagne' | 'clienti' | 'mrr' | 'calendario' | 'lab_idee' | 'spese' | 'personale'
 
 export default function Home() {
   const [user, setUser] = useState<User>('fabio')
@@ -87,28 +88,73 @@ export default function Home() {
 
   function renderDashboard() {
     const urgenti = (data.tasks || []).filter((t: any) => (Number(t.priorita) <= 2 || t.priorita === 'Alta') && t.stato !== 'completato' && t.stato !== 'Fatto').slice(0, 4)
+    const isMob = device.isMobile
     return (
       <div>
-        <div className="bg-[#0B1F2A] rounded-xl p-4 flex gap-3 items-center mb-6">
-          <input className="flex-1 bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white text-sm placeholder-white/40 focus:outline-none focus:border-teal-400" placeholder="Chiedi alla AI segretaria... es: Cosa devo fare oggi?" id="ai-q" />
-          <button onClick={() => { const q = (document.getElementById('ai-q') as HTMLInputElement)?.value; if (!q) return; const ctx = `MASTRO WORKSPACE — ${today} — ${user}\nProgetti: ${(data.progetti || []).map((p: any) => p.nome + ' MRR:€' + (p.mrr || 0) + ' stato:' + p.stato).join(' | ')}\nTask aperti: ${(data.tasks || []).filter((t: any) => t.stato !== 'completato').slice(0, 8).map((t: any) => (t.titolo || t.testo) + '(' + (t.chi || '') + ')').join(' | ')}\nMRR totale: €${totMRR}/mese\nDomanda: ${q}`; navigator.clipboard.writeText(ctx).then(() => alert('✓ Copiato! Incolla su Claude.')).catch(() => prompt('Copia:', ctx)) }} className="px-4 py-2 bg-teal-500 text-white text-sm rounded-lg hover:bg-teal-600 font-medium whitespace-nowrap">Copia per Claude ↗</button>
+        {/* AI bar */}
+        <div style={{ background: '#0B1F2A', borderRadius: 12, padding: isMob ? '10px 12px' : '12px 16px', display: 'flex', gap: 8, alignItems: 'center', marginBottom: 20 }}>
+          <input style={{ flex: 1, background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 8, padding: '8px 12px', color: '#fff', fontSize: 13, fontFamily: 'inherit', outline: 'none', minWidth: 0 }}
+            placeholder="Chiedi alla AI... es: Cosa devo fare oggi?" id="ai-q" />
+          <button onClick={() => {
+            const q = (document.getElementById('ai-q') as HTMLInputElement)?.value
+            if (!q) return
+            const ctx = `MASTRO OS — ${today} — ${user}\nProgetti: ${(data.progetti || []).map((p: any) => p.nome + ' MRR:€' + (p.mrr || 0)).join(' | ')}\nTask aperti: ${(data.tasks || []).filter((t: any) => t.stato !== 'completato').slice(0, 6).map((t: any) => t.titolo || t.testo).join(' | ')}\nMRR: €${totMRR}/mo\nDomanda: ${q}`
+            navigator.clipboard.writeText(ctx).then(() => alert('✓ Copiato!')).catch(() => prompt('Copia:', ctx))
+          }} style={{ padding: '8px 14px', background: '#0A8A7A', color: '#fff', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap', fontFamily: 'inherit', flexShrink: 0 }}>
+            {isMob ? 'Copia' : 'Copia per Claude ↗'}
+          </button>
         </div>
-        <div className="grid grid-cols-4 gap-3 mb-6">
-          <StatCard num={String(taskAperti)} label="Task aperti" sub={`${urgenti.length} urgenti`} />
-          <StatCard num={String(progAttivi)} label="Progetti attivi" sub={`su ${(data.progetti || []).length} totali`} />
-          <StatCard num={`€${totMRR}`} label="MRR totale" sub="da tutti i progetti" color="text-green-600" />
-          <StatCard num={`-€${totSpese}`} label="Spese/mese" sub="correnti" color="text-red-500" />
+
+        {/* KPI stats — 2x2 on mobile, 4 cols on desktop */}
+        <div style={{ display: 'grid', gridTemplateColumns: isMob ? '1fr 1fr' : 'repeat(4, 1fr)', gap: 10, marginBottom: 20 }}>
+          {[
+            { num: String(taskAperti), label: 'Task aperti', sub: `${urgenti.length} urgenti`, color: '#0D1117' },
+            { num: String(progAttivi), label: 'Progetti attivi', sub: `su ${(data.progetti || []).length} totali`, color: '#0D1117' },
+            { num: `€${totMRR}`, label: 'MRR totale', sub: 'da tutti i progetti', color: '#0F7B5A' },
+            { num: `-€${totSpese}`, label: 'Spese/mese', sub: 'correnti', color: '#C93535' },
+          ].map(k => (
+            <div key={k.label} style={{ background: '#fff', border: '1px solid #E5E7EB', borderRadius: 10, padding: '12px 14px' }}>
+              <div style={{ fontSize: isMob ? 20 : 24, fontWeight: 700, color: k.color, fontFamily: '"DM Mono", monospace' }}>{k.num}</div>
+              <div style={{ fontSize: 11, fontWeight: 600, color: '#0D1117', marginTop: 2 }}>{k.label}</div>
+              <div style={{ fontSize: 10, color: '#9CA3AF', marginTop: 8, paddingTop: 6, borderTop: '1px solid #F3F4F6' }}>{k.sub}</div>
+            </div>
+          ))}
         </div>
-        <div className="grid grid-cols-2 gap-6">
+
+        {/* Task urgenti + Progetti — stack on mobile */}
+        <div style={{ display: 'grid', gridTemplateColumns: isMob ? '1fr' : '1fr 1fr', gap: isMob ? 12 : 20 }}>
           <div>
-            <Sep label="🔴 Task urgenti" />
-            {urgenti.length === 0 ? <div className="text-xs text-gray-400 text-center py-4 bg-white border border-gray-200 rounded-xl">Nessun task urgente</div> :
-              urgenti.map((t: any) => <Card key={t.id}><div className="flex items-start justify-between gap-2"><div><div className="text-sm font-medium">{t.titolo || t.testo}</div><div className="text-xs text-gray-500 mt-1">{t.progetto || ''}{t.scadenza ? ' · ' + t.scadenza : ''}</div></div><Badge text="Urgente" color="red" /></div><div className="mt-2 text-xs text-gray-400">{t.chi}</div></Card>)
-            }
+            <div style={{ fontSize: 10, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 10, paddingBottom: 6, borderBottom: '1px solid #F3F4F6' }}>Task urgenti</div>
+            {urgenti.length === 0
+              ? <div style={{ fontSize: 12, color: '#9CA3AF', textAlign: 'center', padding: '16px 0', background: '#fff', border: '1px solid #E5E7EB', borderRadius: 10 }}>Nessun task urgente</div>
+              : urgenti.map((t: any) => (
+                <div key={t.id} style={{ background: '#fff', border: '1px solid #E5E7EB', borderRadius: 10, padding: '10px 12px', marginBottom: 6 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8 }}>
+                    <div style={{ fontSize: 13, fontWeight: 500, color: '#0D1117' }}>{t.titolo || t.testo}</div>
+                    <span style={{ fontSize: 10, background: '#FCEAEA', color: '#C93535', padding: '2px 7px', borderRadius: 20, fontWeight: 600, flexShrink: 0 }}>Urgente</span>
+                  </div>
+                  <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 4 }}>{t.chi}{t.scadenza ? ' · ' + t.scadenza : ''}</div>
+                </div>
+              ))}
           </div>
           <div>
-            <Sep label="🚀 Progetti" />
-            {(data.progetti || []).slice(0, 5).map((p: any) => <Card key={p.id} onClick={() => { setSelectedProject(p); setTab('progetti') }}><div className="flex items-center justify-between gap-2 mb-2"><div className="flex items-center gap-2">{p.colore && <div className="w-3 h-3 rounded-full" style={{ background: p.colore }} />}<div className="text-sm font-medium">{p.nome}</div></div><Badge text={p.stato} color={sc(p.stato)} /></div><div className="flex gap-3"><span className="text-xs text-green-600 font-medium">€{p.mrr || 0}/mo</span><span className="text-xs text-gray-400">{p.beta_clienti || 0} clienti</span><span className="text-xs text-gray-400">€{p.prezzo || 0}/mo</span></div></Card>)}
+            <div style={{ fontSize: 10, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 10, paddingBottom: 6, borderBottom: '1px solid #F3F4F6' }}>Progetti</div>
+            {(data.progetti || []).slice(0, isMob ? 3 : 5).map((p: any) => (
+              <div key={p.id} onClick={() => { setSelectedProject(p); setTab('progetti') }}
+                style={{ background: '#fff', border: '1px solid #E5E7EB', borderRadius: 10, padding: '10px 12px', marginBottom: 6, cursor: 'pointer' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 6 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    {p.colore && <div style={{ width: 8, height: 8, borderRadius: '50%', background: p.colore }} />}
+                    <span style={{ fontSize: 13, fontWeight: 600, color: '#0D1117' }}>{p.nome}</span>
+                  </div>
+                  <span style={{ fontSize: 10, background: '#EDF7F6', color: '#0A8A7A', padding: '2px 7px', borderRadius: 20, fontWeight: 600 }}>{p.stato}</span>
+                </div>
+                <div style={{ display: 'flex', gap: 12 }}>
+                  <span style={{ fontSize: 11, color: '#0F7B5A', fontWeight: 600 }}>€{p.mrr || 0}/mo</span>
+                  <span style={{ fontSize: 11, color: '#9CA3AF' }}>{p.beta_clienti || 0} clienti</span>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
@@ -116,6 +162,7 @@ export default function Home() {
   }
 
   function renderProgetti() {
+    const isMob = device.isMobile
     if (selectedProject) return (
       <ProjectDetailView
         progettoId={selectedProject.id}
@@ -125,22 +172,40 @@ export default function Home() {
     )
     return (
       <div>
-        <SH title="Tutti i progetti" onAdd={() => setShowForm('progetto')} />
-        <div className="grid grid-cols-2 gap-4">
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+          <div style={{ fontSize: isMob ? 16 : 18, fontWeight: 700, color: '#0D1117' }}>Tutti i progetti</div>
+          <button onClick={() => setShowForm('progetto')} style={{ padding: '7px 14px', background: '#0A8A7A', color: '#fff', border: 'none', borderRadius: 7, fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>+ Aggiungi</button>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: isMob ? '1fr' : '1fr 1fr', gap: 10 }}>
           {(data.progetti || []).map((p: any) => (
-            <Card key={p.id} onClick={() => setSelectedProject(p)}>
-              <div className="flex items-start justify-between gap-2 mb-3">
-                <div className="flex items-center gap-2">{p.colore && <div className="w-4 h-4 rounded-full" style={{ background: p.colore }} />}<div className="text-sm font-semibold">{p.nome}</div></div>
-                <div className="flex gap-1"><Badge text={p.stato} color={sc(p.stato)} /><button onClick={e => { e.stopPropagation(); deleteItem('progetti', p.id) }} className="text-xs text-gray-300 hover:text-red-400">✕</button></div>
+            <div key={p.id} onClick={() => setSelectedProject(p)}
+              style={{ background: '#fff', border: '1px solid #E5E7EB', borderRadius: 12, padding: '14px 16px', cursor: 'pointer' }}>
+              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8, marginBottom: 8 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  {p.colore && <div style={{ width: 10, height: 10, borderRadius: '50%', background: p.colore, flexShrink: 0, marginTop: 2 }} />}
+                  <span style={{ fontSize: 14, fontWeight: 600, color: '#0D1117' }}>{p.nome}</span>
+                </div>
+                <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                  <span style={{ fontSize: 10, background: '#EDF7F6', color: '#0A8A7A', padding: '2px 7px', borderRadius: 20, fontWeight: 600, flexShrink: 0 }}>{p.stato}</span>
+                  <button onClick={e => { e.stopPropagation(); deleteItem('progetti', p.id) }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#D1D5DB', fontSize: 13, padding: '0 2px' }}>✕</button>
+                </div>
               </div>
-              <div className="text-xs text-gray-500 mb-3">{p.descrizione}</div>
-              <div className="grid grid-cols-3 gap-2">
-                <div className="bg-gray-50 rounded-lg p-2 text-center"><div className="text-sm font-semibold text-green-600">€{p.mrr || 0}</div><div className="text-xs text-gray-400">MRR</div></div>
-                <div className="bg-gray-50 rounded-lg p-2 text-center"><div className="text-sm font-semibold text-blue-600">{p.beta_clienti || 0}</div><div className="text-xs text-gray-400">Clienti</div></div>
-                <div className="bg-gray-50 rounded-lg p-2 text-center"><div className="text-sm font-semibold text-purple-600">€{p.prezzo || 0}</div><div className="text-xs text-gray-400">Prezzo</div></div>
+              {p.descrizione && <div style={{ fontSize: 12, color: '#6B7280', marginBottom: 10 }}>{p.descrizione}</div>}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 6 }}>
+                <div style={{ background: '#F9FAFB', borderRadius: 7, padding: '7px 8px', textAlign: 'center' }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: '#0F7B5A' }}>€{p.mrr || 0}</div>
+                  <div style={{ fontSize: 9, color: '#9CA3AF', marginTop: 1 }}>MRR</div>
+                </div>
+                <div style={{ background: '#F9FAFB', borderRadius: 7, padding: '7px 8px', textAlign: 'center' }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: '#2563EB' }}>{p.beta_clienti || 0}</div>
+                  <div style={{ fontSize: 9, color: '#9CA3AF', marginTop: 1 }}>Clienti</div>
+                </div>
+                <div style={{ background: '#F9FAFB', borderRadius: 7, padding: '7px 8px', textAlign: 'center' }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: '#6D28D9' }}>€{p.prezzo || 0}</div>
+                  <div style={{ fontSize: 9, color: '#9CA3AF', marginTop: 1 }}>Prezzo</div>
+                </div>
               </div>
-              {p.repo && <div className="mt-2 text-xs text-gray-400">📦 {p.repo}</div>}
-            </Card>
+            </div>
           ))}
         </div>
       </div>
@@ -228,6 +293,7 @@ export default function Home() {
     { id: 'campagne',  iconKey: 'campaigns', label: 'Campagne' },
     { id: 'clienti',   iconKey: 'clients',   label: 'Pipeline CRM' },
     { id: 'mrr',       iconKey: 'mrr',       label: 'MRR Tracker', section: 'Metriche' },
+    { id: 'calendario', iconKey: 'calendar',  label: 'Calendario' },
     { id: 'lab_idee',  iconKey: 'ideas',     label: 'Lab Idee',    section: 'Idee' },
     { id: 'spese',     iconKey: 'finance',   label: 'Finanze',     section: 'Finanze' },
     { id: 'personale', iconKey: 'personal',  label: 'La mia area', section: 'Personale' },
@@ -236,7 +302,7 @@ export default function Home() {
   const tabTitles: any = {
     dashboard: 'Dashboard', progetti: selectedProject ? selectedProject.nome : 'Progetti',
     task: 'Task', campagne: 'Campagne', clienti: 'Pipeline CRM',
-    mrr: 'MRR Tracker', lab_idee: 'Lab Idee', spese: 'Finanze', personale: 'La mia area'
+    mrr: 'MRR Tracker', calendario: 'Calendario', lab_idee: 'Lab Idee', spese: 'Finanze', personale: 'La mia area'
   }
   const cf = showForm ? forms[showForm] : null
 
@@ -248,6 +314,7 @@ export default function Home() {
       campaigns: <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M2 10V6l10-4v12L2 10zm0 0h3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/><path d="M5 10v3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>,
       clients:   <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><circle cx="6" cy="5" r="2.5" stroke="currentColor" strokeWidth="1.5"/><path d="M1.5 13c0-2.485 2.015-4.5 4.5-4.5s4.5 2.015 4.5 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/><path d="M10.5 7.5c1.38 0 2.5 1.12 2.5 2.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>,
       mrr:       <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M2 12l3.5-4 3 2.5L12 5l2 2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>,
+      calendar:  <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="1.5" stroke="currentColor" strokeWidth="1.5"/><path d="M5 1v3M11 1v3M2 7h12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>,
       ideas:     <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M8 2a4 4 0 014 4c0 1.5-.8 2.8-2 3.5V11H6v-1.5C4.8 8.8 4 7.5 4 6a4 4 0 014-4z" stroke="currentColor" strokeWidth="1.5"/><path d="M6 13h4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>,
       finance:   <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><rect x="2" y="4" width="12" height="9" rx="1.5" stroke="currentColor" strokeWidth="1.5"/><path d="M5 4V3a1 1 0 011-1h4a1 1 0 011 1v1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>,
       personal:  <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="5.5" r="2.5" stroke="currentColor" strokeWidth="1.5"/><path d="M2.5 13.5c0-3.038 2.462-5.5 5.5-5.5s5.5 2.462 5.5 5.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>,
@@ -343,6 +410,7 @@ export default function Home() {
               {tab === 'campagne' && renderCampagne()}
               {tab === 'clienti' && renderClienti()}
               {tab === 'mrr' && <MrrTrackerView />}
+              {tab === 'calendario' && <CalendarioView />}
               {tab === 'lab_idee' && renderLabIdee()}
               {tab === 'spese' && renderSpese()}
               {tab === 'personale' && renderPersonale()}
