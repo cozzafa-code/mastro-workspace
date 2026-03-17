@@ -21,6 +21,8 @@ export default function Home() {
   const [showForm, setShowForm] = useState<string | null>(null)
   const [form, setForm] = useState<any>({})
   const [selectedProject, setSelectedProject] = useState<any>(null)
+  const device = useDevice()
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   const tables = ['progetti', 'tasks', 'campagne', 'clienti', 'lab_idee', 'spese_correnti', 'personale', 'mrr_snapshots']
 
@@ -279,9 +281,6 @@ export default function Home() {
     }
     return svgs[key] || svgs.dashboard
   }
-
-  const device = useDevice()
-  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   const bottomNavItems = [
     { id: 'dashboard', iconKey: 'dashboard', label: 'Home' },
