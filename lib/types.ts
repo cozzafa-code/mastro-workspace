@@ -132,7 +132,11 @@ export interface ItemPersonale {
 export interface MrrSnapshot {
   id: string
   progetto_id?: string
+  progetto_nome?: string
   valore?: number
+  clienti_num?: number
+  mese?: string
+  note?: string
   data?: string
   created_at?: string
 }

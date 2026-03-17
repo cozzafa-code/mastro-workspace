@@ -3,10 +3,11 @@ import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { ProjectDetailView } from '@/components/ProjectDetail/ProjectDetailView'
 import { CrmView } from '@/components/CRM/CrmView'
+import { MrrTrackerView } from '@/components/MRR/MrrTrackerView'
 import type { UserType } from '@/lib/types'
 
 type User = UserType
-type Tab = 'dashboard' | 'progetti' | 'task' | 'campagne' | 'clienti' | 'lab_idee' | 'spese' | 'personale'
+type Tab = 'dashboard' | 'progetti' | 'task' | 'campagne' | 'clienti' | 'mrr' | 'lab_idee' | 'spese' | 'personale'
 
 export default function Home() {
   const [user, setUser] = useState<User>('fabio')
@@ -261,7 +262,8 @@ export default function Home() {
     { id: 'campagne', icon: '📣', label: 'Campagne' },
     { id: 'clienti', icon: '👥', label: 'Clienti' },
     { id: 'lab_idee', icon: '💡', label: 'Lab Idee', section: 'Organizzazione' },
-    { id: 'spese', icon: '💰', label: 'Finanze', section: 'Finanze' },
+    { id: 'mrr', icon: '📈', label: 'MRR Tracker', section: 'Finanze' },
+    { id: 'spese', icon: '💰', label: 'Finanze' },
     { id: 'personale', icon: '👤', label: 'La mia area', section: 'Personale' },
   ]
 
@@ -308,6 +310,7 @@ export default function Home() {
             {tab === 'task' && renderTask()}
             {tab === 'campagne' && renderCampagne()}
             {tab === 'clienti' && renderClienti()}
+            {tab === 'mrr' && <MrrTrackerView />}
             {tab === 'lab_idee' && renderLabIdee()}
             {tab === 'spese' && renderSpese()}
             {tab === 'personale' && renderPersonale()}
