@@ -58,9 +58,36 @@ export interface Campagna {
   obiettivo?: string
   stato?: string
   progetto_id?: string
+  responsabile?: string
+  // Metriche base
   leads_totali?: number
   email_inviate?: number
   risposte?: number
+  conversioni?: number
+  click?: number
+  impression?: number
+  // Budget
+  budget_totale?: number
+  spend_attuale?: number
+  // Date
+  data_inizio?: string
+  data_fine?: string
+  target_leads?: number
+  note?: string
+  tag?: string[]
+  created_at?: string
+}
+
+export interface CampagnaMetrica {
+  id: string
+  campagna_id: string
+  data?: string
+  spend?: number
+  leads?: number
+  click?: number
+  impression?: number
+  conversioni?: number
+  note?: string
   created_at?: string
 }
 

@@ -4,6 +4,7 @@ import { supabase } from '@/lib/supabase'
 import { ProjectDetailView } from '@/components/ProjectDetail/ProjectDetailView'
 import { CrmView } from '@/components/CRM/CrmView'
 import { MrrTrackerView } from '@/components/MRR/MrrTrackerView'
+import { CampagneProView } from '@/components/Campagne/CampagneProView'
 import type { UserType } from '@/lib/types'
 
 type User = UserType
@@ -159,14 +160,7 @@ export default function Home() {
   }
 
   function renderCampagne() {
-    return (
-      <div>
-        <SH title="Campagne" onAdd={() => setShowForm('campagna')} />
-        {(data.campagne || []).length === 0 ? <div className="text-center py-8 text-sm text-gray-400 bg-white border border-gray-200 rounded-xl">Nessuna campagna ancora</div> :
-          (data.campagne || []).map((c: any) => <Card key={c.id}><div className="flex items-start justify-between gap-2"><div className="flex-1"><div className="text-sm font-medium">{c.nome}</div><div className="text-xs text-gray-500 mt-1">{c.tipo}{c.canale ? ' · ' + c.canale : ''}</div>{c.obiettivo && <div className="text-xs text-gray-400 mt-1">🎯 {c.obiettivo}</div>}</div><div className="flex gap-1">{c.stato && <Badge text={c.stato} color={sc(c.stato)} />}<button onClick={() => deleteItem('campagne', c.id)} className="text-xs text-gray-300 hover:text-red-400">✕</button></div></div>{(c.leads_totali != null || c.email_inviate != null) && <div className="grid grid-cols-3 gap-2 mt-3"><div className="bg-gray-50 rounded-lg p-2 text-center"><div className="text-sm font-semibold">{c.leads_totali || 0}</div><div className="text-xs text-gray-400">Leads</div></div><div className="bg-gray-50 rounded-lg p-2 text-center"><div className="text-sm font-semibold">{c.email_inviate || 0}</div><div className="text-xs text-gray-400">Email</div></div><div className="bg-gray-50 rounded-lg p-2 text-center"><div className="text-sm font-semibold">{c.risposte || 0}</div><div className="text-xs text-gray-400">Risposte</div></div></div>}</Card>)
-        }
-      </div>
-    )
+    return <CampagneProView currentUser={user} />
   }
 
   function renderClienti() {
