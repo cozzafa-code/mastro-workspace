@@ -29,7 +29,7 @@ export function useCampagnePro(currentUser: 'fabio' | 'lidia') {
     const [cRes, mRes, pRes] = await Promise.all([
       supabase.from('campagne').select('*').order('created_at', { ascending: false }),
       supabase.from('campagna_metriche').select('*').order('data', { ascending: true }),
-      supabase.from('progetti').select('id, nome, colore').order('nome'),
+      supabase.from('progetti').select('*').order('nome'),
     ])
     setState(s => ({ ...s, campagne: cRes.data || [], metriche: mRes.data || [], progetti: pRes.data || [], loading: false }))
   }, [])
