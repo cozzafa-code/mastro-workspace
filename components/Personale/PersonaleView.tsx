@@ -137,9 +137,9 @@ const AddTaskForm: FC<{ currentUser: string; zone: 'privata' | 'condivisa' | 'de
       tipo: form.tipo || 'task',
       stato: 'aperto',
       priorita: form.priorita || '3',
-      scadenza: form.scadenza || null,
-      ora_scadenza: form.ora || null,
-      allegati: form.allegati ? JSON.stringify([{ nome: form.allegati, url: form.allegati, tipo: 'link' }]) : null,
+      scadenza: form.scadenza || undefined,
+      ora_scadenza: form.ora || undefined,
+      allegati: form.allegati ? JSON.stringify([{ nome: form.allegati, url: form.allegati, tipo: 'link' }]) : undefined,
       notifica_email: form.notifica_email,
       visibilita: form.visibilita,
     })
