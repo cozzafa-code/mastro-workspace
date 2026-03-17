@@ -171,8 +171,8 @@ export const FinanceRunwayView: FC = () => {
                 <div style={{ marginTop: 16 }}>
                   <label style={{ display: 'block', fontSize: 10, fontWeight: 700, color: S.textMuted, textTransform: 'uppercase', letterSpacing: 0.4, marginBottom: 6 }}>Cassa attuale (€)</label>
                   <div style={{ display: 'flex', gap: 8 }}>
-                    <input type="number" value={fr.cassa} onChange={e => fr.setCassa(Number(e.target.value))} style={{ flex: 1, padding: '8px 10px', border: `1px solid ${S.border}`, borderRadius: 7, fontSize: 14, fontFamily: DS.fonts.mono, fontWeight: 600, background: S.background }} />
-                    <button onClick={fr.saveCassa} style={{ padding: '8px 14px', background: S.teal, color: '#fff', border: 'none', borderRadius: 7, cursor: 'pointer', fontSize: 13, fontWeight: 600, fontFamily: DS.fonts.ui }}>Salva</button>
+                    <input type="number" value={fr.saldoCorrente} onChange={e => fr.setSnapshotForm({...fr.snapshotForm, saldo_cassa: Number(e.target.value)})} style={{ flex: 1, padding: '8px 10px', border: `1px solid ${S.border}`, borderRadius: 7, fontSize: 14, fontFamily: DS.fonts.mono, fontWeight: 600, background: S.background }} />
+                    <button onClick={fr.saveSnapshot} style={{ padding: '8px 14px', background: S.teal, color: '#fff', border: 'none', borderRadius: 7, cursor: 'pointer', fontSize: 13, fontWeight: 600, fontFamily: DS.fonts.ui }}>Salva</button>
                   </div>
                 </div>
               </div>
