@@ -30,7 +30,7 @@ export default function Home() {
   const [selectedProject, setSelectedProject] = useState<any>(null)
   const device = useDevice()
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const { panelObj, openPanel, closePanel } = usePanel()
+  const { panelObj, openPanel, closePanel, navigatePanel } = usePanel()
 
   const tables = ['progetti', 'tasks', 'campagne', 'clienti', 'lab_idee', 'spese_correnti', 'personale', 'mrr_snapshots']
 
@@ -503,7 +503,7 @@ export default function Home() {
       </div>
 
       {/* Universal Detail Panel */}
-      <DetailPanel obj={panelObj} onClose={closePanel} currentUser={user} />
+      <DetailPanel obj={panelObj} onClose={closePanel} currentUser={user} onNavigate={navigatePanel} />
 
       {/* Modal */}
       {showForm && cf && (

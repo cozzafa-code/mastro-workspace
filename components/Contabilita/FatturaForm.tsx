@@ -211,9 +211,20 @@ export const FatturaForm: FC<{ c: any }> = ({ c }) => {
 
         {/* Actions */}
         <div style={{ display: 'flex', gap: 8, justifyContent: 'space-between', alignItems: 'center', paddingTop: 16, borderTop: `1px solid ${S.borderLight}` }}>
-          <button onClick={generateXML} style={{ padding: '8px 16px', border: `1px solid ${S.purple}`, borderRadius: 7, background: S.purpleLight, color: S.purple, cursor: 'pointer', fontSize: 13, fontWeight: 600, fontFamily: DS.fonts.ui }}>
-            Scarica XML SDI
-          </button>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button onClick={generateXML} style={{ padding: '8px 14px', border: `1px solid ${S.purple}`, borderRadius: 7, background: S.purpleLight, color: S.purple, cursor: 'pointer', fontSize: 12, fontWeight: 600, fontFamily: DS.fonts.ui }}>
+              XML SDI
+            </button>
+            <button onClick={async () => {
+              if (!f.numero || !f.controparte_nome) return
+              const resp = await fetch('/api/fattura-pdf', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...f, righe, ...c.calcolaTotali(righe) }) })
+              const html = await resp.text()
+              const win = window.open('', '_blank')
+              if (win) { win.document.write(html); win.document.close(); setTimeout(() => win.print(), 500) }
+            }} style={{ padding: '8px 14px', border: `1px solid ${S.blue}`, borderRadius: 7, background: S.blueLight, color: S.blue, cursor: 'pointer', fontSize: 12, fontWeight: 600, fontFamily: DS.fonts.ui }}>
+              Stampa PDF
+            </button>
+          </div>
           <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
             {(!f.numero || !f.controparte_nome) && (
               <span style={{ fontSize: 11, color: S.red }}>* Numero e Cliente obbligatori</span>
@@ -222,12 +233,12 @@ export const FatturaForm: FC<{ c: any }> = ({ c }) => {
             <button onClick={() => { c.setFatturaForm({ stato: 'bozza' }); c.saveFattura() }}
               disabled={!f.numero || !f.controparte_nome}
               style={{ padding: '8px 16px', border: `1px solid ${S.border}`, borderRadius: 7, background: S.background, color: S.textSecondary, cursor: f.numero && f.controparte_nome ? 'pointer' : 'not-allowed', fontSize: 13, fontFamily: DS.fonts.ui, opacity: f.numero && f.controparte_nome ? 1 : 0.5 }}>
-              Salva bozza
+              Bozza
             </button>
             <button onClick={() => { c.setFatturaForm({ stato: 'emessa' }); c.saveFattura() }}
               disabled={!f.numero || !f.controparte_nome}
               style={{ padding: '8px 20px', background: f.numero && f.controparte_nome ? S.teal : S.borderLight, color: f.numero && f.controparte_nome ? '#fff' : S.textMuted, border: 'none', borderRadius: 7, cursor: f.numero && f.controparte_nome ? 'pointer' : 'not-allowed', fontSize: 13, fontWeight: 600, fontFamily: DS.fonts.ui }}>
-              Emetti fattura
+              Emetti
             </button>
           </div>
         </div>
