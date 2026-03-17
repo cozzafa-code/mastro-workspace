@@ -47,6 +47,29 @@ export interface Task {
   stato?: string
   progetto?: string
   progetto_id?: string
+  tempo_stimato?: number
+  tempo_totale?: number
+  categoria?: string
+  tags?: string[]
+  created_at?: string
+}
+
+export interface TaskSessione {
+  id: string
+  task_id: string
+  utente: string
+  inizio: string
+  fine?: string
+  durata_min?: number
+  note?: string
+  created_at?: string
+}
+
+export interface FinanceSnapshot {
+  id: string
+  data?: string
+  saldo_cassa?: number
+  note?: string
   created_at?: string
 }
 
