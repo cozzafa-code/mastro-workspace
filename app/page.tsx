@@ -410,7 +410,7 @@ export default function Home() {
               {tab === 'campagne' && renderCampagne()}
               {tab === 'clienti' && renderClienti()}
               {tab === 'mrr' && <MrrTrackerView />}
-              {tab === 'calendario' && <CalendarioView />}
+              {tab === 'calendario' && <CalendarioView currentUser={user} />}
               {tab === 'lab_idee' && renderLabIdee()}
               {tab === 'spese' && renderSpese()}
               {tab === 'personale' && renderPersonale()}

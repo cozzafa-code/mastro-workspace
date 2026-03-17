@@ -15,7 +15,7 @@ export interface DeviceInfo {
 export function useDevice(): DeviceInfo {
   const getDevice = (w: number): DeviceType => {
     if (w < 768) return 'mobile'
-    if (w < 1200) return 'tablet'
+    if (w < 1024) return 'tablet'
     return 'desktop'
   }
 
