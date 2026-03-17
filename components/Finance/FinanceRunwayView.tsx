@@ -139,7 +139,7 @@ export const FinanceRunwayView: FC = () => {
           <div style={{ fontSize: 18, fontWeight: 700, color: S.textPrimary, letterSpacing: '-0.3px' }}>Finanze</div>
           <div style={{ fontSize: 12, color: S.textMuted, marginTop: 2 }}>Runway · Burn rate · Entrate e uscite</div>
         </div>
-        <button onClick={fr.openAddSpesa} style={{ padding: '8px 16px', background: S.teal, color: '#fff', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: DS.fonts.ui }}>+ Voce</button>
+        <button onClick={fr.openForm} style={{ padding: '8px 16px', background: S.teal, color: '#fff', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: DS.fonts.ui }}>+ Voce</button>
       </div>
 
       <div style={{ display: 'flex', gap: 3, background: S.background, borderRadius: 9, padding: 3, marginBottom: 20, width: 'fit-content' }}>
@@ -195,15 +195,15 @@ export const FinanceRunwayView: FC = () => {
       {(tab === 'uscite' || tab === 'entrate') && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {(tab === 'uscite' ? uscite : entrate).length === 0
-            ? <div style={{ textAlign: 'center', padding: '40px', background: S.surface, border: `2px dashed ${S.border}`, borderRadius: 12, fontSize: 13, color: S.textMuted, cursor: 'pointer' }} onClick={fr.openAddSpesa}>Nessuna voce · clicca per aggiungere</div>
+            ? <div style={{ textAlign: 'center', padding: '40px', background: S.surface, border: `2px dashed ${S.border}`, borderRadius: 12, fontSize: 13, color: S.textMuted, cursor: 'pointer' }} onClick={fr.openForm}>Nessuna voce · clicca per aggiungere</div>
             : (tab === 'uscite' ? uscite : entrate).map(s => <SpesaCard key={s.id} s={s} onEdit={() => setEditingSpesa(s)} onDelete={() => fr.deleteSpesa(s.id)} />)
           }
         </div>
       )}
 
-      {(fr.showAddForm || editingSpesa) && (
+      {(fr.showForm || editingSpesa) && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: 16, backdropFilter: 'blur(2px)' }}
-          onClick={e => { if (e.target === e.currentTarget) { fr.closeAddSpesa(); setEditingSpesa(null) } }}>
+          onClick={e => { if (e.target === e.currentTarget) { fr.closeForm(); setEditingSpesa(null) } }}>
           <div style={{ background: S.surface, borderRadius: 14, padding: 24, width: '100%', maxWidth: 420, boxShadow: DS.shadow.xl }}>
             <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 18, color: S.textPrimary }}>{editingSpesa ? 'Modifica voce' : 'Nuova voce finanziaria'}</div>
             <FI label="Nome *" value={fr.form.nome || ''} onChange={v => fr.setForm({ ...fr.form, nome: v })} placeholder="es. Vercel Pro" />
@@ -216,8 +216,8 @@ export const FinanceRunwayView: FC = () => {
               <FI label="Categoria" value={fr.form.categoria || ''} onChange={v => fr.setForm({ ...fr.form, categoria: v })} options={Object.keys(CAT_COLORS)} />
             </div>
             <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', paddingTop: 14, borderTop: `1px solid ${S.borderLight}` }}>
-              <button onClick={() => { fr.closeAddSpesa(); setEditingSpesa(null) }} style={{ padding: '8px 16px', border: `1px solid ${S.border}`, borderRadius: 7, background: 'none', cursor: 'pointer', fontSize: 13, fontFamily: DS.fonts.ui }}>Annulla</button>
-              <button onClick={() => { fr.addSpesa(); setEditingSpesa(null) }} style={{ padding: '8px 20px', background: S.teal, color: '#fff', border: 'none', borderRadius: 7, cursor: 'pointer', fontSize: 13, fontWeight: 600, fontFamily: DS.fonts.ui }}>Salva</button>
+              <button onClick={() => { fr.closeForm(); setEditingSpesa(null) }} style={{ padding: '8px 16px', border: `1px solid ${S.border}`, borderRadius: 7, background: 'none', cursor: 'pointer', fontSize: 13, fontFamily: DS.fonts.ui }}>Annulla</button>
+              <button onClick={() => { fr.saveSpesa(); setEditingSpesa(null) }} style={{ padding: '8px 20px', background: S.teal, color: '#fff', border: 'none', borderRadius: 7, cursor: 'pointer', fontSize: 13, fontWeight: 600, fontFamily: DS.fonts.ui }}>Salva</button>
             </div>
           </div>
         </div>
