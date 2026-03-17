@@ -10,6 +10,7 @@ import { FinanceRunwayView } from '@/components/Finance/FinanceRunwayView'
 import { CalendarioView } from '@/components/Calendario/CalendarioView'
 import { GanttView } from '@/components/Gantt/GanttView'
 import { NotificheBell } from '@/components/Notifiche/NotificheBell'
+import { DetailPanel, PanelObject } from '@/components/Universal/DetailPanel'
 import { useDevice } from '@/hooks/useDevice'
 import type { UserType } from '@/lib/types'
 
@@ -26,6 +27,7 @@ export default function Home() {
   const [selectedProject, setSelectedProject] = useState<any>(null)
   const device = useDevice()
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [panelObj, setPanelObj] = useState<PanelObject | null>(null)
 
   const tables = ['progetti', 'tasks', 'campagne', 'clienti', 'lab_idee', 'spese_correnti', 'personale', 'mrr_snapshots']
 
@@ -130,7 +132,8 @@ export default function Home() {
             {urgenti.length === 0
               ? <div style={{ fontSize: 12, color: '#9CA3AF', textAlign: 'center', padding: '16px 0', background: '#fff', border: '1px solid #E5E7EB', borderRadius: 10 }}>Nessun task urgente</div>
               : urgenti.map((t: any) => (
-                <div key={t.id} style={{ background: '#fff', border: '1px solid #E5E7EB', borderRadius: 10, padding: '10px 12px', marginBottom: 6 }}>
+                <div key={t.id} onClick={() => setPanelObj({ type: 'task', id: t.id, data: t })}
+                  style={{ background: '#fff', border: '1px solid #E5E7EB', borderRadius: 10, padding: '10px 12px', marginBottom: 6, cursor: 'pointer' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8 }}>
                     <div style={{ fontSize: 13, fontWeight: 500, color: '#0D1117' }}>{t.titolo || t.testo}</div>
                     <span style={{ fontSize: 10, background: '#FCEAEA', color: '#C93535', padding: '2px 7px', borderRadius: 20, fontWeight: 600, flexShrink: 0 }}>Urgente</span>
@@ -439,6 +442,9 @@ export default function Home() {
           </div>
         )}
       </div>
+
+      {/* Universal Detail Panel */}
+      <DetailPanel obj={panelObj} onClose={() => setPanelObj(null)} currentUser={user} />
 
       {/* Modal */}
       {showForm && cf && (
