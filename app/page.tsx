@@ -19,6 +19,7 @@ import { PersonaleView } from '@/components/Personale/PersonaleView'
 import { DashboardView } from '@/components/Dashboard/DashboardView'
 import { DelegheView } from '@/components/Deleghe/DelegheView'
 import { LabIdeeView } from '@/components/LabIdee/LabIdeeView'
+import { TeamView } from '@/components/Team/TeamView'
 import { WorkspacePanel } from '@/components/WorkspaceIntelligence/WorkspacePanel'
 import { usePanel } from '@/context/PanelContext'
 import type { PanelObject, PanelObjectType } from '@/components/Universal/DetailPanel'
@@ -26,7 +27,7 @@ import { useDevice } from '@/hooks/useDevice'
 import type { UserType } from '@/lib/types'
 
 type User = UserType
-type Tab = 'dashboard' | 'progetti' | 'task' | 'campagne' | 'clienti' | 'mrr' | 'calendario' | 'gantt' | 'contabilita' | 'deleghe' | 'lab_idee' | 'spese' | 'personale'
+type Tab = 'dashboard' | 'progetti' | 'task' | 'campagne' | 'clienti' | 'mrr' | 'calendario' | 'gantt' | 'contabilita' | 'deleghe' | 'team' | 'lab_idee' | 'spese' | 'personale'
 
 export default function Home() {
   const S = DS.colors
@@ -390,6 +391,7 @@ export default function Home() {
     { id: 'progetti',  iconKey: 'projects',  label: 'Progetti',  section: 'Lavoro' },
     { id: 'task',      iconKey: 'tasks',     label: 'Task' },
     { id: 'deleghe',   iconKey: 'deleghe',   label: 'Deleghe' },
+    { id: 'team',      iconKey: 'clients',   label: 'Team',        section: 'Team' },
     { id: 'campagne',  iconKey: 'campaigns', label: 'Campagne' },
     { id: 'clienti',   iconKey: 'clients',   label: 'Pipeline CRM' },
     { id: 'mrr',       iconKey: 'mrr',       label: 'MRR Tracker', section: 'Metriche' },
@@ -404,7 +406,7 @@ export default function Home() {
   const tabTitles: any = {
     dashboard: 'Dashboard', progetti: selectedProject ? selectedProject.nome : 'Progetti',
     task: 'Task', campagne: 'Campagne', clienti: 'Pipeline CRM',
-    mrr: 'MRR Tracker', calendario: 'Calendario', gantt: 'Gantt Timeline', contabilita: 'Contabilità', deleghe: 'Deleghe', lab_idee: 'Lab Idee', spese: 'Finanze', personale: 'La mia area'
+    mrr: 'MRR Tracker', calendario: 'Calendario', gantt: 'Gantt Timeline', contabilita: 'Contabilità', deleghe: 'Deleghe', team: 'Team', lab_idee: 'Lab Idee', spese: 'Finanze', personale: 'La mia area'
   }
   const cf = showForm ? forms[showForm] : null
 
@@ -543,6 +545,7 @@ export default function Home() {
               {tab === 'gantt' && <GanttView />}
               {tab === 'contabilita' && <ContabilitaView />}
               {tab === 'deleghe' && <DelegheView currentUser={user} progetti={data.progetti || []} />}
+              {tab === 'team' && <TeamView currentUser={user} />}
               {tab === 'lab_idee' && <LabIdeeView currentUser={user} progetti={data.progetti || []} />}
               {tab === 'spese' && renderSpese()}
               {tab === 'personale' && <PersonaleView currentUser={user} />}
