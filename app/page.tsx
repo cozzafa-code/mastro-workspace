@@ -245,9 +245,6 @@ export default function Home() {
     p_idee: { title: 'Idea personale', body: <><FI label="Titolo" id="titolo" placeholder="Titolo" /><FI label="Contenuto" id="contenuto" placeholder="Descrizione" /><div className="grid grid-cols-2 gap-2"><FI label="Priorità" id="priorita" options={['Alta','Media','Bassa']} /><FI label="Stato" id="stato" options={['Aperto','In corso','Fatto']} /></div></> },
   }
 
-  const device = useDevice()
-  const [sidebarOpen, setSidebarOpen] = useState(false)
-
   const navItems = [
     { id: 'dashboard', iconKey: 'dashboard', label: 'Dashboard', section: 'Overview' },
     { id: 'progetti',  iconKey: 'projects',  label: 'Progetti',  section: 'Lavoro' },
