@@ -18,6 +18,7 @@ import { TemplatePicker } from '@/components/Progetti/ProgettoTemplates'
 import { PersonaleView } from '@/components/Personale/PersonaleView'
 import { DashboardView } from '@/components/Dashboard/DashboardView'
 import { DelegheView } from '@/components/Deleghe/DelegheView'
+import { WorkspacePanel } from '@/components/WorkspaceIntelligence/WorkspacePanel'
 import { usePanel } from '@/context/PanelContext'
 import type { PanelObject, PanelObjectType } from '@/components/Universal/DetailPanel'
 import { useDevice } from '@/hooks/useDevice'
@@ -547,6 +548,9 @@ export default function Home() {
           </div>
         </div>
       )}
+      {/* Workspace Intelligence — floating button */}
+      <WorkspacePanel utente={user} workspaceData={data} />
+
     </div>
   )
 }
