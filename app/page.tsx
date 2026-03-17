@@ -10,7 +10,9 @@ import { FinanceRunwayView } from '@/components/Finance/FinanceRunwayView'
 import { CalendarioView } from '@/components/Calendario/CalendarioView'
 import { GanttView } from '@/components/Gantt/GanttView'
 import { NotificheBell } from '@/components/Notifiche/NotificheBell'
-import { DetailPanel, PanelObject } from '@/components/Universal/DetailPanel'
+import { DetailPanel } from '@/components/Universal/DetailPanel'
+import { usePanel } from '@/context/PanelContext'
+import type { PanelObject, PanelObjectType } from '@/components/Universal/DetailPanel'
 import { useDevice } from '@/hooks/useDevice'
 import type { UserType } from '@/lib/types'
 
@@ -27,7 +29,7 @@ export default function Home() {
   const [selectedProject, setSelectedProject] = useState<any>(null)
   const device = useDevice()
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [panelObj, setPanelObj] = useState<PanelObject | null>(null)
+  const { panelObj, openPanel, closePanel } = usePanel()
 
   const tables = ['progetti', 'tasks', 'campagne', 'clienti', 'lab_idee', 'spese_correnti', 'personale', 'mrr_snapshots']
 
@@ -132,7 +134,7 @@ export default function Home() {
             {urgenti.length === 0
               ? <div style={{ fontSize: 12, color: '#9CA3AF', textAlign: 'center', padding: '16px 0', background: '#fff', border: '1px solid #E5E7EB', borderRadius: 10 }}>Nessun task urgente</div>
               : urgenti.map((t: any) => (
-                <div key={t.id} onClick={() => setPanelObj({ type: 'task', id: t.id, data: t })}
+                <div key={t.id} onClick={() => openPanel({ type: 'task', id: t.id, data: t })}
                   style={{ background: '#fff', border: '1px solid #E5E7EB', borderRadius: 10, padding: '10px 12px', marginBottom: 6, cursor: 'pointer' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8 }}>
                     <div style={{ fontSize: 13, fontWeight: 500, color: '#0D1117' }}>{t.titolo || t.testo}</div>
@@ -245,15 +247,68 @@ export default function Home() {
   }
 
   function renderPersonale() {
+    const isMob = device.isMobile
+    const isFabio = user === 'fabio'
+    const accent = isFabio ? '#0A8A7A' : '#BE185D'
+    const accentLight = isFabio ? '#EDF7F6' : '#FDF0F6'
     const d = (data.personale || []).filter((p: any) => p.utente === user)
-    const ac = user === 'fabio' ? 'bg-blue-500' : 'bg-rose-500'
+    const sections = [
+      { key: 'task',  label: 'Task personali',   icon: '✓' },
+      { key: 'note',  label: 'Note',              icon: '≡' },
+      { key: 'idee',  label: 'Idee',              icon: '○' },
+    ]
     return (
       <div>
-        <div className="mb-5"><div className="text-base font-semibold">Area di {user === 'fabio' ? 'Fabio' : 'Lidia'}</div><div className="text-xs text-gray-400 mt-1">Visibile solo a te</div></div>
-        {['task','note','idee'].map(type => {
-          const items = d.filter((p: any) => p.tipo_item === type)
-          const labels: any = { task: 'Task personali', note: 'Note personali', idee: 'Idee personali' }
-          return <div key={type}><div className="flex items-center justify-between mb-3 mt-5"><div className="text-xs font-semibold text-gray-400 uppercase tracking-wider">{labels[type]}</div><button onClick={() => setShowForm('p_' + type)} className={`px-3 py-1.5 ${ac} text-white text-xs rounded-lg font-medium`}>+ Aggiungi</button></div>{items.length === 0 ? <div className="text-xs text-gray-400 text-center py-4 bg-white border border-gray-200 rounded-xl">Nessun elemento</div> : items.map((item: any) => <Card key={item.id}><div className="flex items-start justify-between gap-2"><div className="flex-1"><div className="text-sm font-medium">{item.titolo}</div><div className="text-xs text-gray-500 mt-1">{item.contenuto}</div></div><div className="flex gap-1">{item.stato && <Badge text={item.stato} color={sc(item.stato)} />}<button onClick={() => deleteItem('personale', item.id)} className="text-xs text-gray-300 hover:text-red-400">✕</button></div></div></Card>)}</div>
+        {/* Header area */}
+        <div style={{ background: accentLight, border: `1px solid ${accent}30`, borderRadius: 12, padding: '18px 20px', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 16 }}>
+          <div style={{ width: 44, height: 44, borderRadius: '50%', background: accent, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, fontWeight: 700, color: '#fff', flexShrink: 0 }}>
+            {isFabio ? 'FA' : 'LI'}
+          </div>
+          <div>
+            <div style={{ fontSize: 17, fontWeight: 700, color: '#0D1117' }}>Area di {isFabio ? 'Fabio' : 'Lidia'}</div>
+            <div style={{ fontSize: 12, color: '#6B7280', marginTop: 2 }}>Privata · visibile solo a te</div>
+          </div>
+          <div style={{ marginLeft: 'auto', fontSize: 12, color: accent, fontWeight: 600 }}>
+            {d.length} elementi
+          </div>
+        </div>
+
+        {/* Sections */}
+        {sections.map(sec => {
+          const items = d.filter((p: any) => p.tipo_item === sec.key)
+          return (
+            <div key={sec.key} style={{ marginBottom: 20 }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: 0.6 }}>{sec.label} · {items.length}</div>
+                <button onClick={() => setShowForm('p_' + sec.key)} style={{ padding: '5px 12px', background: accent, color: '#fff', border: 'none', borderRadius: 7, fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>+ Aggiungi</button>
+              </div>
+              {items.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '20px 0', fontSize: 12, color: '#9CA3AF', background: '#fff', border: '1px solid #E5E7EB', borderRadius: 10, cursor: 'pointer' }}
+                  onClick={() => setShowForm('p_' + sec.key)}>
+                  Nessun elemento · clicca per aggiungere
+                </div>
+              ) : (
+                <div style={{ display: 'grid', gridTemplateColumns: isMob ? '1fr' : sec.key === 'note' ? '1fr 1fr' : '1fr', gap: 8 }}>
+                  {items.map((item: any) => (
+                    <div key={item.id} style={{ background: '#fff', border: `1px solid #E5E7EB`, borderRadius: 10, padding: '12px 14px', borderLeft: `3px solid ${accent}` }}>
+                      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8 }}>
+                        <div style={{ flex: 1 }}>
+                          <div style={{ fontSize: 13, fontWeight: 600, color: '#0D1117' }}>{item.titolo}</div>
+                          {item.contenuto && <div style={{ fontSize: 12, color: '#6B7280', marginTop: 4, lineHeight: 1.5 }}>{item.contenuto}</div>}
+                          <div style={{ display: 'flex', gap: 8, marginTop: 6, flexWrap: 'wrap' }}>
+                            {item.stato && <span style={{ fontSize: 10, background: accentLight, color: accent, padding: '1px 7px', borderRadius: 20, fontWeight: 600 }}>{item.stato}</span>}
+                            {item.priorita && <span style={{ fontSize: 10, color: '#9CA3AF' }}>{item.priorita}</span>}
+                            {item.scadenza && <span style={{ fontSize: 10, color: '#9CA3AF' }}>📅 {item.scadenza}</span>}
+                          </div>
+                        </div>
+                        <button onClick={() => deleteItem('personale', item.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#D1D5DB', fontSize: 13 }}>✕</button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )
         })}
       </div>
     )
@@ -444,7 +499,7 @@ export default function Home() {
       </div>
 
       {/* Universal Detail Panel */}
-      <DetailPanel obj={panelObj} onClose={() => setPanelObj(null)} currentUser={user} />
+      <DetailPanel obj={panelObj} onClose={closePanel} currentUser={user} />
 
       {/* Modal */}
       {showForm && cf && (

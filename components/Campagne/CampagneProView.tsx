@@ -3,6 +3,7 @@
 import { FC } from 'react'
 import { DS } from '@/constants/design-system'
 import { useCampagnePro, CANALI, TIPI } from '@/hooks/useCampagnePro'
+import { usePanel } from '@/context/PanelContext'
 import type { Campagna, CampagnaMetrica, UserType } from '@/lib/types'
 
 const S = DS.colors
@@ -245,6 +246,7 @@ const DetailPanel: FC<{ c: Campagna; metriche: CampagnaMetrica[]; showMetricaFor
 // ── Main view ─────────────────────────────────────────────
 export const CampagneProView: FC<{ currentUser: UserType }> = ({ currentUser }) => {
   const cp = useCampagnePro(currentUser)
+  const { openPanel } = usePanel()
   const f = cp.form as Partial<Campagna>
 
   if (cp.loading) return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 300 }}><span style={{ fontSize: 13, color: S.textMuted }}>Caricamento...</span></div>
@@ -277,7 +279,7 @@ export const CampagneProView: FC<{ currentUser: UserType }> = ({ currentUser }) 
         </div>
       ) : cp.campagne.map(c => (
         <CampagnaCard key={c.id} c={c} metriche={cp.metricheByC(c.id)}
-          onSelect={() => cp.selectCampagna(c)}
+          onSelect={() => { cp.selectCampagna(c); openPanel({ type: 'campagna', id: c.id, data: c }) }}
           onDelete={() => cp.deleteCampagna(c.id)}
           onEdit={() => cp.openForm(c)}
         />

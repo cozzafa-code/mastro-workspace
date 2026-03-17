@@ -4,6 +4,7 @@ import { FC, useState } from 'react'
 import { DS } from '@/constants/design-system'
 import { useTaskTimer } from '@/hooks/useTaskTimer'
 import { useDevice } from '@/hooks/useDevice'
+import { usePanel } from '@/context/PanelContext'
 import type { Task, UserType } from '@/lib/types'
 
 const S = DS.colors
@@ -47,16 +48,18 @@ const FI: FC<{ label: string; value: string; onChange: (v: string) => void; plac
   )
 
 // ── Task card ──────────────────────────────────────────────
-const TaskCard: FC<{ t: Task; isActive: boolean; elapsed: number; formatElapsed: (s: number) => string; onStart: () => void; onStop: () => void; onComplete: () => void; onDelete: () => void; sessioni: number; compact?: boolean }> =
-  ({ t, isActive, elapsed, formatElapsed, onStart, onStop, onComplete, onDelete, sessioni, compact }) => {
+const TaskCard: FC<{ t: Task; isActive: boolean; elapsed: number; formatElapsed: (s: number) => string; onStart: () => void; onStop: () => void; onComplete: () => void; onDelete: () => void; sessioni: number; compact?: boolean; onDetail?: () => void }> =
+  ({ t, isActive, elapsed, formatElapsed, onStart, onStop, onComplete, onDelete, sessioni, compact, onDetail }) => {
     const isCompleted = t.stato === 'completato' || t.stato === 'Fatto'
     return (
-      <div style={{
+      <div onClick={onDetail}
+        style={{
         background: S.surface, border: `1px solid ${isActive ? S.teal : S.border}`,
         borderRadius: DS.radius.md, padding: compact ? '10px 12px' : '14px 16px',
         marginBottom: 8, opacity: isCompleted ? 0.55 : 1,
         boxShadow: isActive ? `0 0 0 3px ${S.teal}20` : 'none',
         transition: 'border-color 0.15s, box-shadow 0.15s',
+        cursor: onDetail ? 'pointer' : 'default',
       }}>
         <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
           <div style={{ paddingTop: 3, flexShrink: 0 }}>
@@ -77,7 +80,7 @@ const TaskCard: FC<{ t: Task; isActive: boolean; elapsed: number; formatElapsed:
           </div>
 
           {/* Timer + actions */}
-          <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexShrink: 0 }}>
+          <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexShrink: 0 }} onClick={e => e.stopPropagation()}>
             {isActive && (
               <div style={{ fontSize: 14, fontWeight: 700, color: S.teal, fontFamily: DS.fonts.mono, minWidth: 52 }}>
                 {formatElapsed(elapsed)}
@@ -104,6 +107,7 @@ const TaskCard: FC<{ t: Task; isActive: boolean; elapsed: number; formatElapsed:
 export const TaskTimerView: FC<{ currentUser: UserType }> = ({ currentUser }) => {
   const tk = useTaskTimer(currentUser)
   const device = useDevice()
+  const { openPanel } = usePanel()
   const [kanbanView, setKanbanView] = useState(!device.isMobile)
 
   const aperti = tk.filteredTasks.filter(t => !t.stato || t.stato === 'aperto' || t.stato === 'Aperto')
@@ -160,6 +164,7 @@ export const TaskTimerView: FC<{ currentUser: UserType }> = ({ currentUser }) =>
           onComplete={() => tk.updateStato(t.id, 'completato')}
           onDelete={() => tk.deleteTask(t.id)}
           sessioni={tk.sessioniByTask(t.id).length}
+          onDetail={() => openPanel({ type: 'task', id: t.id, data: t })}
         />
       ))}
     </div>
@@ -234,6 +239,7 @@ export const TaskTimerView: FC<{ currentUser: UserType }> = ({ currentUser }) =>
                   onComplete={() => tk.updateStato(t.id, 'completato')}
                   onDelete={() => tk.deleteTask(t.id)}
                   sessioni={tk.sessioniByTask(t.id).length}
+                  onDetail={() => openPanel({ type: 'task', id: t.id, data: t })}
                 />
               ))}
             </div>
@@ -250,6 +256,7 @@ export const TaskTimerView: FC<{ currentUser: UserType }> = ({ currentUser }) =>
               onComplete={() => tk.updateStato(t.id, 'completato')}
               onDelete={() => tk.deleteTask(t.id)}
               sessioni={tk.sessioniByTask(t.id).length}
+              onDetail={() => openPanel({ type: 'task', id: t.id, data: t })}
             />
           ))}
         </div>

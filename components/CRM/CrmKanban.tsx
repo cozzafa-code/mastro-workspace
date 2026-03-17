@@ -3,6 +3,7 @@
 import { FC } from 'react'
 import { DS } from '@/constants/design-system'
 import { STAGES } from '@/hooks/useCrmPipeline'
+import { usePanel } from '@/context/PanelContext'
 import type { Cliente, PipelineStage } from '@/lib/types'
 
 interface Props {
@@ -77,6 +78,7 @@ const ClienteCard: FC<{ c: Cliente; onSelect: () => void; onDelete: () => void; 
   }
 
 export const CrmKanban: FC<Props> = ({ clienti, onSelect, onMoveStage, onDelete }) => {
+  const { openPanel } = usePanel()
   return (
     <div style={{ display: 'flex', gap: 12, overflowX: 'auto', paddingBottom: 8 }}>
       {STAGES.map(stage => {
@@ -109,7 +111,7 @@ export const CrmKanban: FC<Props> = ({ clienti, onSelect, onMoveStage, onDelete 
               ) : stageClienti.map(c => (
                 <ClienteCard
                   key={c.id} c={c}
-                  onSelect={() => onSelect(c)}
+                  onSelect={() => { onSelect(c); openPanel({ type: 'cliente', id: c.id, data: c }) }}
                   onDelete={() => onDelete(c.id)}
                   onMoveStage={(s) => onMoveStage(c.id, s)}
                 />
