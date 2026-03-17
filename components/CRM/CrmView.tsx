@@ -5,6 +5,7 @@ import { DS } from '@/constants/design-system'
 import { useCrmPipeline, STAGES, FONTI, PROGETTI_INTERESSE } from '@/hooks/useCrmPipeline'
 import { CrmKanban } from './CrmKanban'
 import { CrmClienteDetail } from './CrmClienteDetail'
+import { usePanel } from '@/context/PanelContext'
 import type { UserType, Cliente } from '@/lib/types'
 
 interface Props { currentUser: UserType }
@@ -26,6 +27,7 @@ const FI: FC<{ label: string; value: string; onChange: (v: string) => void; plac
 
 export const CrmView: FC<Props> = ({ currentUser }) => {
   const crm = useCrmPipeline(currentUser)
+  const { openPanel } = usePanel()
 
   if (crm.loading) return (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 300 }}>
@@ -88,7 +90,7 @@ export const CrmView: FC<Props> = ({ currentUser }) => {
                 const stage = STAGES.find(s => s.id === (c.pipeline_stage || 'lead'))!
                 return (
                   <tr key={c.id} style={{ borderBottom: `1px solid ${DS.colors.borderLight}`, cursor: 'pointer' }}
-                    onClick={() => crm.selectCliente(c)}
+                    onClick={() => { crm.selectCliente(c); openPanel({ type: 'cliente', id: c.id, data: c }) }}
                     onMouseEnter={e => (e.currentTarget.style.background = DS.colors.background)}
                     onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
                     <td style={{ padding: '10px 14px', fontWeight: 600, color: DS.colors.textPrimary }}>{c.nome}</td>

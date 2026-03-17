@@ -250,11 +250,35 @@ export default function Home() {
   }
 
   function renderLabIdee() {
+    const idee = data.lab_idee || []
     return (
       <div>
-        <SH title="Lab Idee" onAdd={() => setShowForm('idea')} />
-        {(data.lab_idee || []).length === 0 ? <div className="text-center py-8 text-sm text-gray-400 bg-white border border-gray-200 rounded-xl">Nessuna idea ancora</div> :
-          (data.lab_idee || []).map((i: any) => <Card key={i.id}><div className="flex items-start justify-between gap-2"><div className="flex-1"><div className="text-sm font-medium">{i.titolo || i.nome}</div><div className="text-xs text-gray-500 mt-1">{i.descrizione || i.dettaglio}</div></div><div className="flex gap-1">{i.stato && <Badge text={i.stato} color={sc(i.stato)} />}{i.priorita && <Badge text={`P${i.priorita}`} color={pc(i.priorita)} />}<button onClick={() => deleteItem('lab_idee', i.id)} className="text-xs text-gray-300 hover:text-red-400">✕</button></div></div><div className="flex gap-2 mt-2">{i.categoria && <Badge text={i.categoria} color="purple" />}{i.chi && <span className="text-xs text-gray-400">{i.chi}</span>}</div></Card>)
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+          <div style={{ fontSize: 18, fontWeight: 700, color: S.textPrimary }}>Lab Idee</div>
+          <button onClick={() => setShowForm('idea')} style={{ padding: '7px 14px', background: S.teal, color: '#fff', border: 'none', borderRadius: 7, fontSize: 13, cursor: 'pointer', fontFamily: 'inherit' }}>+ Aggiungi</button>
+        </div>
+        {idee.length === 0
+          ? <div style={{ textAlign: 'center', padding: '32px', fontSize: 13, color: S.textMuted, background: S.surface, border: `2px dashed ${S.border}`, borderRadius: 12, cursor: 'pointer' }} onClick={() => setShowForm('idea')}>Nessuna idea ancora · clicca per aggiungere</div>
+          : <div style={{ display: 'grid', gridTemplateColumns: device.isMobile ? '1fr' : '1fr 1fr', gap: 10 }}>
+              {idee.map((idea: any) => (
+                <div key={idea.id} onClick={() => openPanel({ type: 'campagna', id: idea.id, data: idea })}
+                  style={{ background: S.surface, border: `1px solid ${S.border}`, borderRadius: 10, padding: '14px 16px', cursor: 'pointer', borderLeft: `3px solid #6D28D9` }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, marginBottom: 6 }}>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: S.textPrimary }}>{idea.titolo || idea.nome}</div>
+                    <div style={{ display: 'flex', gap: 5, flexShrink: 0 }}>
+                      {idea.stato && <span style={{ fontSize: 10, background: S.tealLight, color: S.teal, padding: '1px 7px', borderRadius: 20, fontWeight: 600 }}>{idea.stato}</span>}
+                      {idea.priorita && <span style={{ fontSize: 10, background: Number(idea.priorita) <= 2 ? S.redLight : S.borderLight, color: Number(idea.priorita) <= 2 ? S.red : S.textMuted, padding: '1px 6px', borderRadius: 20, fontWeight: 600 }}>P{idea.priorita}</span>}
+                      <button onClick={e => { e.stopPropagation(); deleteItem('lab_idee', idea.id) }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: S.textMuted, fontSize: 12 }}>✕</button>
+                    </div>
+                  </div>
+                  {(idea.descrizione || idea.dettaglio) && <div style={{ fontSize: 12, color: S.textSecondary, marginBottom: 8, lineHeight: 1.5 }}>{idea.descrizione || idea.dettaglio}</div>}
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    {idea.categoria && <span style={{ fontSize: 10, background: '#EDE9FE', color: '#6D28D9', padding: '1px 7px', borderRadius: 20, fontWeight: 600 }}>{idea.categoria}</span>}
+                    {idea.chi && <span style={{ fontSize: 11, color: S.textMuted }}>{idea.chi}</span>}
+                  </div>
+                </div>
+              ))}
+            </div>
         }
       </div>
     )

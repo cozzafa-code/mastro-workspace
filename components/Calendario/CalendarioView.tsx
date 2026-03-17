@@ -4,6 +4,7 @@ import { FC, useState, useEffect, useCallback } from 'react'
 import { DS } from '@/constants/design-system'
 import { supabase } from '@/lib/supabase'
 import { useDevice } from '@/hooks/useDevice'
+import { usePanel } from '@/context/PanelContext'
 
 const S = DS.colors
 
@@ -31,6 +32,7 @@ const fmt = (d: Date) => d.toISOString().split('T')[0]
 
 export const CalendarioView: FC<{ currentUser?: string }> = ({ currentUser = 'fabio' }) => {
   const device = useDevice()
+  const { openPanel } = usePanel()
   const [events, setEvents] = useState<CalEvent[]>([])
   const [loading, setLoading] = useState(true)
   const [view, setView] = useState<'mese'|'settimana'>(device.isMobile ? 'settimana' : 'mese')
@@ -140,7 +142,10 @@ export const CalendarioView: FC<{ currentUser?: string }> = ({ currentUser = 'fa
         {de.length===0
           ?<div onClick={()=>openAdd(ds)} style={{textAlign:'center',padding:'20px',fontSize:12,color:S.textMuted,background:S.surface,border:`2px dashed ${S.border}`,borderRadius:10,cursor:'pointer'}}>Nessun evento · clicca per aggiungere</div>
           :de.map(e=>{const c=TIPO_CFG[e.tipo]||TIPO_CFG.evento;return(
-            <div key={e.id} style={{background:S.surface,border:`1px solid ${S.border}`,borderRadius:10,padding:'10px 14px',marginBottom:7,borderLeft:`3px solid ${e.colore}`,display:'flex',justifyContent:'space-between',gap:8}}>
+            <div key={e.id} onClick={() => {
+                if (e.tipo === 'task' && e.id.startsWith('task-')) openPanel({ type: 'task', id: e.id.replace('task-', ''), data: null })
+                else if (e.tipo === 'followup' && e.id.startsWith('fu-')) openPanel({ type: 'cliente', id: e.id.replace('fu-', ''), data: null })
+              }} style={{background:S.surface,border:`1px solid ${S.border}`,borderRadius:10,padding:'10px 14px',marginBottom:7,borderLeft:`3px solid ${e.colore}`,display:'flex',justifyContent:'space-between',gap:8,cursor:'pointer'}}>
               <div style={{flex:1}}>
                 <div style={{display:'flex',gap:6,alignItems:'center',marginBottom:3,flexWrap:'wrap'}}>
                   <span style={{fontSize:10,background:c.bg,color:c.text,padding:'1px 6px',borderRadius:20,fontWeight:600}}>{c.label}</span>
