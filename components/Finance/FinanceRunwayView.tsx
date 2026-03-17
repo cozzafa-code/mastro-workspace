@@ -139,7 +139,7 @@ export const FinanceRunwayView: FC = () => {
           <div style={{ fontSize: 18, fontWeight: 700, color: S.textPrimary, letterSpacing: '-0.3px' }}>Finanze</div>
           <div style={{ fontSize: 12, color: S.textMuted, marginTop: 2 }}>Runway · Burn rate · Entrate e uscite</div>
         </div>
-        <button onClick={fr.openForm} style={{ padding: '8px 16px', background: S.teal, color: '#fff', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: DS.fonts.ui }}>+ Voce</button>
+        <button onClick={() => fr.openForm()} style={{ padding: '8px 16px', background: S.teal, color: '#fff', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: DS.fonts.ui }}>+ Voce</button>
       </div>
 
       <div style={{ display: 'flex', gap: 3, background: S.background, borderRadius: 9, padding: 3, marginBottom: 20, width: 'fit-content' }}>
@@ -195,7 +195,7 @@ export const FinanceRunwayView: FC = () => {
       {(tab === 'uscite' || tab === 'entrate') && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {(tab === 'uscite' ? uscite : entrate).length === 0
-            ? <div style={{ textAlign: 'center', padding: '40px', background: S.surface, border: `2px dashed ${S.border}`, borderRadius: 12, fontSize: 13, color: S.textMuted, cursor: 'pointer' }} onClick={fr.openForm}>Nessuna voce · clicca per aggiungere</div>
+            ? <div style={{ textAlign: 'center', padding: '40px', background: S.surface, border: `2px dashed ${S.border}`, borderRadius: 12, fontSize: 13, color: S.textMuted, cursor: 'pointer' }} onClick={() => fr.openForm()}>Nessuna voce · clicca per aggiungere</div>
             : (tab === 'uscite' ? uscite : entrate).map(s => <SpesaCard key={s.id} s={s} onEdit={() => setEditingSpesa(s)} onDelete={() => fr.deleteSpesa(s.id)} />)
           }
         </div>
