@@ -426,6 +426,30 @@ export const DashboardView: FC<{ data: any; user: string; onNavigate: (tab: stri
         </div>
       </div>
 
-    </div>
-  )
-}
+      {/* ── ULTIME IDEE ── */}
+      {(data.lab_idee || []).length > 0 && (
+        <div>
+          <SectionHeader title="Lab Idee — ultime" action={{ label: 'Tutte le idee', onClick: () => onNavigate('lab_idee') }} />
+          <div style={{ display: 'grid', gridTemplateColumns: isMob ? '1fr' : 'repeat(3, 1fr)', gap: 10 }}>
+            {(data.lab_idee || []).filter((i: any) => i.stato !== 'archiviato').slice(0, 6).map((idea: any) => {
+              const COLORI_IDEA = ['#FEF3C7','#DBEAFE','#D1FAE5','#EDE9FE','#FFE4E6']
+              const bg = idea.colore || COLORI_IDEA[Math.abs(idea.id?.charCodeAt(0) || 0) % COLORI_IDEA.length]
+              const testo = idea.contenuto_ricco || idea.descrizione || idea.dettaglio || ''
+              return (
+                <div key={idea.id} onClick={() => onNavigate('lab_idee')}
+                  style={{ background: bg, border: `1px solid rgba(0,0,0,0.06)`, borderRadius: 10, padding: '14px 16px', cursor: 'pointer', transition: 'transform 0.1s' }}
+                  onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'}
+                  onMouseLeave={e => e.currentTarget.style.transform = 'none'}>
+                  {idea.categoria && <div style={{ fontSize: 10, background: 'rgba(109,40,217,0.15)', color: '#6D28D9', padding: '1px 7px', borderRadius: 20, fontWeight: 600, display: 'inline-block', marginBottom: 6 }}>{idea.categoria}</div>}
+                  <div style={{ fontSize: 13, fontWeight: 700, color: S.textPrimary, marginBottom: testo ? 5 : 0, lineHeight: 1.3 }}>{idea.titolo || 'Senza titolo'}</div>
+                  {testo && <div style={{ fontSize: 11, color: S.textSecondary, lineHeight: 1.5, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{testo}</div>}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8 }}>
+                    {idea.stato && <span style={{ fontSize: 10, background: 'rgba(255,255,255,0.5)', color: S.textMuted, padding: '1px 6px', borderRadius: 20 }}>{idea.stato}</span>}
+                    <span style={{ fontSize: 10, color: S.textMuted, marginLeft: 'auto' }}>{idea.created_at ? new Date(idea.created_at).toLocaleDateString('it-IT', { day: '2-digit', month: 'short' }) : ''}</span>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
