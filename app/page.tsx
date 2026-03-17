@@ -256,76 +256,160 @@ export default function Home() {
   }
 
   const navItems = [
-    { id: 'dashboard', icon: '🏠', label: 'Dashboard', section: 'Generale' },
-    { id: 'progetti', icon: '🚀', label: 'Progetti', section: 'Lavoro' },
-    { id: 'task', icon: '✅', label: 'Task' },
-    { id: 'campagne', icon: '📣', label: 'Campagne' },
-    { id: 'clienti', icon: '👥', label: 'Clienti' },
-    { id: 'lab_idee', icon: '💡', label: 'Lab Idee', section: 'Organizzazione' },
-    { id: 'mrr', icon: '📈', label: 'MRR Tracker', section: 'Finanze' },
-    { id: 'spese', icon: '💰', label: 'Finanze' },
-    { id: 'personale', icon: '👤', label: 'La mia area', section: 'Personale' },
+    { id: 'dashboard', iconKey: 'dashboard', label: 'Dashboard', section: 'Overview' },
+    { id: 'progetti',  iconKey: 'projects',  label: 'Progetti',  section: 'Lavoro' },
+    { id: 'task',      iconKey: 'tasks',     label: 'Task' },
+    { id: 'campagne',  iconKey: 'campaigns', label: 'Campagne' },
+    { id: 'clienti',   iconKey: 'clients',   label: 'Pipeline CRM' },
+    { id: 'mrr',       iconKey: 'mrr',       label: 'MRR Tracker', section: 'Metriche' },
+    { id: 'lab_idee',  iconKey: 'ideas',     label: 'Lab Idee',    section: 'Idee' },
+    { id: 'spese',     iconKey: 'finance',   label: 'Finanze',     section: 'Finanze' },
+    { id: 'personale', iconKey: 'personal',  label: 'La mia area', section: 'Personale' },
   ]
 
-  const tabTitles: any = { dashboard: 'Dashboard', progetti: selectedProject ? selectedProject.nome : 'Progetti', task: 'Task', campagne: 'Campagne', clienti: 'Clienti', lab_idee: 'Lab Idee', spese: 'Finanze', personale: 'La mia area' }
+  const tabTitles: any = {
+    dashboard: 'Dashboard', progetti: selectedProject ? selectedProject.nome : 'Progetti',
+    task: 'Task', campagne: 'Campagne', clienti: 'Pipeline CRM',
+    mrr: 'MRR Tracker', lab_idee: 'Lab Idee', spese: 'Finanze', personale: 'La mia area'
+  }
   const cf = showForm ? forms[showForm] : null
 
+  const iconSvg = (key: string, active: boolean) => {
+    const svgs: any = {
+      dashboard: <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1.5" stroke="currentColor" strokeWidth="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5" stroke="currentColor" strokeWidth="1.5"/><rect x="1" y="9" width="6" height="6" rx="1.5" stroke="currentColor" strokeWidth="1.5"/><rect x="9" y="9" width="6" height="6" rx="1.5" stroke="currentColor" strokeWidth="1.5"/></svg>,
+      projects:  <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M2 4.5C2 3.12 3.12 2 4.5 2h7C12.88 2 14 3.12 14 4.5v7C14 12.88 12.88 14 11.5 14h-7C3.12 14 2 12.88 2 11.5v-7z" stroke="currentColor" strokeWidth="1.5"/><path d="M5.5 8h5M5.5 5.5h5M5.5 10.5h3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>,
+      tasks:     <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M3 8l3 3 7-7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>,
+      campaigns: <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M2 10V6l10-4v12L2 10zm0 0h3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/><path d="M5 10v3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>,
+      clients:   <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><circle cx="6" cy="5" r="2.5" stroke="currentColor" strokeWidth="1.5"/><path d="M1.5 13c0-2.485 2.015-4.5 4.5-4.5s4.5 2.015 4.5 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/><path d="M10.5 7.5c1.38 0 2.5 1.12 2.5 2.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>,
+      mrr:       <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M2 12l3.5-4 3 2.5L12 5l2 2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>,
+      ideas:     <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M8 2a4 4 0 014 4c0 1.5-.8 2.8-2 3.5V11H6v-1.5C4.8 8.8 4 7.5 4 6a4 4 0 014-4z" stroke="currentColor" strokeWidth="1.5"/><path d="M6 13h4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>,
+      finance:   <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><rect x="2" y="4" width="12" height="9" rx="1.5" stroke="currentColor" strokeWidth="1.5"/><path d="M5 4V3a1 1 0 011-1h4a1 1 0 011 1v1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>,
+      personal:  <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="5.5" r="2.5" stroke="currentColor" strokeWidth="1.5"/><path d="M2.5 13.5c0-3.038 2.462-5.5 5.5-5.5s5.5 2.462 5.5 5.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>,
+    }
+    return svgs[key] || svgs.dashboard
+  }
+
   return (
-    <div className="flex h-screen overflow-hidden bg-gray-50" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif' }}>
-      <div className="w-52 flex-shrink-0 flex flex-col overflow-y-auto" style={{ background: '#0B1F2A' }}>
-        <div className="px-4 py-5 border-b border-white/10">
-          <div className="text-white text-sm font-semibold leading-tight">MASTRO<br />WORKSPACE</div>
-          <div className="text-white/40 text-xs mt-1">Fabio & Lidia</div>
-        </div>
-        <nav className="flex-1 px-2 py-3">
-          {navItems.map((item: any) => (
-            <div key={item.id}>
-              {item.section && <div className="text-white/30 text-[9px] font-semibold uppercase tracking-widest px-2 pt-4 pb-1">{item.section}</div>}
-              <button onClick={() => { setTab(item.id as Tab); setSelectedProject(null) }} className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm mb-0.5 transition-all text-left ${tab === item.id ? 'bg-teal-500 text-white' : 'text-white/60 hover:bg-white/7 hover:text-white/90'}`}>
-                <span className="text-base w-5 text-center">{item.icon}</span><span>{item.label}</span>
-              </button>
+    <div style={{ display: 'flex', height: '100vh', overflow: 'hidden', background: '#F7F8FA', fontFamily: '"DM Sans", -apple-system, BlinkMacSystemFont, sans-serif' }}>
+      {/* Google Font import */}
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap');`}</style>
+
+      {/* SIDEBAR */}
+      <div style={{ width: 220, flexShrink: 0, display: 'flex', flexDirection: 'column', background: '#FFFFFF', borderRight: '1px solid #EFEFEF', overflow: 'hidden' }}>
+
+        {/* Logo */}
+        <div style={{ padding: '20px 20px 16px', borderBottom: '1px solid #F3F4F6' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{ width: 28, height: 28, borderRadius: 7, background: '#0A8A7A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 12L7 2l5 10" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/><path d="M3.5 9h7" stroke="white" strokeWidth="1.8" strokeLinecap="round"/></svg>
             </div>
-          ))}
+            <div>
+              <div style={{ fontSize: 13, fontWeight: 600, color: '#0D1117', letterSpacing: '-0.2px' }}>Mastro OS</div>
+              <div style={{ fontSize: 10, color: '#9CA3AF', marginTop: 0 }}>fabio-os</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Nav */}
+        <nav style={{ flex: 1, padding: '10px 10px', overflowY: 'auto' }}>
+          {navItems.map((item: any) => {
+            const isActive = tab === item.id
+            return (
+              <div key={item.id}>
+                {item.section && (
+                  <div style={{ fontSize: 9.5, fontWeight: 600, color: '#C4C9D4', textTransform: 'uppercase', letterSpacing: '0.8px', padding: '14px 10px 5px' }}>
+                    {item.section}
+                  </div>
+                )}
+                <button
+                  onClick={() => { setTab(item.id as Tab); setSelectedProject(null) }}
+                  style={{
+                    width: '100%', display: 'flex', alignItems: 'center', gap: 9,
+                    padding: '7px 10px', borderRadius: 7, border: 'none', cursor: 'pointer',
+                    background: isActive ? '#EDF7F6' : 'transparent',
+                    color: isActive ? '#0A8A7A' : '#5C6370',
+                    fontSize: 13, fontWeight: isActive ? 500 : 400,
+                    marginBottom: 1, textAlign: 'left', transition: 'all 0.1s',
+                    fontFamily: 'inherit',
+                  }}
+                  onMouseEnter={e => { if (!isActive) e.currentTarget.style.background = '#F7F8FA' }}
+                  onMouseLeave={e => { if (!isActive) e.currentTarget.style.background = 'transparent' }}
+                >
+                  <span style={{ opacity: isActive ? 1 : 0.6, flexShrink: 0 }}>{iconSvg(item.iconKey, isActive)}</span>
+                  <span>{item.label}</span>
+                  {isActive && <div style={{ marginLeft: 'auto', width: 5, height: 5, borderRadius: '50%', background: '#0A8A7A', flexShrink: 0 }} />}
+                </button>
+              </div>
+            )
+          })}
         </nav>
-        <div className="px-2 py-3 border-t border-white/10">
-          <div className="flex gap-1.5">
-            <button onClick={() => setUser('fabio')} className={`flex-1 py-2 rounded-lg text-xs font-medium transition-all ${user === 'fabio' ? 'bg-teal-500 text-white' : 'text-white/60 border border-white/15 hover:bg-white/7'}`}>FA</button>
-            <button onClick={() => setUser('lidia')} className={`flex-1 py-2 rounded-lg text-xs font-medium transition-all ${user === 'lidia' ? 'bg-rose-500 text-white' : 'text-white/60 border border-white/15 hover:bg-white/7'}`}>LI</button>
+
+        {/* User switcher */}
+        <div style={{ padding: '12px 10px', borderTop: '1px solid #F3F4F6' }}>
+          <div style={{ fontSize: 9.5, fontWeight: 600, color: '#C4C9D4', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: 8, paddingLeft: 4 }}>Utente attivo</div>
+          <div style={{ display: 'flex', gap: 6 }}>
+            {[{ id: 'fabio', label: 'Fabio', initials: 'FA', color: '#0A8A7A' }, { id: 'lidia', label: 'Lidia', initials: 'LI', color: '#BE185D' }].map(u => (
+              <button key={u.id} onClick={() => setUser(u.id as User)} style={{
+                flex: 1, display: 'flex', alignItems: 'center', gap: 6, padding: '7px 8px',
+                borderRadius: 7, border: `1px solid ${user === u.id ? u.color + '40' : '#F0F0F0'}`,
+                background: user === u.id ? u.color + '12' : 'transparent',
+                cursor: 'pointer', fontFamily: 'inherit',
+              }}>
+                <div style={{ width: 20, height: 20, borderRadius: '50%', background: user === u.id ? u.color : '#E5E7EB', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 8, fontWeight: 700, color: user === u.id ? '#fff' : '#9CA3AF', flexShrink: 0 }}>{u.initials}</div>
+                <span style={{ fontSize: 11.5, fontWeight: user === u.id ? 500 : 400, color: user === u.id ? u.color : '#6B7280' }}>{u.label}</span>
+              </button>
+            ))}
           </div>
         </div>
       </div>
 
-      <div className="flex-1 flex flex-col overflow-hidden min-w-0">
-        <div className="bg-white border-b border-gray-200 px-6 py-3.5 flex items-center justify-between flex-shrink-0">
-          <h1 className="text-sm font-semibold text-gray-900">{tabTitles[tab]}</h1>
-          <div className="flex items-center gap-3">
-            <span className="text-xs px-3 py-1.5 rounded-full bg-green-50 text-green-700 font-medium">✓ fabio-os connesso</span>
-            <span className="text-sm text-gray-400">{user === 'fabio' ? '👤 Fabio' : '👤 Lidia'}</span>
+      {/* MAIN */}
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', minWidth: 0 }}>
+
+        {/* Topbar */}
+        <div style={{ background: '#FFFFFF', borderBottom: '1px solid #EFEFEF', padding: '0 28px', height: 52, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <span style={{ fontSize: 13, color: '#9CA3AF' }}>Workspace</span>
+            <span style={{ fontSize: 13, color: '#D1D5DB' }}>/</span>
+            <span style={{ fontSize: 13, fontWeight: 500, color: '#0D1117' }}>{tabTitles[tab]}</span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 5, background: '#F0F7F6', border: '1px solid #B2E8E3', borderRadius: 20, padding: '4px 10px 4px 8px' }}>
+              <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#0A8A7A' }} />
+              <span style={{ fontSize: 11.5, fontWeight: 500, color: '#0A8A7A' }}>fabio-os · live</span>
+            </div>
           </div>
         </div>
-        <div className="flex-1 overflow-y-auto px-6 py-5">
-          {loading ? <div className="flex items-center justify-center h-full"><div className="text-sm text-gray-400">Caricamento da fabio-os...</div></div> : <>
-            {tab === 'dashboard' && renderDashboard()}
-            {tab === 'progetti' && renderProgetti()}
-            {tab === 'task' && renderTask()}
-            {tab === 'campagne' && renderCampagne()}
-            {tab === 'clienti' && renderClienti()}
-            {tab === 'mrr' && <MrrTrackerView />}
-            {tab === 'lab_idee' && renderLabIdee()}
-            {tab === 'spese' && renderSpese()}
-            {tab === 'personale' && renderPersonale()}
-          </>}
+
+        {/* Content */}
+        <div style={{ flex: 1, overflowY: 'auto', padding: '28px 32px' }}>
+          {loading
+            ? <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}><span style={{ fontSize: 13, color: '#9CA3AF' }}>Caricamento...</span></div>
+            : <>
+              {tab === 'dashboard' && renderDashboard()}
+              {tab === 'progetti' && renderProgetti()}
+              {tab === 'task' && renderTask()}
+              {tab === 'campagne' && renderCampagne()}
+              {tab === 'clienti' && renderClienti()}
+              {tab === 'mrr' && <MrrTrackerView />}
+              {tab === 'lab_idee' && renderLabIdee()}
+              {tab === 'spese' && renderSpese()}
+              {tab === 'personale' && renderPersonale()}
+            </>
+          }
         </div>
       </div>
 
+      {/* Modal */}
       {showForm && cf && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={e => { if (e.target === e.currentTarget) { setShowForm(null); setForm({}) } }}>
-          <div className="bg-white rounded-2xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto shadow-2xl">
-            <div className="text-base font-semibold mb-4">{cf.title}</div>
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50, backdropFilter: 'blur(2px)' }}
+          onClick={e => { if (e.target === e.currentTarget) { setShowForm(null); setForm({}) } }}>
+          <div style={{ background: '#fff', borderRadius: 14, padding: '24px', width: '100%', maxWidth: 440, maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 24px 48px rgba(0,0,0,0.12), 0 8px 16px rgba(0,0,0,0.06)', border: '1px solid #F0F0F0' }}>
+            <div style={{ fontSize: 15, fontWeight: 600, color: '#0D1117', marginBottom: 18, letterSpacing: '-0.2px' }}>{cf.title}</div>
             {cf.body}
-            <div className="flex gap-2 justify-end mt-4">
-              <button onClick={() => { setShowForm(null); setForm({}) }} className="px-4 py-2 border border-gray-200 rounded-lg text-sm hover:bg-gray-50">Annulla</button>
-              <button onClick={handleSave} className="px-4 py-2 bg-teal-500 text-white rounded-lg text-sm font-medium hover:bg-teal-600">Salva</button>
+            <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 16, paddingTop: 16, borderTop: '1px solid #F3F4F6' }}>
+              <button onClick={() => { setShowForm(null); setForm({}) }} style={{ padding: '8px 16px', border: '1px solid #E5E7EB', borderRadius: 7, background: 'none', cursor: 'pointer', fontSize: 13, color: '#6B7280', fontFamily: 'inherit' }}>Annulla</button>
+              <button onClick={handleSave} style={{ padding: '8px 18px', background: '#0A8A7A', color: '#fff', border: 'none', borderRadius: 7, cursor: 'pointer', fontSize: 13, fontWeight: 500, fontFamily: 'inherit' }}>Salva</button>
             </div>
           </div>
         </div>
