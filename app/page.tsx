@@ -527,92 +527,205 @@ export default function Home() {
   if (!authUser) return <LoginPage />
 
   return (
-    <div style={{ display: 'flex', height: '100vh', overflow: 'hidden', background: '#F7F8FA', fontFamily: '"DM Sans", -apple-system, BlinkMacSystemFont, sans-serif' }}>
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap');`}</style>
+    <div style={{ display: 'flex', height: '100vh', overflow: 'hidden', background: '#F4F6F8', fontFamily: DS.fonts.ui }}>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+        * { box-sizing: border-box; }
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #D1D5DB; border-radius: 2px; }
+      `}</style>
 
-      {/* SIDEBAR — hidden on mobile, collapsible on tablet */}
+      {/* SIDEBAR — desktop only, premium dark */}
       {!device.isMobile && (
-        <div style={{ width: device.isTablet && !sidebarOpen ? 56 : 220, flexShrink: 0, display: 'flex', flexDirection: 'column', background: '#FFFFFF', borderRight: '1px solid #EFEFEF', overflow: 'hidden', transition: 'width 0.2s ease' }}>
-          <div style={{ padding: device.isTablet && !sidebarOpen ? '18px 14px' : '20px 20px 16px', borderBottom: '1px solid #F3F4F6', display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div style={{ width: 28, height: 28, borderRadius: 7, background: '#0A8A7A', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, cursor: device.isTablet ? 'pointer' : 'default' }}
-              onClick={() => device.isTablet && setSidebarOpen(!sidebarOpen)}>
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 12L7 2l5 10" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/><path d="M3.5 9h7" stroke="white" strokeWidth="1.8" strokeLinecap="round"/></svg>
+        <div style={{
+          width: device.isTablet && !sidebarOpen ? 64 : 240,
+          flexShrink: 0,
+          display: 'flex',
+          flexDirection: 'column',
+          background: DS.colors.dark,
+          overflow: 'hidden',
+          transition: 'width 0.25s cubic-bezier(0.4,0,0.2,1)',
+        }}>
+          {/* Logo */}
+          <div style={{ padding: device.isTablet && !sidebarOpen ? '20px 16px' : '20px 20px 16px', display: 'flex', alignItems: 'center', gap: 12, borderBottom: '1px solid rgba(255,255,255,0.06)', cursor: device.isTablet ? 'pointer' : 'default' }}
+            onClick={() => device.isTablet && setSidebarOpen(!sidebarOpen)}>
+            <div style={{ width: 32, height: 32, borderRadius: 10, background: DS.colors.teal, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><path d="M1 10L5 1l4 7 4-7 3 9" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
             </div>
-            {(!device.isTablet || sidebarOpen) && <div><div style={{ fontSize: 13, fontWeight: 600, color: '#0D1117' }}>Mastro OS</div><div style={{ fontSize: 10, color: '#9CA3AF' }}>fabio-os</div></div>}
+            {(!device.isTablet || sidebarOpen) && (
+              <div>
+                <div style={{ fontSize: 14, fontWeight: 800, color: '#fff', letterSpacing: '-0.3px' }}>MASTRO OS</div>
+                <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.3)', marginTop: 1 }}>workspace</div>
+              </div>
+            )}
           </div>
-          <nav style={{ flex: 1, padding: '10px 8px', overflowY: 'auto' }}>
-            {navItems.map((item: any) => {
-              const isActive = tab === item.id
+
+          {/* Nav principale */}
+          <nav style={{ flex: 1, padding: '12px 10px', overflowY: 'auto' }}>
+            {(() => {
               const collapsed = device.isTablet && !sidebarOpen
-              return (
-                <div key={item.id}>
-                  {item.section && !collapsed && <div style={{ fontSize: 9.5, fontWeight: 600, color: '#C4C9D4', textTransform: 'uppercase', letterSpacing: '0.8px', padding: '14px 10px 5px' }}>{item.section}</div>}
-                  <button onClick={() => { setTab(item.id as Tab); setSelectedProject(null) }} title={collapsed ? item.label : undefined}
-                    style={{ width: '100%', display: 'flex', alignItems: 'center', gap: collapsed ? 0 : 9, justifyContent: collapsed ? 'center' : 'flex-start', padding: collapsed ? '9px 0' : '7px 10px', borderRadius: 7, border: 'none', cursor: 'pointer', background: isActive ? '#EDF7F6' : 'transparent', color: isActive ? '#0A8A7A' : '#5C6370', fontSize: 13, fontWeight: isActive ? 500 : 400, marginBottom: 1, textAlign: 'left', fontFamily: 'inherit', position: 'relative' }}>
-                    <span style={{ opacity: isActive ? 1 : 0.6, flexShrink: 0, position: 'relative' }}>
-                      {iconSvg(item.iconKey, isActive)}
-                    </span>
-                    {!collapsed && <span>{item.label}</span>}
-                    {!collapsed && isActive && <div style={{ marginLeft: 'auto', width: 5, height: 5, borderRadius: '50%', background: '#0A8A7A' }} />}
-                  </button>
+              const groups = [
+                {
+                  label: null,
+                  items: [
+                    { id: 'dashboard',  iconKey: 'dashboard', label: 'Home' },
+                  ]
+                },
+                {
+                  label: 'Lavoro',
+                  items: [
+                    { id: 'task',       iconKey: 'tasks',     label: 'Task' },
+                    { id: 'deleghe',    iconKey: 'deleghe',   label: 'Deleghe' },
+                    { id: 'progetti',   iconKey: 'projects',  label: 'Progetti' },
+                    { id: 'calendario', iconKey: 'calendar',  label: 'Calendario' },
+                    { id: 'condivisa',  iconKey: 'deleghe',   label: 'Bacheca' },
+                  ]
+                },
+                {
+                  label: 'Clienti',
+                  items: [
+                    { id: 'clienti',    iconKey: 'clients',   label: 'CRM' },
+                    { id: 'preventivi', iconKey: 'receipt',   label: 'Preventivi' },
+                    { id: 'campagne',   iconKey: 'campaigns', label: 'Campagne' },
+                  ]
+                },
+                {
+                  label: 'Business',
+                  items: [
+                    { id: 'contabilita',iconKey: 'receipt',   label: 'Contabilità' },
+                    { id: 'spese',      iconKey: 'finance',   label: 'Finanze' },
+                    { id: 'mrr',        iconKey: 'mrr',       label: 'MRR' },
+                  ]
+                },
+                {
+                  label: 'Altro',
+                  items: [
+                    { id: 'lab_idee',   iconKey: 'ideas',     label: 'Lab Idee' },
+                    { id: 'team',       iconKey: 'clients',   label: 'Team' },
+                    { id: 'gantt',      iconKey: 'gantt',     label: 'Gantt' },
+                    { id: 'personale',  iconKey: 'personal',  label: 'La mia area' },
+                  ]
+                },
+              ]
+              return groups.map((group, gi) => (
+                <div key={gi}>
+                  {group.label && !collapsed && (
+                    <div style={{ fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.2)', textTransform: 'uppercase', letterSpacing: 1.2, padding: '14px 8px 5px' }}>
+                      {group.label}
+                    </div>
+                  )}
+                  {group.items.map((item: any) => {
+                    const isActive = tab === item.id
+                    return (
+                      <button key={item.id}
+                        onClick={() => { setTab(item.id as Tab); setSelectedProject(null) }}
+                        title={collapsed ? item.label : undefined}
+                        style={{
+                          width: '100%', display: 'flex', alignItems: 'center',
+                          gap: collapsed ? 0 : 10, justifyContent: collapsed ? 'center' : 'flex-start',
+                          padding: collapsed ? '9px 0' : '8px 10px',
+                          borderRadius: 8, border: 'none', cursor: 'pointer',
+                          background: isActive ? 'rgba(10,138,122,0.2)' : 'transparent',
+                          color: isActive ? DS.colors.teal : 'rgba(255,255,255,0.45)',
+                          fontSize: 13, fontWeight: isActive ? 600 : 400,
+                          marginBottom: 1, textAlign: 'left', fontFamily: 'inherit',
+                          transition: 'all 0.15s',
+                        }}
+                        onMouseEnter={e => { if (!isActive) e.currentTarget.style.background = 'rgba(255,255,255,0.06)'; e.currentTarget.style.color = 'rgba(255,255,255,0.8)' }}
+                        onMouseLeave={e => { if (!isActive) { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'rgba(255,255,255,0.45)' } }}
+                      >
+                        <span style={{ flexShrink: 0, opacity: isActive ? 1 : 0.7 }}>{iconSvg(item.iconKey, isActive)}</span>
+                        {!collapsed && <span>{item.label}</span>}
+                        {!collapsed && isActive && <div style={{ marginLeft: 'auto', width: 5, height: 5, borderRadius: '50%', background: DS.colors.teal, flexShrink: 0 }} />}
+                      </button>
+                    )
+                  })}
                 </div>
-              )
-            })}
+              ))
+            })()}
           </nav>
+
+          {/* Footer sidebar */}
           {(!device.isTablet || sidebarOpen) && (
-            <div style={{ padding: '12px 10px', borderTop: '1px solid #F3F4F6' }}>
-              <div style={{ fontSize: 9.5, fontWeight: 600, color: '#C4C9D4', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: 8, paddingLeft: 4 }}>Utente</div>
-              <div style={{ display: 'flex', gap: 6, marginBottom: 6 }}>
-                {[{ id: 'fabio', label: 'Fabio', initials: 'FA', color: '#0A8A7A' }, { id: 'lidia', label: 'Lidia', initials: 'LI', color: '#BE185D' }].map(u => (
-                  <button key={u.id} onClick={() => setUser(u.id as User)} style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 6, padding: '7px 8px', borderRadius: 7, border: `1px solid ${user === u.id ? u.color + '40' : '#F0F0F0'}`, background: user === u.id ? u.color + '12' : 'transparent', cursor: 'pointer', fontFamily: 'inherit' }}>
-                    <div style={{ width: 20, height: 20, borderRadius: '50%', background: user === u.id ? u.color : '#E5E7EB', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 8, fontWeight: 700, color: user === u.id ? '#fff' : '#9CA3AF', flexShrink: 0 }}>{u.initials}</div>
-                    <span style={{ fontSize: 11.5, fontWeight: user === u.id ? 500 : 400, color: user === u.id ? u.color : '#6B7280' }}>{u.label}</span>
+            <div style={{ padding: '12px 10px', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+              {/* User switcher */}
+              <div style={{ display: 'flex', gap: 5, marginBottom: 8 }}>
+                {[
+                  { id: 'fabio', label: 'Fabio', initials: 'FA', color: DS.colors.teal },
+                  { id: 'lidia', label: 'Lidia',  initials: 'LI', color: DS.colors.lidia }
+                ].map(u => (
+                  <button key={u.id} onClick={() => setUser(u.id as User)}
+                    style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 6, padding: '7px 8px', borderRadius: 8, border: `1px solid ${user === u.id ? u.color + '60' : 'rgba(255,255,255,0.08)'}`, background: user === u.id ? u.color + '20' : 'transparent', cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.15s' }}>
+                    <div style={{ width: 20, height: 20, borderRadius: '50%', background: user === u.id ? u.color : 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 7, fontWeight: 800, color: '#fff', flexShrink: 0 }}>{u.initials}</div>
+                    <span style={{ fontSize: 11, fontWeight: user === u.id ? 600 : 400, color: user === u.id ? u.color : 'rgba(255,255,255,0.35)' }}>{u.label}</span>
                   </button>
                 ))}
               </div>
-              <button onClick={() => supabase.auth.signOut()}
-                style={{ width: '100%', padding: '6px 8px', border: '1px solid #F0F0F0', borderRadius: 7, background: 'transparent', cursor: 'pointer', fontFamily: 'inherit', fontSize: 11, color: '#9CA3AF', textAlign: 'left' }}>
-                → Esci
-              </button>
-              <button onClick={() => setShowSettings(true)}
-                style={{ width: '100%', padding: '6px 8px', border: '1px solid #F0F0F0', borderRadius: 7, background: 'transparent', cursor: 'pointer', fontFamily: 'inherit', fontSize: 11, color: '#9CA3AF', textAlign: 'left', marginTop: 4 }}>
-                ⚙️ Impostazioni
-              </button>
+              <div style={{ display: 'flex', gap: 5 }}>
+                <button onClick={() => setShowSettings(true)}
+                  style={{ flex: 1, padding: '6px 8px', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 7, background: 'transparent', cursor: 'pointer', fontFamily: 'inherit', fontSize: 11, color: 'rgba(255,255,255,0.3)', textAlign: 'center' }}>
+                  ⚙️
+                </button>
+                <button onClick={() => supabase.auth.signOut()}
+                  style={{ flex: 1, padding: '6px 8px', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 7, background: 'transparent', cursor: 'pointer', fontFamily: 'inherit', fontSize: 11, color: 'rgba(255,255,255,0.3)', textAlign: 'center' }}>
+                  Esci
+                </button>
+              </div>
             </div>
           )}
         </div>
       )}
 
-      {/* MAIN */}
+            {/* MAIN */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', minWidth: 0 }}>
-        {/* Topbar */}
-        <div style={{ background: '#FFFFFF', borderBottom: '1px solid #EFEFEF', padding: device.isMobile ? '0 16px' : '0 28px', height: device.isMobile ? 48 : 52, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            {device.isMobile && <div style={{ width: 24, height: 24, borderRadius: 6, background: '#0A8A7A', display: 'flex', alignItems: 'center', justifyContent: 'center', marginRight: 4 }}><svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M2 12L7 2l5 10" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg></div>}
-            {!device.isMobile && <span style={{ fontSize: 13, color: '#9CA3AF' }}>Workspace /</span>}
-            <span style={{ fontSize: device.isMobile ? 14 : 13, fontWeight: 600, color: '#0D1117' }}>{tabTitles[tab]}</span>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            {!device.isMobile && (
-              <button onClick={() => setShowImportExport(true)} style={{ padding: '5px 10px', border: `1px solid ${S.border}`, borderRadius: 7, background: 'none', cursor: 'pointer', fontSize: 11, color: S.textSecondary, fontFamily: DS.fonts.ui, fontWeight: 500 }}>
-                Import / Export
-              </button>
+        {/* Topbar — pulita e orientativa */}
+        <div style={{
+          background: '#FFFFFF',
+          borderBottom: '1px solid #E8EAED',
+          padding: device.isMobile ? '0 16px' : '0 24px',
+          height: device.isMobile ? 52 : 54,
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          flexShrink: 0, gap: 12,
+        }}>
+          {/* Left — logo mobile + breadcrumb */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            {device.isMobile && (
+              <div style={{ width: 30, height: 30, borderRadius: 8, background: DS.colors.dark, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <svg width="14" height="10" viewBox="0 0 16 12" fill="none"><path d="M1 10L5 1l4 7 4-7 3 9" stroke={DS.colors.teal} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              </div>
             )}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 5, background: '#F0F7F6', border: '1px solid #B2E8E3', borderRadius: 20, padding: '3px 8px 3px 6px' }}>
-              <div style={{ width: 5, height: 5, borderRadius: '50%', background: '#0A8A7A' }} />
-              <span style={{ fontSize: device.isMobile ? 10 : 11.5, fontWeight: 500, color: '#0A8A7A' }}>live</span>
+            <div>
+              {!device.isMobile && <div style={{ fontSize: 11, color: DS.colors.textFaint, marginBottom: 1 }}>Workspace</div>}
+              <div style={{ fontSize: device.isMobile ? 15 : 15, fontWeight: 700, color: DS.colors.textPrimary, letterSpacing: '-0.2px' }}>{tabTitles[tab]}</div>
             </div>
+          </div>
+
+          {/* Right — actions */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            {/* Live indicator */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 5, background: DS.colors.tealLight, borderRadius: 20, padding: '4px 10px' }}>
+              <div style={{ width: 6, height: 6, borderRadius: '50%', background: DS.colors.teal }} />
+              <span style={{ fontSize: 11, fontWeight: 600, color: DS.colors.teal }}>live</span>
+            </div>
+
+            {/* Notifiche + Cerca su desktop */}
             {!device.isMobile && <NotificheBell utente={user} />}
             {!device.isMobile && (
               <button onClick={() => setShowSearch(true)}
-                style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '5px 10px', border: `1px solid ${S.border}`, borderRadius: 8, background: S.background, cursor: 'pointer', fontSize: 12, color: S.textMuted, fontFamily: DS.fonts.ui }}>
-                <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="5" stroke={S.textMuted} strokeWidth="1.5"/><path d="M11 11l3 3" stroke={S.textMuted} strokeWidth="1.5" strokeLinecap="round"/></svg>
+                style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '6px 12px', border: `1px solid ${DS.colors.border}`, borderRadius: 8, background: DS.colors.background, cursor: 'pointer', fontSize: 12, color: DS.colors.textMuted, fontFamily: DS.fonts.ui, transition: 'all 0.15s' }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = DS.colors.teal; e.currentTarget.style.color = DS.colors.teal }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = DS.colors.border; e.currentTarget.style.color = DS.colors.textMuted }}>
+                <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="5" stroke="currentColor" strokeWidth="1.5"/><path d="M11 11l3 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
                 Cerca
-                <span style={{ fontSize: 10, background: S.borderLight, padding: '1px 5px', borderRadius: 4 }}>⌘K</span>
+                <span style={{ fontSize: 10, background: DS.colors.borderLight, color: DS.colors.textFaint, padding: '1px 5px', borderRadius: 4 }}>⌘K</span>
               </button>
             )}
+
+            {/* User avatar mobile */}
             {device.isMobile && (
-              <button onClick={() => setUser(user === 'fabio' ? 'lidia' : 'fabio')} style={{ width: 28, height: 28, borderRadius: '50%', background: user === 'fabio' ? '#0A8A7A' : '#BE185D', border: 'none', color: '#fff', fontSize: 10, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'inherit' }}>
+              <button onClick={() => setUser(user === 'fabio' ? 'lidia' : 'fabio')}
+                style={{ width: 32, height: 32, borderRadius: '50%', background: user === 'fabio' ? DS.colors.teal : DS.colors.lidia, border: 'none', color: '#fff', fontSize: 10, fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'inherit', boxShadow: `0 2px 8px ${user === 'fabio' ? DS.colors.teal : DS.colors.lidia}50` }}>
                 {user === 'fabio' ? 'FA' : 'LI'}
               </button>
             )}
@@ -620,7 +733,7 @@ export default function Home() {
         </div>
 
         {/* Content */}
-        <div style={{ flex: 1, overflowY: 'auto', padding: device.isMobile ? '16px 16px 80px' : device.isTablet ? '20px 24px 80px' : '28px 32px' }}>
+        <div style={{ flex: 1, overflowY: 'auto', padding: device.isMobile ? '16px 16px 76px' : device.isTablet ? '20px 24px 80px' : '24px 32px', background: DS.colors.background }}>
           {loading
             ? <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}><span style={{ fontSize: 13, color: '#9CA3AF' }}>Caricamento...</span></div>
             : <>
@@ -742,15 +855,37 @@ export default function Home() {
               </div>
             </DraggableFAB>
 
-            {/* Bottom nav */}
-            <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: '#fff', borderTop: '1px solid #EFEFEF', display: 'flex', zIndex: 70, height: 60, paddingBottom: 'env(safe-area-inset-bottom)' }}>
-              {bottomNavItems.map((item: any) => {
+            {/* Bottom nav — mobile premium */}
+            <div style={{
+              position: 'fixed', bottom: 0, left: 0, right: 0,
+              background: '#FFFFFF',
+              borderTop: '1px solid #E8EAED',
+              display: 'flex', zIndex: 70,
+              paddingBottom: 'env(safe-area-inset-bottom)',
+              boxShadow: '0 -4px 20px rgba(0,0,0,0.06)',
+            }}>
+              {[
+                { id: 'dashboard',  iconKey: 'dashboard', label: 'Home' },
+                { id: 'task',       iconKey: 'tasks',     label: 'Task' },
+                { id: 'clienti',    iconKey: 'clients',   label: 'CRM' },
+                { id: 'personale',  iconKey: 'personal',  label: 'La mia' },
+              ].map((item: any) => {
                 const isActive = tab === item.id
                 return (
-                  <button key={item.id} onClick={() => { setTab(item.id as Tab); setSelectedProject(null); setShowFab(false); setFabMode(null) }}
-                    style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3, border: 'none', background: 'none', cursor: 'pointer', color: isActive ? '#0A8A7A' : '#9CA3AF' }}>
-                    {iconSvg(item.iconKey, isActive)}
-                    <span style={{ fontSize: 10, fontWeight: isActive ? 700 : 400, fontFamily: 'inherit' }}>{item.label}</span>
+                  <button key={item.id}
+                    onClick={() => { setTab(item.id as Tab); setSelectedProject(null); setShowFab(false); setFabMode(null) }}
+                    style={{
+                      flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center',
+                      justifyContent: 'center', padding: '10px 0 8px',
+                      border: 'none', background: 'none', cursor: 'pointer',
+                      color: isActive ? DS.colors.teal : DS.colors.textFaint,
+                      fontFamily: DS.fonts.ui, position: 'relative',
+                    }}>
+                    {isActive && (
+                      <div style={{ position: 'absolute', top: 0, left: '20%', right: '20%', height: 2, background: DS.colors.teal, borderRadius: '0 0 2px 2px' }} />
+                    )}
+                    <div style={{ opacity: isActive ? 1 : 0.5, marginBottom: 4 }}>{iconSvg(item.iconKey, isActive)}</div>
+                    <span style={{ fontSize: 10, fontWeight: isActive ? 700 : 400 }}>{item.label}</span>
                   </button>
                 )
               })}
