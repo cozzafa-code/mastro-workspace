@@ -1,0 +1,320 @@
+{
+  "meta": {
+    "version": "1.0",
+    "generated": "2026-03-18",
+    "description": "Mastro Workspace OS — Import dati iniziali per Fabio e Lidia"
+  },
+
+  "projects": [
+    {
+      "id": "mastro-erp",
+      "name": "MASTRO ERP",
+      "color": "#14B8A6",
+      "status": "active",
+      "mrr": 0,
+      "target_mrr": 4400,
+      "launch_date": "2026-06-01",
+      "description": "ERP SaaS verticale per serramentisti europei. Include: ERP core, Messaggi, Team, Montaggi.",
+      "modules": ["ERP", "MESSAGGI", "TEAM", "MONTAGGI", "RETE", "ADMIN"],
+      "pricing": {
+        "BASE": 9,
+        "START": 29,
+        "PRO": 59,
+        "TITAN": 89
+      }
+    }
+  ],
+
+  "projects_to_remove": ["FRAMEFLOW", "MASTRO MISURE", "MASTRO MONTAGGI"],
+
+  "costs": [
+    { "name": "Vercel Pro", "amount": 20, "currency": "USD", "category": "infrastruttura", "recurring": "monthly" },
+    { "name": "Supabase Pro", "amount": 25, "currency": "USD", "category": "infrastruttura", "recurring": "monthly" },
+    { "name": "Claude (Anthropic)", "amount": 250, "currency": "USD", "category": "AI", "recurring": "monthly" },
+    { "name": "HeyGen", "amount": 29, "currency": "EUR", "category": "marketing", "recurring": "monthly" },
+    { "name": "iubenda", "amount": 69, "currency": "EUR", "category": "legale", "recurring": "yearly" },
+    { "name": "Sentry", "amount": 0, "currency": "EUR", "category": "monitoring", "recurring": "monthly", "note": "piano free" },
+    { "name": "GitHub", "amount": 4, "currency": "EUR", "category": "dev", "recurring": "monthly" }
+  ],
+
+  "kpi": {
+    "mrr_target_giugno_2026": 4400,
+    "clienti_target_giugno_2026": 30,
+    "clienti_target_q4_2026": 250,
+    "mrr_target_q4_2026": 25000,
+    "autosufficienza_odense_clienti": 28,
+    "burn_rate_mensile": 295,
+    "runway_mesi": 0,
+    "clienti_attuali": 0
+  },
+
+  "roadmap": [
+    { "step": 1, "title": "Fix 59 vulnerabilità RLS", "status": "open", "priority": "critica", "owner": "fabio", "detail": "mastro-messaggi 35, mastro-erp 2, mastro-team 22" },
+    { "step": 2, "title": "EUIPO trademark MASTRO + GALASSIA MASTRO", "status": "todo", "priority": "alta", "owner": "lidia" },
+    { "step": 3, "title": "Domini mastrosuite.com/.eu/.it/.fr/.de", "status": "todo", "priority": "alta", "owner": "lidia" },
+    { "step": 4, "title": "Social @mastrosuite tutte le piattaforme", "status": "todo", "priority": "media", "owner": "lidia" },
+    { "step": 5, "title": "Baker Tilly Odense — ApS danese", "status": "in_progress", "priority": "alta", "owner": "fabio" },
+    { "step": 6, "title": "ERP audit completo — bug e UX", "status": "in_progress", "priority": "alta", "owner": "fabio" },
+    { "step": 7, "title": "Stripe plans configurati + P.IVA italiana", "status": "blocked", "priority": "critica", "owner": "fabio", "blocker": "Ticket #47 — P.IVA bloccata" },
+    { "step": 8, "title": "Foto vano + PDF misure + Listini fornitori", "status": "todo", "priority": "alta", "owner": "fabio" },
+    { "step": 9, "title": "Universal Order Transformer", "status": "todo", "priority": "alta", "owner": "fabio" },
+    { "step": 10, "title": "Onboarding 5-step guidato", "status": "todo", "priority": "alta", "owner": "fabio" },
+    { "step": 11, "title": "ToS + DPA GDPR con dati reali", "status": "in_progress", "priority": "critica", "owner": "lidia" },
+    { "step": 12, "title": "5 beta tester reclutati (CNA, associazioni)", "status": "todo", "priority": "alta", "owner": "lidia" },
+    { "step": 13, "title": "Beta testing 3 settimane", "status": "todo", "priority": "alta", "owner": "lidia" },
+    { "step": 14, "title": "Landing page + video demo", "status": "todo", "priority": "alta", "owner": "lidia" },
+    { "step": 15, "title": "LANCIO ITALIA — Giugno 2026", "status": "target", "priority": "critica", "owner": "entrambi" },
+    { "step": 16, "title": "Modulo RETE agenti", "status": "todo", "priority": "media", "owner": "fabio" },
+    { "step": 17, "title": "Certificazione AT Portogallo (entro Giu 2026)", "status": "todo", "priority": "media", "owner": "lidia" },
+    { "step": 18, "title": "EUIPO filing ufficiale Classe 42", "status": "todo", "priority": "media", "owner": "lidia" }
+  ],
+
+  "tasks": [
+    {
+      "id": "t001",
+      "title": "Fix RLS — mastro-messaggi (35 vulnerabilità)",
+      "owner": "fabio",
+      "project": "mastro-erp",
+      "priority": "critica",
+      "status": "open",
+      "due_date": "2026-03-25",
+      "tags": ["sicurezza", "supabase", "rls"]
+    },
+    {
+      "id": "t002",
+      "title": "Fix RLS — mastro-team (22 vulnerabilità)",
+      "owner": "fabio",
+      "project": "mastro-erp",
+      "priority": "critica",
+      "status": "open",
+      "due_date": "2026-03-25",
+      "tags": ["sicurezza", "supabase", "rls"]
+    },
+    {
+      "id": "t003",
+      "title": "Fix RLS — mastro-erp (2 vulnerabilità)",
+      "owner": "fabio",
+      "project": "mastro-erp",
+      "priority": "critica",
+      "status": "open",
+      "due_date": "2026-03-25",
+      "tags": ["sicurezza", "supabase", "rls"]
+    },
+    {
+      "id": "t004",
+      "title": "Sbloccare Stripe — ticket #47 P.IVA italiana",
+      "owner": "fabio",
+      "project": "mastro-erp",
+      "priority": "critica",
+      "status": "blocked",
+      "tags": ["stripe", "pagamenti", "legale"]
+    },
+    {
+      "id": "t005",
+      "title": "Registrare @mastrosuite su Instagram",
+      "owner": "lidia",
+      "project": "mastro-erp",
+      "priority": "alta",
+      "status": "open",
+      "due_date": "2026-03-22",
+      "tags": ["social", "marketing"]
+    },
+    {
+      "id": "t006",
+      "title": "Registrare @mastrosuite su LinkedIn",
+      "owner": "lidia",
+      "project": "mastro-erp",
+      "priority": "alta",
+      "status": "open",
+      "due_date": "2026-03-22",
+      "tags": ["social", "marketing"]
+    },
+    {
+      "id": "t007",
+      "title": "Registrare @mastrosuite su Facebook",
+      "owner": "lidia",
+      "project": "mastro-erp",
+      "priority": "alta",
+      "status": "open",
+      "due_date": "2026-03-22",
+      "tags": ["social", "marketing"]
+    },
+    {
+      "id": "t008",
+      "title": "Registrare @mastrosuite su TikTok",
+      "owner": "lidia",
+      "project": "mastro-erp",
+      "priority": "media",
+      "status": "open",
+      "due_date": "2026-03-22",
+      "tags": ["social", "marketing"]
+    },
+    {
+      "id": "t009",
+      "title": "Verificare autenticazione dominio Brevo (DNS propagato?)",
+      "owner": "lidia",
+      "project": "mastro-erp",
+      "priority": "alta",
+      "status": "open",
+      "due_date": "2026-03-19",
+      "tags": ["brevo", "email", "dns"]
+    },
+    {
+      "id": "t010",
+      "title": "Impostare forwarding email hello@ → personale",
+      "owner": "lidia",
+      "project": "mastro-erp",
+      "priority": "alta",
+      "status": "open",
+      "due_date": "2026-03-20",
+      "tags": ["email", "aruba"]
+    },
+    {
+      "id": "t011",
+      "title": "Aggiornare ToS e DPA con dati reali (rimuovere placeholder)",
+      "owner": "lidia",
+      "project": "mastro-erp",
+      "priority": "critica",
+      "status": "in_progress",
+      "tags": ["legale", "gdpr"]
+    },
+    {
+      "id": "t012",
+      "title": "Contattare CNA Cosenza per beta tester",
+      "owner": "lidia",
+      "project": "mastro-erp",
+      "priority": "alta",
+      "status": "open",
+      "due_date": "2026-04-01",
+      "tags": ["beta", "acquisizione"]
+    },
+    {
+      "id": "t013",
+      "title": "Contattare associazioni categoria serramentisti",
+      "owner": "lidia",
+      "project": "mastro-erp",
+      "priority": "alta",
+      "status": "open",
+      "due_date": "2026-04-01",
+      "tags": ["beta", "acquisizione"]
+    },
+    {
+      "id": "t014",
+      "title": "EUIPO: ricerca trademark MASTRO",
+      "owner": "lidia",
+      "project": "mastro-erp",
+      "priority": "alta",
+      "status": "open",
+      "tags": ["legale", "trademark"]
+    },
+    {
+      "id": "t015",
+      "title": "EUIPO: ricerca trademark GALASSIA MASTRO",
+      "owner": "lidia",
+      "project": "mastro-erp",
+      "priority": "alta",
+      "status": "open",
+      "tags": ["legale", "trademark"]
+    },
+    {
+      "id": "t016",
+      "title": "Baker Tilly Odense — primo contatto per ApS",
+      "owner": "fabio",
+      "project": "mastro-erp",
+      "priority": "alta",
+      "status": "in_progress",
+      "tags": ["legale", "danimarca", "aps"]
+    },
+    {
+      "id": "t017",
+      "title": "Configurare Anthropic API key per 3 agenti AI",
+      "owner": "fabio",
+      "project": "mastro-erp",
+      "priority": "alta",
+      "status": "open",
+      "tags": ["ai", "anthropic", "dev"]
+    },
+    {
+      "id": "t018",
+      "title": "Twilio WhatsApp — uscire da sandbox",
+      "owner": "fabio",
+      "project": "mastro-erp",
+      "priority": "media",
+      "status": "open",
+      "tags": ["twilio", "whatsapp", "dev"]
+    }
+  ],
+
+  "recurring_tasks": [
+    {
+      "title": "Controlla Stripe Dashboard",
+      "owner": "lidia",
+      "frequency": "weekly",
+      "day": "monday",
+      "tags": ["routine", "stripe"]
+    },
+    {
+      "title": "Controlla bug tracker (GitHub Issues)",
+      "owner": "lidia",
+      "frequency": "weekly",
+      "day": "wednesday",
+      "tags": ["routine", "dev"]
+    },
+    {
+      "title": "Controlla status page (Vercel + Supabase)",
+      "owner": "lidia",
+      "frequency": "weekly",
+      "day": "friday",
+      "tags": ["routine", "monitoring"]
+    },
+    {
+      "title": "Post social @mastrosuite",
+      "owner": "lidia",
+      "frequency": "daily",
+      "tags": ["social", "marketing"]
+    }
+  ],
+
+  "trackers": [
+    {
+      "id": "beta-tester-tracker",
+      "name": "Beta Tester",
+      "target": 30,
+      "current": 0,
+      "deadline": "2026-06-01",
+      "owner": "lidia",
+      "items": []
+    },
+    {
+      "id": "social-registrations",
+      "name": "Social @mastrosuite",
+      "platforms": [
+        { "name": "Instagram", "status": "todo" },
+        { "name": "LinkedIn", "status": "todo" },
+        { "name": "Facebook", "status": "todo" },
+        { "name": "TikTok", "status": "todo" },
+        { "name": "YouTube", "status": "todo" },
+        { "name": "X (Twitter)", "status": "todo" }
+      ]
+    }
+  ],
+
+  "members": [
+    {
+      "id": "fabio",
+      "name": "Fabio",
+      "role": "Founder & CTO",
+      "color": "#0A8A7A",
+      "initials": "FA",
+      "focus": "Dev, architettura, infrastruttura"
+    },
+    {
+      "id": "lidia",
+      "name": "Lidia",
+      "role": "Co-Founder & COO",
+      "color": "#BE185D",
+      "initials": "LI",
+      "focus": "Operations, marketing, legale, social"
+    }
+  ]
+}
