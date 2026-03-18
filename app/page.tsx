@@ -24,7 +24,6 @@ import { PreventiviView } from '@/components/Preventivi/PreventiviView'
 import { BachecaCondivisa } from '@/components/Condivisa/BachecaCondivisa'
 import { OperationsView } from '@/components/Operations/OperationsView'
 import { OnboardingFlow } from '@/components/Onboarding/OnboardingFlow'
-import { LidiaOpsView } from '@/components/LidiaOps/LidiaOpsView'
 import { GlobalSearch } from '@/components/Search/GlobalSearch'
 import { SettingsPanel } from '@/components/Settings/SettingsPanel'
 import { FabAI } from '@/components/WorkspaceIntelligence/FabAI'
@@ -772,8 +771,7 @@ export default function Home() {
               {tab === 'spese' && renderSpese()}
               {tab === 'personale' && <PersonaleView currentUser={user} />}
               {tab === 'operations' && <OperationsView currentUser={user} />}
-              {tab === 'lidiaops' && <LidiaOpsView />}
-            </>
+                          </>
           }
         </div>
 
