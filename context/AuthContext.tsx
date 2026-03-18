@@ -54,17 +54,25 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const [loading, setLoading] = useState(true)
 
   const loadWorkspace = async (userId: string) => {
-    // Trova il workspace del membro
-    const { data: memberData } = await supabase
-      .from('workspace_members')
-      .select('*, workspaces(*)')
-      .eq('user_id', userId)
-      .eq('attivo', true)
-      .single()
+    try {
+      const { data: memberData } = await supabase
+        .from('workspace_members')
+        .select('*')
+        .eq('user_id', userId)
+        .eq('attivo', true)
+        .single()
 
-    if (memberData) {
-      setMember(memberData)
-      setWorkspace(memberData.workspaces)
+      if (memberData) {
+        setMember(memberData)
+        const { data: wsData } = await supabase
+          .from('workspaces')
+          .select('*')
+          .eq('id', memberData.workspace_id)
+          .single()
+        if (wsData) setWorkspace(wsData)
+      }
+    } catch (e) {
+      console.warn('Workspace load error:', e)
     }
   }
 

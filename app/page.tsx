@@ -63,13 +63,9 @@ export default function Home() {
     return () => subscription.unsubscribe()
   }, [])
 
-  // Mostra login se non autenticato (dopo check iniziale)
-  if (!authChecked) return <div style={{ display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#9CA3AF' }}>Caricamento...</div>
-  if (!authUser) return <LoginPage />
-
   const tables = ['progetti', 'tasks', 'campagne', 'clienti', 'lab_idee', 'spese_correnti', 'personale', 'mrr_snapshots']
 
-  useEffect(() => { loadAll() }, [])
+  useEffect(() => { if (authUser) loadAll() }, [authUser])
 
   async function loadAll() {
     setLoading(true)
@@ -498,6 +494,10 @@ export default function Home() {
     { id: 'spese',      iconKey: 'finance',   label: 'Finanze' },
     { id: 'contabilita',iconKey: 'receipt',   label: 'Contabilità' },
   ]
+
+  // Auth gate — dentro il return per rispettare le regole degli hooks
+  if (!authChecked) return <div style={{ display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#9CA3AF', fontFamily: 'system-ui, sans-serif' }}>Caricamento...</div>
+  if (!authUser) return <LoginPage />
 
   return (
     <div style={{ display: 'flex', height: '100vh', overflow: 'hidden', background: '#F7F8FA', fontFamily: '"DM Sans", -apple-system, BlinkMacSystemFont, sans-serif' }}>
