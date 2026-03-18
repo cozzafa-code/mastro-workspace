@@ -27,6 +27,8 @@ import { OnboardingFlow } from '@/components/Onboarding/OnboardingFlow'
 import { GlobalSearch } from '@/components/Search/GlobalSearch'
 import { SettingsPanel } from '@/components/Settings/SettingsPanel'
 import { FabAI } from '@/components/WorkspaceIntelligence/FabAI'
+import { MastroAI } from '@/components/AI/MastroAI'
+import { MastroAI } from '@/components/AI/MastroAI'
 import DraggableFAB from '@/components/DraggableFAB'
 import { usePanel } from '@/context/PanelContext'
 import type { PanelObject, PanelObjectType } from '@/components/Universal/DetailPanel'
@@ -776,7 +778,9 @@ export default function Home() {
         </div>
 
         {/* DRAGGABLE FAB — mobile/tablet only */}
-        {!device.isDesktop && (
+        <MastroAI currentUser={user} />
+          <MastroAI currentUser={user} />
+          {!device.isDesktop && (
           <>
             <DraggableFAB
               fabOpen={showFab}
