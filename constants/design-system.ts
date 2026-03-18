@@ -49,18 +49,18 @@ export const DS = {
   },
 }
 
-export const STATE_COLORS: Record<string, { bg: string; color: string }> = {
-  attivo:       { bg: '#ECFDF5', color: '#0F7B5A' },
-  in_sviluppo:  { bg: '#EFF6FF', color: '#2563EB' },
-  pausa:        { bg: '#FFFBEB', color: '#D97706' },
-  completato:   { bg: '#E6F4F2', color: '#0A8A7A' },
-  aperto:       { bg: '#F0F2F4', color: '#6B7280' },
-  in_corso:     { bg: '#EFF6FF', color: '#2563EB' },
-  urgente:      { bg: '#FEF2F2', color: '#DC4444' },
-  lead:         { bg: '#F5F3FF', color: '#7C3AED' },
-  proposta:     { bg: '#FFFBEB', color: '#D97706' },
-  chiuso_vinto: { bg: '#ECFDF5', color: '#0F7B5A' },
-  chiuso_perso: { bg: '#FEF2F2', color: '#DC4444' },
+export const STATE_COLORS: Record<string, { bg: string; color: string; text: string }> = {
+  attivo:       { bg: '#ECFDF5', color: '#0F7B5A', text: '#0F7B5A' },
+  in_sviluppo:  { bg: '#EFF6FF', color: '#2563EB', text: '#2563EB' },
+  pausa:        { bg: '#FFFBEB', color: '#D97706', text: '#D97706' },
+  completato:   { bg: '#E6F4F2', color: '#0A8A7A', text: '#0A8A7A' },
+  aperto:       { bg: '#F0F2F4', color: '#6B7280', text: '#6B7280' },
+  in_corso:     { bg: '#EFF6FF', color: '#2563EB', text: '#2563EB' },
+  urgente:      { bg: '#FEF2F2', color: '#DC4444', text: '#DC4444' },
+  lead:         { bg: '#F5F3FF', color: '#7C3AED', text: '#7C3AED' },
+  proposta:     { bg: '#FFFBEB', color: '#D97706', text: '#D97706' },
+  chiuso_vinto: { bg: '#ECFDF5', color: '#0F7B5A', text: '#0F7B5A' },
+  chiuso_perso: { bg: '#FEF2F2', color: '#DC4444', text: '#DC4444' },
 }
 
 export const LOG_TYPE_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
