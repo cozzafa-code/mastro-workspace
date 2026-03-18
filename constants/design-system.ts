@@ -63,11 +63,11 @@ export const STATE_COLORS: Record<string, { bg: string; color: string; text: str
   chiuso_perso: { bg: '#FEF2F2', color: '#DC4444', text: '#DC4444' },
 }
 
-export const LOG_TYPE_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
-  nota:       { label: 'Nota',       color: '#6B7280', bg: '#F0F2F4' },
-  aggiornamento: { label: 'Update',  color: '#2563EB', bg: '#EFF6FF' },
-  problema:   { label: 'Problema',   color: '#DC4444', bg: '#FEF2F2' },
-  milestone:  { label: 'Milestone',  color: '#0F7B5A', bg: '#ECFDF5' },
-  decisione:  { label: 'Decisione',  color: '#D97706', bg: '#FFFBEB' },
-  call:       { label: 'Call',       color: '#7C3AED', bg: '#F5F3FF' },
+export const LOG_TYPE_CONFIG: Record<string, { label: string; color: string; bg: string; icon: string }> = {
+  nota:          { label: 'Nota',       color: '#6B7280', bg: '#F0F2F4', icon: '📝' },
+  aggiornamento: { label: 'Update',     color: '#2563EB', bg: '#EFF6FF', icon: '🔄' },
+  problema:      { label: 'Problema',   color: '#DC4444', bg: '#FEF2F2', icon: '⚠️' },
+  milestone:     { label: 'Milestone',  color: '#0F7B5A', bg: '#ECFDF5', icon: '🎯' },
+  decisione:     { label: 'Decisione',  color: '#D97706', bg: '#FFFBEB', icon: '✅' },
+  call:          { label: 'Call',       color: '#7C3AED', bg: '#F5F3FF', icon: '📞' },
 }
