@@ -26,6 +26,7 @@ import { OnboardingFlow } from '@/components/Onboarding/OnboardingFlow'
 import { GlobalSearch } from '@/components/Search/GlobalSearch'
 import { SettingsPanel } from '@/components/Settings/SettingsPanel'
 import { FabAI } from '@/components/WorkspaceIntelligence/FabAI'
+import DraggableFAB from '@/components/DraggableFAB'
 import { usePanel } from '@/context/PanelContext'
 import type { PanelObject, PanelObjectType } from '@/components/Universal/DetailPanel'
 import { useDevice } from '@/hooks/useDevice'
@@ -481,8 +482,6 @@ export default function Home() {
 
   const [showMobileMenu, setShowMobileMenu] = useState(false)
   const [showFab, setShowFab] = useState(false)
-  const [fabSide, setFabSide] = useState<'right' | 'left'>('right')
-  const [fabTop, setFabTop] = useState('40%')
   const [fabMode, setFabMode] = useState<'ai' | null>(null)
 
   // AI ASSISTENTE VOCALE con function calling
@@ -645,105 +644,85 @@ export default function Home() {
           }
         </div>
 
-        {/* FAB MASTRO — mobile/tablet only */}
+        {/* DRAGGABLE FAB — mobile/tablet only */}
         {!device.isDesktop && (
           <>
-            {/* Overlay */}
-            {showFab && (
-              <div onClick={() => { setShowFab(false); setFabMode(null) }}
-                style={{ position: 'fixed', inset: 0, zIndex: 79, background: 'rgba(0,0,0,0.6)' }} />
-            )}
+            <DraggableFAB
+              fabOpen={showFab}
+              setFabOpen={setShowFab}
+              acc={user === 'fabio' ? '#0A8A7A' : '#BE185D'}
+              onVoice={() => { setShowFab(false); setFabMode('ai') }}
+            >
+              {/* Contenuto menu FAB */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
 
-            {/* FAB container */}
-            <div style={{ position: 'fixed', right: 0, top: fabTop, zIndex: 80, display: 'flex', flexDirection: 'row', alignItems: 'flex-start' }}>
-
-              {/* Pannello espanso */}
-              {showFab && (
-                <div style={{ width: 280, maxHeight: '75vh', background: '#0B1F2A', borderRadius: '16px 0 0 16px', overflow: 'hidden', display: 'flex', flexDirection: 'column', boxShadow: '-8px 8px 40px rgba(0,0,0,0.5)' }}>
-
-                  {/* Header pannello */}
-                  <div style={{ padding: '14px 16px', borderBottom: '1px solid rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    {fabMode === 'ai' ? (
-                      <>
-                        <button onClick={() => setFabMode(null)} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.5)', cursor: 'pointer', fontSize: 18, padding: '0 8px 0 0' }}>←</button>
-                        <span style={{ fontSize: 13, fontWeight: 700, color: '#fff', flex: 1 }}>🤖 Chiedi alla AI</span>
-                      </>
-                    ) : (
-                      <>
-                        <div style={{ width: 8, height: 8, borderRadius: '50%', background: user === 'fabio' ? '#0A8A7A' : '#BE185D' }} />
-                        <span style={{ fontSize: 12, fontWeight: 700, color: '#fff', flex: 1, marginLeft: 8 }}>
-                          {user === 'fabio' ? 'Fabio' : 'Lidia'} · MASTRO OS
-                        </span>
-                        <button onClick={() => { setUser(user === 'fabio' ? 'lidia' : 'fabio') }}
-                          style={{ background: 'rgba(255,255,255,0.1)', border: 'none', borderRadius: 20, padding: '3px 10px', cursor: 'pointer', fontSize: 11, color: 'rgba(255,255,255,0.6)', fontFamily: 'inherit' }}>
-                          → {user === 'fabio' ? 'Lidia' : 'Fabio'}
-                        </button>
-                      </>
-                    )}
-                  </div>
-
-                  {/* AI mode */}
-                  {fabMode === 'ai' ? (
-                    <FabAI utente={user} workspaceData={data} onAction={loadAll} />
-                  ) : (
-                    <div style={{ overflowY: 'auto', padding: '12px' }}>
-
-                      {/* Azioni principali */}
-                      {[
-                        { emoji: '✅', label: '+ Task rapida',    color: '#2563EB', action: () => { setShowFab(false); setFabMode(null); setShowForm('task') } },
-                        { emoji: '🤖', label: 'Chiedi alla AI',   color: '#D97706', action: () => setFabMode('ai') },
-                        { emoji: '→',  label: 'Nuova delega',     color: '#BE185D', action: () => { setShowFab(false); setFabMode(null); setTab('deleghe') } },
-                        { emoji: '💡', label: '+ Idea',           color: '#7C3AED', action: () => { setShowFab(false); setFabMode(null); setTab('lab_idee') } },
-                      ].map(a => (
-                        <button key={a.label} onClick={a.action}
-                          style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 12, padding: '12px 14px', marginBottom: 8, background: a.color + '25', border: `1px solid ${a.color}50`, borderRadius: 10, cursor: 'pointer', fontFamily: 'inherit' }}>
-                          <span style={{ width: 32, height: 32, borderRadius: '50%', background: a.color, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, flexShrink: 0 }}>{a.emoji}</span>
-                          <span style={{ fontSize: 13, fontWeight: 600, color: '#fff' }}>{a.label}</span>
-                        </button>
-                      ))}
-
-                      {/* Navigazione moduli */}
-                      <div style={{ borderTop: '1px solid rgba(255,255,255,0.07)', paddingTop: 10, marginTop: 4 }}>
-                        <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.25)', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>Vai a</div>
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
-                          {([
-                            ['Dashboard', 'dashboard'], ['Progetti', 'progetti'],
-                            ['CRM', 'clienti'],          ['Calendario', 'calendario'],
-                            ['Preventivi', 'preventivi'],['Bacheca', 'condivisa'],
-                            ['Finanze', 'spese'],        ['Team', 'team'],
-                          ] as [string, Tab][]).map(([label, id]) => (
-                            <button key={id} onClick={() => { setTab(id); setShowFab(false); setFabMode(null) }}
-                              style={{ padding: '8px', background: tab === id ? 'rgba(10,138,122,0.3)' : 'rgba(255,255,255,0.06)', border: `1px solid ${tab === id ? '#0A8A7A50' : 'rgba(255,255,255,0.08)'}`, borderRadius: 8, cursor: 'pointer', fontSize: 11, color: tab === id ? '#5EEAD4' : 'rgba(255,255,255,0.55)', fontFamily: 'inherit', fontWeight: tab === id ? 700 : 400 }}>
-                              {label}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Impostazioni */}
-                      <button onClick={() => { setShowSettings(true); setShowFab(false); setFabMode(null) }}
-                        style={{ width: '100%', marginTop: 10, padding: '8px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 8, cursor: 'pointer', fontSize: 11, color: 'rgba(255,255,255,0.35)', fontFamily: 'inherit' }}>
-                        ⚙️ Impostazioni
-                      </button>
+                {/* Header utente + switch */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '6px 8px 10px', borderBottom: '1px solid rgba(255,255,255,0.08)', marginBottom: 4 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <div style={{ width: 24, height: 24, borderRadius: '50%', background: user === 'fabio' ? '#0A8A7A' : '#BE185D', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, fontWeight: 800, color: '#fff' }}>
+                      {user === 'fabio' ? 'FA' : 'LI'}
                     </div>
-                  )}
+                    <span style={{ fontSize: 12, fontWeight: 600, color: '#fff' }}>{user === 'fabio' ? 'Fabio' : 'Lidia'}</span>
+                  </div>
+                  <button onClick={() => { setUser(user === 'fabio' ? 'lidia' : 'fabio') }}
+                    style={{ background: 'rgba(255,255,255,0.1)', border: 'none', borderRadius: 20, padding: '4px 10px', cursor: 'pointer', fontSize: 11, color: 'rgba(255,255,255,0.6)', fontFamily: 'inherit' }}>
+                    → {user === 'fabio' ? 'Lidia' : 'Fabio'}
+                  </button>
                 </div>
-              )}
 
-              {/* Tab verticale — tasto MASTRO */}
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <button onClick={() => setFabTop(t => `${Math.max(10, parseInt(t) - 8)}%`)}
-                  style={{ width: 30, height: 22, background: '#065f46', border: 'none', borderRadius: '10px 0 0 0', cursor: 'pointer', color: 'rgba(255,255,255,0.7)', fontSize: 11, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>▲</button>
-                <button onClick={() => { setShowFab(f => !f); if (showFab) setFabMode(null) }}
-                  style={{ width: 30, height: 90, background: showFab ? '#1a3a4a' : '#0A8A7A', border: 'none', cursor: 'pointer', padding: 0, transition: 'background 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <span style={{ fontSize: 8, fontWeight: 800, color: '#fff', letterSpacing: 1.5, textTransform: 'uppercase', writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}>
-                    {showFab ? '✕ CHIUDI' : 'MASTRO'}
-                  </span>
-                </button>
-                <button onClick={() => setFabTop(t => `${Math.min(80, parseInt(t) + 8)}%`)}
-                  style={{ width: 30, height: 22, background: '#065f46', border: 'none', borderRadius: '0 0 0 10px', cursor: 'pointer', color: 'rgba(255,255,255,0.7)', fontSize: 11, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>▼</button>
+                {/* AI mode o menu */}
+                {fabMode === 'ai' ? (
+                  <div style={{ height: 360, display: 'flex', flexDirection: 'column' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '0 8px 8px' }}>
+                      <button onClick={() => setFabMode(null)} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.4)', cursor: 'pointer', fontSize: 16, padding: 0 }}>←</button>
+                      <span style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.7)' }}>AI MASTRO</span>
+                    </div>
+                    <FabAI utente={user} workspaceData={data} onAction={loadAll} />
+                  </div>
+                ) : (
+                  <>
+                    {/* Azioni principali */}
+                    {[
+                      { emoji: '✅', label: '+ Task rapida',  color: '#2563EB', action: () => { setShowFab(false); setFabMode(null); setTimeout(() => setShowForm('task'), 50) } },
+                      { emoji: '🤖', label: 'Chiedi alla AI', color: '#D97706', action: () => setFabMode('ai') },
+                      { emoji: '📋', label: 'Nuova delega',   color: '#BE185D', action: () => { setShowFab(false); setFabMode(null); setTab('deleghe') } },
+                      { emoji: '💡', label: '+ Idea',         color: '#7C3AED', action: () => { setShowFab(false); setFabMode(null); setTab('lab_idee') } },
+                    ].map(a => (
+                      <button key={a.label} onClick={a.action}
+                        style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', background: a.color + '20', border: `1px solid ${a.color}40`, borderRadius: 10, cursor: 'pointer', fontFamily: 'inherit', width: '100%', marginBottom: 4 }}>
+                        <span style={{ width: 30, height: 30, borderRadius: '50%', background: a.color, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, flexShrink: 0 }}>{a.emoji}</span>
+                        <span style={{ fontSize: 13, fontWeight: 600, color: '#fff' }}>{a.label}</span>
+                      </button>
+                    ))}
+
+                    {/* Griglia moduli */}
+                    <div style={{ borderTop: '1px solid rgba(255,255,255,0.07)', paddingTop: 8, marginTop: 4 }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 5 }}>
+                        {([
+                          ['🏠', 'dashboard'], ['🚀', 'progetti'], ['👥', 'clienti'],
+                          ['📅', 'calendario'], ['📋', 'preventivi'], ['💰', 'spese'],
+                        ] as [string, Tab][]).map(([emoji, id]) => {
+                          const labels: Record<string, string> = { dashboard: 'Home', progetti: 'Progetti', clienti: 'CRM', calendario: 'Agenda', preventivi: 'Prev.', spese: 'Finanze' }
+                          return (
+                            <button key={id} onClick={() => { setTab(id); setShowFab(false); setFabMode(null) }}
+                              style={{ padding: '7px 4px', background: tab === id ? 'rgba(10,138,122,0.3)' : 'rgba(255,255,255,0.06)', border: `1px solid ${tab === id ? '#0A8A7A60' : 'rgba(255,255,255,0.08)'}`, borderRadius: 8, cursor: 'pointer', fontSize: 10, color: tab === id ? '#5EEAD4' : 'rgba(255,255,255,0.55)', fontFamily: 'inherit', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+                              <span style={{ fontSize: 16 }}>{emoji}</span>
+                              {labels[id]}
+                            </button>
+                          )
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Settings */}
+                    <button onClick={() => { setShowSettings(true); setShowFab(false); setFabMode(null) }}
+                      style={{ width: '100%', marginTop: 6, padding: '7px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 8, cursor: 'pointer', fontSize: 11, color: 'rgba(255,255,255,0.3)', fontFamily: 'inherit' }}>
+                      ⚙️ Impostazioni
+                    </button>
+                  </>
+                )}
               </div>
-            </div>
+            </DraggableFAB>
 
             {/* Bottom nav */}
             <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: '#fff', borderTop: '1px solid #EFEFEF', display: 'flex', zIndex: 70, height: 60, paddingBottom: 'env(safe-area-inset-bottom)' }}>
