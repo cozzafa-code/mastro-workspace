@@ -150,7 +150,7 @@ export function useWorkflow(currentUser: string) {
         tipo: 'scadenza_domani',
         da: task.chi || currentUser,
         a: task.chi || currentUser,
-        titolo: task.titolo || task.testo,
+        titolo: task.titolo || (task as any).testo,
       })
     }
 
