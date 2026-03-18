@@ -1,214 +1,152 @@
 // components/DraggableFAB.tsx
 'use client'
-import { useRef, useState, useEffect, useCallback, FC } from 'react'
+import { useRef, useState, useEffect, FC } from 'react'
 
 interface Props {
   fabOpen: boolean
   setFabOpen: (v: boolean) => void
   acc: string
-  onVoice?: () => void
-  children?: React.ReactNode  // menu content quando aperto
+  children?: React.ReactNode
 }
 
-const BUTTON_W = 56
-const BUTTON_H = 56
-const EDGE_PAD = 12
+const W = 58
+const H = 58
+const PAD = 16
 
-const DraggableFAB: FC<Props> = ({ fabOpen, setFabOpen, acc, onVoice, children }) => {
-  // Posizione iniziale: angolo in basso a destra
-  const [pos, setPos] = useState({ x: -1, y: -1 }) // -1 = non inizializzato
+const DraggableFAB: FC<Props> = ({ fabOpen, setFabOpen, acc, children }) => {
+  const [pos, setPos] = useState({ x: -1, y: -1 })
   const [dragging, setDragging] = useState(false)
-  const [menuVisible, setMenuVisible] = useState(false)
+  const dragged = useRef(false)
+  const origin = useRef({ x: 0, y: 0, px: 0, py: 0 })
 
-  const dragRef = useRef({ active: false, startX: 0, startY: 0, originX: 0, originY: 0, moved: false })
-  const fabRef = useRef<HTMLDivElement>(null)
-
-  // Inizializza posizione dopo mount (safe per SSR)
   useEffect(() => {
     if (pos.x === -1) {
       setPos({
-        x: window.innerWidth - BUTTON_W - EDGE_PAD,
-        y: window.innerHeight - BUTTON_H - EDGE_PAD - 70, // sopra bottom nav
+        x: window.innerWidth - W - PAD,
+        y: window.innerHeight - H - 80,
       })
     }
-  }, [pos.x])
+  }, [])
 
-  // Anima menu
-  useEffect(() => {
-    if (fabOpen) setMenuVisible(true)
-    else {
-      const t = setTimeout(() => setMenuVisible(false), 200)
-      return () => clearTimeout(t)
-    }
-  }, [fabOpen])
+  const clamp = (x: number, y: number) => ({
+    x: Math.max(PAD, Math.min(window.innerWidth - W - PAD, x)),
+    y: Math.max(PAD, Math.min(window.innerHeight - H - 70, y)),
+  })
 
-  // Clamp posizione dentro schermo
-  const clamp = useCallback((x: number, y: number) => ({
-    x: Math.max(EDGE_PAD, Math.min(window.innerWidth - BUTTON_W - EDGE_PAD, x)),
-    y: Math.max(EDGE_PAD, Math.min(window.innerHeight - BUTTON_H - EDGE_PAD - 60, y)),
-  }), [])
-
-  // ── TOUCH ──────────────────────────────────────────────
-  const onTouchStart = useCallback((e: React.TouchEvent) => {
+  const onTouchStart = (e: React.TouchEvent) => {
     const t = e.touches[0]
-    dragRef.current = { active: true, startX: t.clientX, startY: t.clientY, originX: pos.x, originY: pos.y, moved: false }
-    setDragging(false)
-  }, [pos])
+    dragged.current = false
+    origin.current = { x: t.clientX, y: t.clientY, px: pos.x, py: pos.y }
+  }
 
-  const onTouchMove = useCallback((e: React.TouchEvent) => {
-    if (!dragRef.current.active) return
-    const t = e.touches[0]
-    const dx = t.clientX - dragRef.current.startX
-    const dy = t.clientY - dragRef.current.startY
-    if (!dragRef.current.moved && Math.hypot(dx, dy) < 6) return
-    dragRef.current.moved = true
-    setDragging(true)
-    if (fabOpen) setFabOpen(false)
-    setPos(clamp(dragRef.current.originX + dx, dragRef.current.originY + dy))
-  }, [clamp, fabOpen, setFabOpen])
-
-  const onTouchEnd = useCallback(() => {
-    dragRef.current.active = false
-    if (!dragRef.current.moved) {
-      // È un tap
-      setFabOpen(!fabOpen)
-    }
-    setDragging(false)
-  }, [fabOpen, setFabOpen])
-
-  // ── MOUSE ──────────────────────────────────────────────
-  const onMouseDown = useCallback((e: React.MouseEvent) => {
+  const onTouchMove = (e: React.TouchEvent) => {
     e.preventDefault()
-    dragRef.current = { active: true, startX: e.clientX, startY: e.clientY, originX: pos.x, originY: pos.y, moved: false }
-
-    const onMove = (ev: MouseEvent) => {
-      if (!dragRef.current.active) return
-      const dx = ev.clientX - dragRef.current.startX
-      const dy = ev.clientY - dragRef.current.startY
-      if (!dragRef.current.moved && Math.hypot(dx, dy) < 6) return
-      dragRef.current.moved = true
+    const t = e.touches[0]
+    const dx = t.clientX - origin.current.x
+    const dy = t.clientY - origin.current.y
+    if (Math.hypot(dx, dy) > 5) {
+      dragged.current = true
       setDragging(true)
       if (fabOpen) setFabOpen(false)
-      setPos(clamp(dragRef.current.originX + dx, dragRef.current.originY + dy))
+      setPos(clamp(origin.current.px + dx, origin.current.py + dy))
     }
+  }
 
+  const onTouchEnd = () => {
+    setDragging(false)
+    if (!dragged.current) setFabOpen(!fabOpen)
+  }
+
+  const onMouseDown = (e: React.MouseEvent) => {
+    e.preventDefault()
+    dragged.current = false
+    origin.current = { x: e.clientX, y: e.clientY, px: pos.x, py: pos.y }
+    const onMove = (ev: MouseEvent) => {
+      const dx = ev.clientX - origin.current.x
+      const dy = ev.clientY - origin.current.y
+      if (Math.hypot(dx, dy) > 5) {
+        dragged.current = true
+        setDragging(true)
+        if (fabOpen) setFabOpen(false)
+        setPos(clamp(origin.current.px + dx, origin.current.py + dy))
+      }
+    }
     const onUp = () => {
-      dragRef.current.active = false
-      if (!dragRef.current.moved) setFabOpen(!fabOpen)
       setDragging(false)
+      if (!dragged.current) setFabOpen(!fabOpen)
       window.removeEventListener('mousemove', onMove)
       window.removeEventListener('mouseup', onUp)
     }
-
     window.addEventListener('mousemove', onMove)
     window.addEventListener('mouseup', onUp)
-  }, [pos, clamp, fabOpen, setFabOpen])
+  }
 
-  // Non renderizzare finché posizione non inizializzata
   if (pos.x === -1) return null
 
-  // Decide se aprire il menu sopra o sotto il FAB
-  const menuAbove = pos.y > window.innerHeight / 2
+  const menuAbove = pos.y > window.innerHeight * 0.55
 
   return (
     <>
-      {/* Overlay chiude menu */}
       {fabOpen && (
-        <div
-          onClick={() => setFabOpen(false)}
-          style={{ position: 'fixed', inset: 0, zIndex: 89, background: 'rgba(0,0,0,0.35)', backdropFilter: 'blur(2px)' }}
-        />
+        <div onClick={() => setFabOpen(false)}
+          style={{ position: 'fixed', inset: 0, zIndex: 88, background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(3px)' }} />
       )}
 
-      {/* FAB container */}
-      <div
-        ref={fabRef}
-        style={{
-          position: 'fixed',
-          left: pos.x,
-          top: pos.y,
-          zIndex: 90,
-          userSelect: 'none',
-          WebkitUserSelect: 'none',
-          touchAction: 'none',
-        }}
-      >
-        {/* Menu */}
-        {menuVisible && (
+      <div style={{ position: 'fixed', left: pos.x, top: pos.y, zIndex: 90, touchAction: 'none', userSelect: 'none' }}>
+
+        {fabOpen && (
           <div style={{
             position: 'absolute',
-            [menuAbove ? 'bottom' : 'top']: BUTTON_H + 10,
+            [menuAbove ? 'bottom' : 'top']: H + 12,
             right: 0,
-            minWidth: 220,
+            width: 260,
             background: '#0B1F2A',
-            borderRadius: 14,
-            padding: '8px',
-            boxShadow: '0 8px 32px rgba(0,0,0,0.45)',
-            opacity: fabOpen ? 1 : 0,
-            transform: fabOpen
-              ? 'scale(1) translateY(0)'
-              : `scale(0.92) translateY(${menuAbove ? '8px' : '-8px'})`,
-            transformOrigin: menuAbove ? 'bottom right' : 'top right',
-            transition: 'opacity 0.18s ease, transform 0.18s ease',
-            pointerEvents: fabOpen ? 'all' : 'none',
+            borderRadius: 16,
+            padding: 10,
+            boxShadow: '0 16px 48px rgba(0,0,0,0.5)',
+            animation: 'fabIn 0.18s ease',
           }}>
+            <style>{`@keyframes fabIn{from{opacity:0;transform:scale(0.92)}to{opacity:1;transform:scale(1)}}`}</style>
             {children}
           </div>
         )}
 
-        {/* Bottone principale */}
         <div
           onTouchStart={onTouchStart}
           onTouchMove={onTouchMove}
           onTouchEnd={onTouchEnd}
           onMouseDown={onMouseDown}
           style={{
-            width: BUTTON_W,
-            height: BUTTON_H,
-            borderRadius: '50%',
-            background: fabOpen ? '#1a3a4a' : acc,
-            boxShadow: dragging
-              ? `0 12px 32px ${acc}80`
-              : fabOpen
-              ? `0 4px 20px rgba(0,0,0,0.5)`
-              : `0 4px 16px ${acc}60`,
+            width: W, height: H,
+            borderRadius: 18,
+            background: fabOpen
+              ? 'linear-gradient(135deg, #0B1F2A, #1a3a4a)'
+              : `linear-gradient(135deg, ${acc}, ${acc}cc)`,
+            boxShadow: dragging ? `0 16px 40px ${acc}70` : fabOpen ? '0 4px 20px rgba(0,0,0,0.5)' : `0 6px 20px ${acc}60`,
             cursor: dragging ? 'grabbing' : 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            transition: dragging ? 'none' : 'background 0.2s, box-shadow 0.2s, transform 0.15s',
-            transform: dragging ? 'scale(1.1)' : fabOpen ? 'scale(0.95)' : 'scale(1)',
+            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2,
+            transition: dragging ? 'none' : 'all 0.2s ease',
+            transform: dragging ? 'scale(1.08)' : fabOpen ? 'scale(0.96)' : 'scale(1)',
           }}
         >
-          {/* Icona */}
           {fabOpen ? (
-            // X chiudi
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-              <path d="M5 5l10 10M15 5L5 15" stroke="white" strokeWidth="2.2" strokeLinecap="round"/>
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+              <path d="M4 4l10 10M14 4L4 14" stroke="white" strokeWidth="2.2" strokeLinecap="round"/>
             </svg>
           ) : (
-            // Stelle MASTRO
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-              <path d="M12 2l1.5 4.5L18 8l-4.5 1.5L12 14l-1.5-4.5L6 8l4.5-1.5L12 2z" fill="white" opacity="1"/>
-              <path d="M19 14l.8 2.2L22 17l-2.2.8L19 20l-.8-2.2L16 17l2.2-.8L19 14z" fill="white" opacity="0.7"/>
-              <path d="M6 16l.5 1.5L8 18l-1.5.5L6 20l-.5-1.5L4 18l1.5-.5L6 16z" fill="white" opacity="0.5"/>
-            </svg>
+            <>
+              <svg width="22" height="14" viewBox="0 0 22 14" fill="none">
+                <path d="M1 13L6 1l5 8 5-8 5 12" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              <span style={{ fontSize: 8, fontWeight: 800, color: 'rgba(255,255,255,0.85)', letterSpacing: 2.5, fontFamily: 'system-ui,sans-serif' }}>OS</span>
+            </>
           )}
         </div>
 
-        {/* Drag indicator — piccolo punto sotto il FAB */}
-        {!fabOpen && (
-          <div style={{
-            position: 'absolute',
-            bottom: -6,
-            left: '50%',
-            transform: 'translateX(-50%)',
-            width: 4,
-            height: 4,
-            borderRadius: '50%',
-            background: 'rgba(255,255,255,0.25)',
-            transition: 'opacity 0.2s',
-          }} />
+        {!fabOpen && !dragging && (
+          <div style={{ position: 'absolute', bottom: -8, left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: 3 }}>
+            {[0,1,2].map(i => <div key={i} style={{ width: 3, height: 3, borderRadius: '50%', background: 'rgba(255,255,255,0.2)' }} />)}
+          </div>
         )}
       </div>
     </>
