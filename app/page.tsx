@@ -777,8 +777,8 @@ export default function Home() {
         </div>
 
         {/* DRAGGABLE FAB — mobile/tablet only */}
-        <MastroAI currentUser={user} />
-          <MastroAI currentUser={user} />
+        
+          
           {!device.isDesktop && (
           <>
             <DraggableFAB
