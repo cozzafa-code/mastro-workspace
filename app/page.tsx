@@ -689,26 +689,25 @@ export default function Home() {
           flexShrink: 0, gap: 12,
         }}>
           {/* Left — logo mobile + breadcrumb */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            {device.isMobile && (
-              <div style={{ width: 30, height: 30, borderRadius: 8, background: DS.colors.dark, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                <svg width="14" height="10" viewBox="0 0 16 12" fill="none"><path d="M1 10L5 1l4 7 4-7 3 9" stroke={DS.colors.teal} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
-              </div>
-            )}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             {/* Tasto indietro — visibile quando non sei in dashboard */}
-            {tab !== 'dashboard' && (
+            {tab !== 'dashboard' ? (
               <button
                 onClick={() => { setTab('dashboard'); setSelectedProject(null) }}
-                style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '5px 10px', border: `1px solid ${DS.colors.border}`, borderRadius: 8, background: DS.colors.surface, cursor: 'pointer', fontFamily: DS.fonts.ui, fontSize: 12, color: DS.colors.textMuted, flexShrink: 0, transition: 'all 0.15s' }}
-                onMouseEnter={e => { e.currentTarget.style.borderColor = DS.colors.teal; e.currentTarget.style.color = DS.colors.teal }}
-                onMouseLeave={e => { e.currentTarget.style.borderColor = DS.colors.border; e.currentTarget.style.color = DS.colors.textMuted }}>
-                <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M8 2L4 6l4 4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                {!device.isMobile && 'Home'}
+                style={{ width: 34, height: 34, display: 'flex', alignItems: 'center', justifyContent: 'center', border: `1px solid ${DS.colors.border}`, borderRadius: 10, background: DS.colors.surface, cursor: 'pointer', flexShrink: 0, transition: 'all 0.15s' }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = DS.colors.teal; e.currentTarget.style.background = DS.colors.tealLight }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = DS.colors.border; e.currentTarget.style.background = DS.colors.surface }}>
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 2L5 7l4 5" stroke={DS.colors.textSecondary} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
               </button>
-            )}
+            ) : device.isMobile ? (
+              <div style={{ width: 30, height: 30, borderRadius: 9, background: DS.colors.dark, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <svg width="14" height="10" viewBox="0 0 16 12" fill="none"><path d="M1 10L5 1l4 7 4-7 3 9" stroke={DS.colors.teal} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              </div>
+            ) : null}
             <div>
-              {!device.isMobile && <div style={{ fontSize: 11, color: DS.colors.textFaint, marginBottom: 1 }}>Workspace</div>}
-              <div style={{ fontSize: device.isMobile ? 15 : 15, fontWeight: 700, color: DS.colors.textPrimary, letterSpacing: '-0.2px' }}>{tabTitles[tab]}</div>
+              {!device.isMobile && tab !== 'dashboard' && <div style={{ fontSize: 10, color: DS.colors.textFaint, marginBottom: 1, cursor: 'pointer' }} onClick={() => setTab('dashboard')}>← Home</div>}
+              {!device.isMobile && tab === 'dashboard' && <div style={{ fontSize: 10, color: DS.colors.textFaint, marginBottom: 1 }}>Workspace</div>}
+              <div style={{ fontSize: device.isMobile ? 16 : 15, fontWeight: 700, color: DS.colors.textPrimary, letterSpacing: '-0.3px' }}>{tabTitles[tab]}</div>
             </div>
           </div>
 
@@ -744,7 +743,7 @@ export default function Home() {
         </div>
 
         {/* Content */}
-        <div style={{ flex: 1, overflowY: 'auto', padding: device.isMobile ? '16px 16px 76px' : device.isTablet ? '20px 24px 80px' : '24px 32px', background: DS.colors.background }}>
+        <div style={{ flex: 1, overflowY: 'auto', padding: device.isMobile ? '16px 16px 84px' : device.isTablet ? '20px 24px 80px' : '24px 32px', background: DS.colors.background }}>
           {loading
             ? <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}><span style={{ fontSize: 13, color: '#9CA3AF' }}>Caricamento...</span></div>
             : <>
@@ -866,37 +865,41 @@ export default function Home() {
               </div>
             </DraggableFAB>
 
-            {/* Bottom nav — mobile premium */}
+            {/* Bottom nav — 5 tab premium light */}
             <div style={{
               position: 'fixed', bottom: 0, left: 0, right: 0,
-              background: '#FFFFFF',
-              borderTop: '1px solid #E8EAED',
+              background: 'rgba(255,255,255,0.95)',
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+              borderTop: '1px solid rgba(0,0,0,0.06)',
               display: 'flex', zIndex: 70,
               paddingBottom: 'env(safe-area-inset-bottom)',
-              boxShadow: '0 -4px 20px rgba(0,0,0,0.06)',
             }}>
               {[
-                { id: 'dashboard',  iconKey: 'dashboard', label: 'Home' },
-                { id: 'task',       iconKey: 'tasks',     label: 'Task' },
-                { id: 'clienti',    iconKey: 'clients',   label: 'CRM' },
-                { id: 'personale',  iconKey: 'personal',  label: 'La mia' },
-              ].map((item: any) => {
+                { id: 'dashboard',  label: 'Home',      icon: (a: boolean) => <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2" y="10" width="6" height="8" rx="1.5" stroke="currentColor" strokeWidth="1.6" fill={a ? 'currentColor' : 'none'} fillOpacity="0.15"/><rect x="10" y="2" width="8" height="16" rx="1.5" stroke="currentColor" strokeWidth="1.6" fill={a ? 'currentColor' : 'none'} fillOpacity="0.15"/><path d="M2 8L10 2" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/></svg> },
+                { id: 'task',       label: 'Task',      icon: (a: boolean) => <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="3" y="3" width="14" height="14" rx="3" stroke="currentColor" strokeWidth="1.6" fill={a ? 'currentColor' : 'none'} fillOpacity="0.1"/><path d="M7 10l2.5 2.5L13 8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg> },
+                { id: 'clienti',    label: 'CRM',       icon: (a: boolean) => <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="7" r="3.5" stroke="currentColor" strokeWidth="1.6" fill={a ? 'currentColor' : 'none'} fillOpacity="0.15"/><path d="M3 17c0-3.866 3.134-7 7-7s7 3.134 7 7" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/></svg> },
+                { id: 'calendario', label: 'Agenda',    icon: (a: boolean) => <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="3" y="4" width="14" height="13" rx="2.5" stroke="currentColor" strokeWidth="1.6" fill={a ? 'currentColor' : 'none'} fillOpacity="0.1"/><path d="M3 9h14M7 2v3M13 2v3" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/></svg> },
+                { id: 'personale',  label: 'La mia',    icon: (a: boolean) => <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="7" r="3.5" stroke="currentColor" strokeWidth="1.6" fill={a ? 'currentColor' : 'none'} fillOpacity="0.15"/><path d="M3 17c0-3.866 3.134-7 7-7s7 3.134 7 7" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/><circle cx="16" cy="14" r="3" fill={DS.colors.teal}/><path d="M15 14h2M16 13v2" stroke="white" strokeWidth="1.4" strokeLinecap="round"/></svg> },
+              ].map((item) => {
                 const isActive = tab === item.id
                 return (
                   <button key={item.id}
                     onClick={() => { setTab(item.id as Tab); setSelectedProject(null); setShowFab(false); setFabMode(null) }}
                     style={{
                       flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center',
-                      justifyContent: 'center', padding: '10px 0 8px',
+                      justifyContent: 'center', padding: '10px 4px 9px',
                       border: 'none', background: 'none', cursor: 'pointer',
-                      color: isActive ? DS.colors.teal : DS.colors.textFaint,
-                      fontFamily: DS.fonts.ui, position: 'relative',
+                      color: isActive ? DS.colors.teal : '#94A3B8',
+                      fontFamily: DS.fonts.ui, position: 'relative', gap: 3,
+                      transition: 'color 0.15s',
                     }}>
+                    {/* Active pill background */}
                     {isActive && (
-                      <div style={{ position: 'absolute', top: 0, left: '20%', right: '20%', height: 2, background: DS.colors.teal, borderRadius: '0 0 2px 2px' }} />
+                      <div style={{ position: 'absolute', top: 6, left: '50%', transform: 'translateX(-50%)', width: 36, height: 28, background: DS.colors.tealLight, borderRadius: 10 }} />
                     )}
-                    <div style={{ opacity: isActive ? 1 : 0.5, marginBottom: 4 }}>{iconSvg(item.iconKey, isActive)}</div>
-                    <span style={{ fontSize: 10, fontWeight: isActive ? 700 : 400 }}>{item.label}</span>
+                    <div style={{ position: 'relative', zIndex: 1 }}>{item.icon(isActive)}</div>
+                    <span style={{ fontSize: 9.5, fontWeight: isActive ? 700 : 500, position: 'relative', zIndex: 1, letterSpacing: 0.1 }}>{item.label}</span>
                   </button>
                 )
               })}
