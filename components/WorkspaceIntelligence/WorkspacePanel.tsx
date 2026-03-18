@@ -228,24 +228,51 @@ Rispondi in italiano, in modo conciso e operativo. Puoi suggerire priorità, ana
     setLoading(true)
     setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: 'smooth' }), 50)
 
+    const history = msgs.slice(-6).map(m => ({ role: m.role, content: m.text }))
+    const systemPrompt = buildContext()
+    let reply = ''
+
+    // Prova OpenAI GPT-4o prima (più affidabile dal browser)
     try {
-      const history = msgs.slice(-6).map(m => ({ role: m.role, content: m.text }))
-      const res = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 1000,
-          system: buildContext(),
-          messages: [...history, { role: 'user', content: userMsg }],
-        }),
-      })
-      const data = await res.json()
-      const reply = data.content?.[0]?.text || 'Errore nella risposta.'
-      setMsgs(ms => [...ms, { role: 'assistant', text: reply }])
-    } catch {
-      setMsgs(ms => [...ms, { role: 'assistant', text: 'Errore di connessione. Riprova.' }])
+      const openaiKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY
+      if (openaiKey) {
+        const res = await fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${openaiKey}` },
+          body: JSON.stringify({
+            model: 'gpt-4o-mini',
+            max_tokens: 1000,
+            messages: [
+              { role: 'system', content: systemPrompt },
+              ...history,
+              { role: 'user', content: userMsg }
+            ],
+          }),
+        })
+        const data = await res.json()
+        reply = data.choices?.[0]?.message?.content || ''
+      }
+    } catch { reply = '' }
+
+    // Fallback: Anthropic Claude
+    if (!reply) {
+      try {
+        const res = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model: 'claude-sonnet-4-20250514',
+            max_tokens: 1000,
+            system: systemPrompt,
+            messages: [...history, { role: 'user', content: userMsg }],
+          }),
+        })
+        const data = await res.json()
+        reply = data.content?.[0]?.text || ''
+      } catch { reply = '' }
     }
+
+    setMsgs(ms => [...ms, { role: 'assistant', text: reply || 'Errore di connessione. Configura NEXT_PUBLIC_OPENAI_API_KEY su Vercel.' }])
     setLoading(false)
     setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: 'smooth' }), 100)
   }
