@@ -649,74 +649,93 @@ export default function Home() {
           <>
             <DraggableFAB
               fabOpen={showFab}
-              setFabOpen={setShowFab}
+              setFabOpen={(v) => { setShowFab(v); if (!v) setFabMode(null) }}
               acc={user === 'fabio' ? '#0A8A7A' : '#BE185D'}
             >
-              {/* Contenuto menu FAB */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 4, fontFamily: 'system-ui, -apple-system, sans-serif' }}>
 
-                {/* Header utente + switch */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '6px 8px 10px', borderBottom: '1px solid rgba(255,255,255,0.08)', marginBottom: 4 }}>
+                {/* Header */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '4px 4px 10px', borderBottom: '1px solid rgba(255,255,255,0.08)', marginBottom: 6 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <div style={{ width: 24, height: 24, borderRadius: '50%', background: user === 'fabio' ? '#0A8A7A' : '#BE185D', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, fontWeight: 800, color: '#fff' }}>
+                    <div style={{ width: 26, height: 26, borderRadius: '50%', background: user === 'fabio' ? '#0A8A7A' : '#BE185D', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, fontWeight: 800, color: '#fff' }}>
                       {user === 'fabio' ? 'FA' : 'LI'}
                     </div>
-                    <span style={{ fontSize: 12, fontWeight: 600, color: '#fff' }}>{user === 'fabio' ? 'Fabio' : 'Lidia'}</span>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: '#fff' }}>{user === 'fabio' ? 'Fabio' : 'Lidia'}</span>
                   </div>
-                  <button onClick={() => { setUser(user === 'fabio' ? 'lidia' : 'fabio') }}
-                    style={{ background: 'rgba(255,255,255,0.1)', border: 'none', borderRadius: 20, padding: '4px 10px', cursor: 'pointer', fontSize: 11, color: 'rgba(255,255,255,0.6)', fontFamily: 'inherit' }}>
-                    → {user === 'fabio' ? 'Lidia' : 'Fabio'}
+                  <button onClick={() => setUser(user === 'fabio' ? 'lidia' : 'fabio')}
+                    style={{ background: 'rgba(255,255,255,0.1)', border: 'none', borderRadius: 20, padding: '4px 12px', cursor: 'pointer', fontSize: 11, color: 'rgba(255,255,255,0.7)', fontFamily: 'inherit' }}>
+                    {user === 'fabio' ? 'Lidia' : 'Fabio'} →
                   </button>
                 </div>
 
-                {/* AI mode o menu */}
+                {/* AI mode */}
                 {fabMode === 'ai' ? (
-                  <div style={{ height: 360, display: 'flex', flexDirection: 'column' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '0 8px 8px' }}>
-                      <button onClick={() => setFabMode(null)} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.4)', cursor: 'pointer', fontSize: 16, padding: 0 }}>←</button>
-                      <span style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.7)' }}>AI MASTRO</span>
-                    </div>
+                  <div style={{ height: 340, display: 'flex', flexDirection: 'column' }}>
+                    <button onClick={() => setFabMode(null)}
+                      style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'none', border: 'none', color: 'rgba(255,255,255,0.5)', cursor: 'pointer', fontSize: 12, padding: '0 0 8px', fontFamily: 'inherit' }}>
+                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 1L3 7l6 6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                      Torna al menu
+                    </button>
                     <FabAI utente={user} workspaceData={data} onAction={loadAll} />
                   </div>
                 ) : (
                   <>
-                    {/* Azioni principali */}
+                    {/* Azioni principali con SVG professionali */}
                     {[
-                      { emoji: '✅', label: '+ Task rapida',  color: '#2563EB', action: () => { setShowFab(false); setFabMode(null); setTimeout(() => setShowForm('task'), 50) } },
-                      { emoji: '🤖', label: 'Chiedi alla AI', color: '#D97706', action: () => setFabMode('ai') },
-                      { emoji: '📋', label: 'Nuova delega',   color: '#BE185D', action: () => { setShowFab(false); setFabMode(null); setTab('deleghe') } },
-                      { emoji: '💡', label: '+ Idea',         color: '#7C3AED', action: () => { setShowFab(false); setFabMode(null); setTab('lab_idee') } },
+                      {
+                        icon: <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8l3.5 3.5L13 4" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>,
+                        label: 'Nuova task', color: '#2563EB',
+                        action: () => { setShowFab(false); setFabMode(null); setTimeout(() => setShowForm('task'), 50) }
+                      },
+                      {
+                        icon: <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="white" strokeWidth="1.8"/><path d="M8 5v3l2 2" stroke="white" strokeWidth="1.8" strokeLinecap="round"/></svg>,
+                        label: 'AI Assistant', color: '#D97706',
+                        action: () => setFabMode('ai')
+                      },
+                      {
+                        icon: <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="white" strokeWidth="2" strokeLinecap="round"/></svg>,
+                        label: 'Delega a ' + (user === 'fabio' ? 'Lidia' : 'Fabio'), color: '#BE185D',
+                        action: () => { setShowFab(false); setFabMode(null); setTab('deleghe') }
+                      },
+                      {
+                        icon: <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2l1.5 3.5L13 6l-2.5 2.5.5 3.5L8 10.5 5 12l.5-3.5L3 6l3.5-.5L8 2z" stroke="white" strokeWidth="1.5" strokeLinejoin="round"/></svg>,
+                        label: 'Nuova idea', color: '#7C3AED',
+                        action: () => { setShowFab(false); setFabMode(null); setTab('lab_idee') }
+                      },
                     ].map(a => (
                       <button key={a.label} onClick={a.action}
-                        style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', background: a.color + '20', border: `1px solid ${a.color}40`, borderRadius: 10, cursor: 'pointer', fontFamily: 'inherit', width: '100%', marginBottom: 4 }}>
-                        <span style={{ width: 30, height: 30, borderRadius: '50%', background: a.color, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, flexShrink: 0 }}>{a.emoji}</span>
+                        style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '11px 14px', background: a.color + '22', border: `1px solid ${a.color}45`, borderRadius: 10, cursor: 'pointer', fontFamily: 'inherit', width: '100%', marginBottom: 5 }}>
+                        <div style={{ width: 32, height: 32, borderRadius: 9, background: a.color, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{a.icon}</div>
                         <span style={{ fontSize: 13, fontWeight: 600, color: '#fff' }}>{a.label}</span>
+                        <svg style={{ marginLeft: 'auto', opacity: 0.3 }} width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M5 2l5 5-5 5" stroke="white" strokeWidth="1.8" strokeLinecap="round"/></svg>
                       </button>
                     ))}
 
-                    {/* Griglia moduli */}
-                    <div style={{ borderTop: '1px solid rgba(255,255,255,0.07)', paddingTop: 8, marginTop: 4 }}>
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 5 }}>
+                    {/* Griglia moduli con SVG */}
+                    <div style={{ borderTop: '1px solid rgba(255,255,255,0.07)', paddingTop: 10, marginTop: 2 }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 6 }}>
                         {([
-                          ['🏠', 'dashboard'], ['🚀', 'progetti'], ['👥', 'clienti'],
-                          ['📅', 'calendario'], ['📋', 'preventivi'], ['💰', 'spese'],
-                        ] as [string, Tab][]).map(([emoji, id]) => {
-                          const labels: Record<string, string> = { dashboard: 'Home', progetti: 'Progetti', clienti: 'CRM', calendario: 'Agenda', preventivi: 'Prev.', spese: 'Finanze' }
-                          return (
-                            <button key={id} onClick={() => { setTab(id); setShowFab(false); setFabMode(null) }}
-                              style={{ padding: '7px 4px', background: tab === id ? 'rgba(10,138,122,0.3)' : 'rgba(255,255,255,0.06)', border: `1px solid ${tab === id ? '#0A8A7A60' : 'rgba(255,255,255,0.08)'}`, borderRadius: 8, cursor: 'pointer', fontSize: 10, color: tab === id ? '#5EEAD4' : 'rgba(255,255,255,0.55)', fontFamily: 'inherit', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
-                              <span style={{ fontSize: 16 }}>{emoji}</span>
-                              {labels[id]}
-                            </button>
-                          )
-                        })}
+                          ['dashboard', 'Home',      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="7" width="5" height="6" rx="1" stroke="currentColor" strokeWidth="1.5"/><rect x="8" y="1" width="5" height="12" rx="1" stroke="currentColor" strokeWidth="1.5"/><path d="M1 5L7 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>],
+                          ['progetti',  'Progetti',  <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 11L7 2l5 9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>],
+                          ['clienti',   'CRM',       <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="5" r="2.5" stroke="currentColor" strokeWidth="1.5"/><path d="M2 12c0-2.76 2.24-5 5-5s5 2.24 5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>],
+                          ['calendario','Agenda',    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="3" width="12" height="10" rx="1.5" stroke="currentColor" strokeWidth="1.5"/><path d="M1 7h12M5 1v3M9 1v3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>],
+                          ['preventivi','Prev.',     <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="2" y="1" width="10" height="12" rx="1.5" stroke="currentColor" strokeWidth="1.5"/><path d="M5 5h4M5 8h3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>],
+                          ['spese',     'Finanze',   <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" strokeWidth="1.5"/><path d="M7 4v1.5M7 8.5V10M5.5 7c0-.83.67-1.5 1.5-1.5h.5a1 1 0 010 2H7a1 1 0 000 2h.5c.83 0 1.5-.67 1.5-1.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/></svg>],
+                        ] as [Tab, string, any][]).map(([id, label, icon]) => (
+                          <button key={id} onClick={() => { setTab(id); setShowFab(false); setFabMode(null) }}
+                            style={{ padding: '8px 4px', background: tab === id ? 'rgba(10,138,122,0.25)' : 'rgba(255,255,255,0.06)', border: `1px solid ${tab === id ? '#0A8A7A50' : 'rgba(255,255,255,0.08)'}`, borderRadius: 9, cursor: 'pointer', fontSize: 10, color: tab === id ? '#5EEAD4' : 'rgba(255,255,255,0.55)', fontFamily: 'inherit', fontWeight: tab === id ? 700 : 400, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+                            <span style={{ color: tab === id ? '#5EEAD4' : 'rgba(255,255,255,0.4)' }}>{icon}</span>
+                            {label}
+                          </button>
+                        ))}
                       </div>
                     </div>
 
-                    {/* Settings */}
+                    {/* Impostazioni */}
                     <button onClick={() => { setShowSettings(true); setShowFab(false); setFabMode(null) }}
-                      style={{ width: '100%', marginTop: 6, padding: '7px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 8, cursor: 'pointer', fontSize: 11, color: 'rgba(255,255,255,0.3)', fontFamily: 'inherit' }}>
-                      ⚙️ Impostazioni
+                      style={{ width: '100%', marginTop: 8, padding: '8px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 8, cursor: 'pointer', fontSize: 11, color: 'rgba(255,255,255,0.35)', fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                      <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="2" stroke="currentColor" strokeWidth="1.5"/><path d="M6 1v1M6 10v1M1 6h1M10 6h1M2.5 2.5l.7.7M8.8 8.8l.7.7M2.5 9.5l.7-.7M8.8 3.2l.7-.7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
+                      Impostazioni
                     </button>
                   </>
                 )}
