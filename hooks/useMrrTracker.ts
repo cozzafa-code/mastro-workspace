@@ -75,9 +75,9 @@ export function useMrrTracker() {
     }, {} as Record<string, { mese: string; totale: number; clienti: number }>)
   ).sort((a, b) => a.mese.localeCompare(b.mese))
 
-  // Target Odense: 28-34 clienti @ €248/mo = ~€6944-8432 MRR
-  const targetMrr = 34 * 248
-  const targetClienti = 34
+  // Target lancio Italia: 30 clienti @ ~147/mo media = ~4400 MRR Giugno 2026
+  const targetMrr = 4400
+  const targetClienti = 30
   const clientiAttuali = state.progetti.reduce((a, p) => a + (Number(p.beta_clienti) || 0), 0)
   const progressoPct = targetMrr > 0 ? Math.min(100, Math.round((mrrCorrente / targetMrr) * 100)) : 0
 

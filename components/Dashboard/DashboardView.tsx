@@ -164,7 +164,7 @@ export const DashboardView: FC<{ data: any; user: string; onNavigate: (tab: stri
 
   const totMRR = progetti.reduce((a: number, p: any) => a + (Number(p.mrr) || 0), 0)
   const totClienti = progetti.reduce((a: number, p: any) => a + (Number(p.beta_clienti) || 0), 0)
-  const targetOdense = 34 * 248
+  const targetOdense = 4400
   const runwayMesi = (() => {
     const cashRes = spese.find((s: any) => s.nome?.toLowerCase().includes('cassa') || s.categoria?.toLowerCase().includes('cassa'))
     const cassa = cashRes ? Number(cashRes.importo) : 0
@@ -331,8 +331,8 @@ export const DashboardView: FC<{ data: any; user: string; onNavigate: (tab: stri
       <div>
         <SectionHeader title="KPI Business" />
         <div style={col3}>
-          <KpiCard value={`€${totMRR.toLocaleString('it-IT')}`} label="MRR Totale" sub={`${Math.round(totMRR / targetOdense * 100)}% target Odense`} onClick={() => onNavigate('mrr')} />
-          <KpiCard value={String(totClienti)} label="Clienti totali" sub={`${Math.max(0, Math.round(targetOdense / 248) - totClienti)} al target`} onClick={() => onNavigate('mrr')} />
+          <KpiCard value={`€${totMRR.toLocaleString('it-IT')}`} label="MRR Totale" sub={`${Math.round(totMRR / targetOdense * 100)}% target lancio`} onClick={() => onNavigate('mrr')} />
+          <KpiCard value={String(totClienti)} label="Clienti totali" sub={`${Math.max(0, 30 - totClienti)} al target`} onClick={() => onNavigate('mrr')} />
           <KpiCard value={`€${burnRate.toLocaleString('it-IT')}`} label="Burn rate/mese" sub="spese correnti" alert={burnRate > totMRR} onClick={() => onNavigate('spese')} />
           <KpiCard value={runwayMesi > 99 ? '∞' : `${runwayMesi}m`} label="Runway" sub="mesi di cassa" alert={runwayMesi < 3} onClick={() => onNavigate('spese')} />
         </div>

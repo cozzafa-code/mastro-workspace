@@ -20,7 +20,6 @@ const FI: FC<{ label: string; value: string; onChange: (v: string) => void; plac
     </div>
   )
 
-// Mini bar chart SVG inline
 function MiniBarChart({ data }: { data: { mese: string; totale: number }[] }) {
   if (data.length === 0) return (
     <div style={{ textAlign: 'center', padding: '40px 0', color: DS.colors.textMuted, fontSize: 13 }}>
@@ -32,29 +31,26 @@ function MiniBarChart({ data }: { data: { mese: string; totale: number }[] }) {
 
   return (
     <svg viewBox={`0 0 ${w} ${h + 40}`} style={{ width: '100%', fontFamily: DS.fonts.ui }}>
-      {/* Grid lines */}
       {[0, 0.25, 0.5, 0.75, 1].map(pct => {
         const y = pad + (1 - pct) * h
         return (
           <g key={pct}>
             <line x1={pad} y1={y} x2={w - pad} y2={y} stroke={DS.colors.border} strokeWidth={1} />
             <text x={pad - 6} y={y + 4} textAnchor="end" fontSize={9} fill={DS.colors.textMuted}>
-              €{Math.round(max * pct).toLocaleString('it-IT')}
+              {String.fromCharCode(8364)}{Math.round(max * pct).toLocaleString('it-IT')}
             </text>
           </g>
         )
       })}
-      {/* Bars */}
       {data.map((d, i) => {
         const x = pad + i * ((w - pad * 2) / data.length) + ((w - pad * 2) / data.length - barW) / 2
         const barH = Math.max(2, (d.totale / max) * h)
         const y = pad + h - barH
         return (
           <g key={d.mese}>
-            <rect x={x} y={y} width={barW} height={barH} rx={3}
-              fill={DS.colors.teal} opacity={0.85} />
+            <rect x={x} y={y} width={barW} height={barH} rx={3} fill={DS.colors.teal} opacity={0.85} />
             <text x={x + barW / 2} y={y - 4} textAnchor="middle" fontSize={9} fill={DS.colors.teal} fontWeight={600}>
-              {d.totale > 0 ? `€${d.totale}` : ''}
+              {d.totale > 0 ? `${String.fromCharCode(8364)}${d.totale}` : ''}
             </text>
             <text x={x + barW / 2} y={pad + h + 16} textAnchor="middle" fontSize={9} fill={DS.colors.textMuted}>
               {d.mese.substring(5)}
@@ -69,7 +65,6 @@ function MiniBarChart({ data }: { data: { mese: string; totale: number }[] }) {
   )
 }
 
-// Progress bar verso target Odense
 function ProgressBar({ value, max, label, color }: { value: number; max: number; label: string; color: string }) {
   const pct = Math.min(100, Math.round((value / max) * 100))
   return (
@@ -103,22 +98,20 @@ export const MrrTrackerView: FC = () => {
 
   return (
     <div>
-      {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
         <div>
           <div style={{ fontSize: 18, fontWeight: 700, color: DS.colors.textPrimary }}>MRR Tracker</div>
-          <div style={{ fontSize: 12, color: DS.colors.textMuted, marginTop: 2 }}>Storico mensile · Target Odense self-sufficiency</div>
+          <div style={{ fontSize: 12, color: DS.colors.textMuted, marginTop: 2 }}>Storico mensile · Target lancio Italia</div>
         </div>
         <button onClick={mrr.openForm} style={{ padding: '7px 14px', background: DS.colors.teal, color: '#fff', border: 'none', borderRadius: DS.radius.sm, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
           + Snapshot
         </button>
       </div>
 
-      {/* KPI row */}
       <div style={{ display: 'flex', gap: 12, marginBottom: 20, flexWrap: 'wrap' }}>
         {[
-          { label: 'MRR attuale', value: `€${mrr.mrrCorrente.toLocaleString('it-IT')}/mo`, color: DS.colors.green, sub: 'da progetti attivi' },
-          { label: 'Target Odense', value: `€${mrr.targetMrr.toLocaleString('it-IT')}/mo`, color: DS.colors.textSecondary, sub: '34 clienti × €248' },
+          { label: 'MRR attuale', value: `${String.fromCharCode(8364)}${mrr.mrrCorrente.toLocaleString('it-IT')}/mo`, color: DS.colors.green, sub: 'da progetti attivi' },
+          { label: 'Target lancio', value: `${String.fromCharCode(8364)}${mrr.targetMrr.toLocaleString('it-IT')}/mo`, color: DS.colors.textSecondary, sub: '30 clienti · Giugno 2026' },
           { label: 'Clienti totali', value: String(mrr.clientiAttuali), color: DS.colors.blue, sub: `su ${mrr.targetClienti} target` },
           { label: 'Crescita m/m', value: growth !== null ? `${growth > 0 ? '+' : ''}${growth}%` : '—', color: growth !== null && growth > 0 ? DS.colors.green : DS.colors.red, sub: 'vs mese precedente' },
         ].map(k => (
@@ -131,21 +124,19 @@ export const MrrTrackerView: FC = () => {
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 280px', gap: 20, marginBottom: 20 }}>
-        {/* Chart */}
         <div style={{ background: DS.colors.surface, border: `1px solid ${DS.colors.border}`, borderRadius: DS.radius.lg, padding: '20px 24px' }}>
           <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 16, color: DS.colors.textPrimary }}>Andamento MRR mensile</div>
           <MiniBarChart data={mrr.mrrPerMese} />
         </div>
 
-        {/* Target progress */}
         <div style={{ background: DS.colors.surface, border: `1px solid ${DS.colors.border}`, borderRadius: DS.radius.lg, padding: '20px' }}>
-          <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 16, color: DS.colors.textPrimary }}>Target Odense</div>
-          <ProgressBar value={mrr.mrrCorrente} max={mrr.targetMrr} label={`MRR: €${mrr.mrrCorrente} / €${mrr.targetMrr}`} color={DS.colors.teal} />
+          <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 16, color: DS.colors.textPrimary }}>Target lancio</div>
+          <ProgressBar value={mrr.mrrCorrente} max={mrr.targetMrr} label={`MRR: ${String.fromCharCode(8364)}${mrr.mrrCorrente} / ${String.fromCharCode(8364)}${mrr.targetMrr}`} color={DS.colors.teal} />
           <ProgressBar value={mrr.clientiAttuali} max={mrr.targetClienti} label={`Clienti: ${mrr.clientiAttuali} / ${mrr.targetClienti}`} color={DS.colors.blue} />
           <div style={{ marginTop: 16, padding: 12, background: DS.colors.tealLight, borderRadius: DS.radius.sm }}>
             <div style={{ fontSize: 11, fontWeight: 700, color: DS.colors.tealDark, marginBottom: 4 }}>MANCANO</div>
             <div style={{ fontSize: 18, fontWeight: 700, color: DS.colors.tealDark }}>
-              €{Math.max(0, mrr.targetMrr - mrr.mrrCorrente).toLocaleString('it-IT')}/mo
+              {String.fromCharCode(8364)}{Math.max(0, mrr.targetMrr - mrr.mrrCorrente).toLocaleString('it-IT')}/mo
             </div>
             <div style={{ fontSize: 11, color: DS.colors.tealDark, marginTop: 2 }}>
               {Math.max(0, mrr.targetClienti - mrr.clientiAttuali)} clienti al target
@@ -154,7 +145,6 @@ export const MrrTrackerView: FC = () => {
         </div>
       </div>
 
-      {/* MRR per progetto */}
       <div style={{ background: DS.colors.surface, border: `1px solid ${DS.colors.border}`, borderRadius: DS.radius.lg, padding: '20px', marginBottom: 20 }}>
         <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 14, color: DS.colors.textPrimary }}>MRR per progetto</div>
         {mrr.progetti.filter(p => (p.mrr || 0) > 0 || p.stato === 'attivo').length === 0 ? (
@@ -170,7 +160,7 @@ export const MrrTrackerView: FC = () => {
                   <div style={{ flex: 1, height: 6, background: DS.colors.borderLight, borderRadius: 3, overflow: 'hidden' }}>
                     <div style={{ height: '100%', width: `${pct}%`, background: p.colore || DS.colors.teal, borderRadius: 3 }} />
                   </div>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: DS.colors.green, minWidth: 80, textAlign: 'right' }}>€{p.mrr || 0}/mo</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: DS.colors.green, minWidth: 80, textAlign: 'right' }}>{String.fromCharCode(8364)}{p.mrr || 0}/mo</div>
                   <div style={{ fontSize: 11, color: DS.colors.textMuted, minWidth: 30 }}>{pct}%</div>
                 </div>
               )
@@ -179,7 +169,6 @@ export const MrrTrackerView: FC = () => {
         )}
       </div>
 
-      {/* Storico snapshot */}
       {mrr.snapshots.length > 0 && (
         <div style={{ background: DS.colors.surface, border: `1px solid ${DS.colors.border}`, borderRadius: DS.radius.lg, padding: '20px' }}>
           <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 14, color: DS.colors.textPrimary }}>Storico snapshot ({mrr.snapshots.length})</div>
@@ -196,7 +185,7 @@ export const MrrTrackerView: FC = () => {
                 <tr key={s.id} style={{ borderBottom: `1px solid ${DS.colors.borderLight}` }}>
                   <td style={{ padding: '9px 12px', color: DS.colors.textSecondary }}>{s.data ? new Date(s.data).toLocaleDateString('it-IT') : '—'}</td>
                   <td style={{ padding: '9px 12px', fontWeight: 500 }}>{s.progetto_nome || '—'}</td>
-                  <td style={{ padding: '9px 12px', fontWeight: 700, color: DS.colors.green }}>€{s.valore || 0}/mo</td>
+                  <td style={{ padding: '9px 12px', fontWeight: 700, color: DS.colors.green }}>{String.fromCharCode(8364)}{s.valore || 0}/mo</td>
                   <td style={{ padding: '9px 12px', color: DS.colors.blue }}>{s.clienti_num || 0}</td>
                   <td style={{ padding: '9px 12px', color: DS.colors.textMuted, fontSize: 12 }}>{s.note || '—'}</td>
                   <td style={{ padding: '9px 12px' }}>
@@ -209,7 +198,6 @@ export const MrrTrackerView: FC = () => {
         </div>
       )}
 
-      {/* Form modal */}
       {mrr.showForm && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: 16 }}
           onClick={e => { if (e.target === e.currentTarget) mrr.closeForm() }}>

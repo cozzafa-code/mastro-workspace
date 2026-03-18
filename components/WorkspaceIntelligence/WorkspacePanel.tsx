@@ -216,7 +216,7 @@ TASK APERTE (${tasks.length}):
 ${tasks.slice(0, 10).map((t: any) => `- [${t.chi || '?'}] ${t.titolo || t.testo}${t.scadenza ? ` (scadenza: ${t.scadenza})` : ''} — ${t.stato}`).join('\n')}
 
 MRR TOTALE: €${totMRR}/mo
-TARGET ODENSE: 34 clienti × €248 = €8.432/mo (${Math.round(totMRR / 8432 * 100)}% raggiunto)
+TARGET LANCIO ITALIA: 30 clienti @ ~€4.400/mo (${Math.round(totMRR / 4400 * 100)}% raggiunto)
 
 Rispondi in italiano, in modo conciso e operativo. Puoi suggerire priorità, analizzare dati, rispondere a domande operative. Sii diretto.`
 
@@ -281,7 +281,7 @@ Rispondi in italiano, in modo conciso e operativo. Puoi suggerire priorità, ana
     'Cosa devo fare oggi?',
     `Come va ${progetti[0]?.nome || 'MASTRO ERP'}?`,
     'Quali task sono in scadenza questa settimana?',
-    'Quanto manca al target Odense?',
+    'Quanto manca al target lancio Italia?',
   ]
 
   return (
