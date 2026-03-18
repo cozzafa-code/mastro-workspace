@@ -103,7 +103,7 @@ REGOLE:
 }
 
 async function parseAndExecuteActions(content: string, user: User, onUpdate?: (id: string, stato: string) => void) {
-  const actionRegex = /<action>(.*?)<\/action>/gs
+  const actionRegex = /<action>([\s\S]*?)<\/action>/g
   const matches = [...content.matchAll(actionRegex)]
 
   for (const match of matches) {
