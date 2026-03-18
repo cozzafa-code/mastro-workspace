@@ -200,18 +200,46 @@ const PreventivoCard: FC<{ p: Preventivo; onClick: () => void; onDelete: () => v
   const cfg = STATO_CFG[p.stato] || STATO_CFG.bozza
   const oggi = new Date().toISOString().split('T')[0]
   const scaduto = p.scadenza && p.scadenza < oggi && p.stato !== 'accettato'
+  const [pdfLoading, setPdfLoading] = useState(false)
+
+  const downloadPdf = async (e: React.MouseEvent) => {
+    e.stopPropagation()
+    setPdfLoading(true)
+    try {
+      const res = await fetch('/api/export-pdf', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tipo: 'preventivo', id: p.id }),
+      })
+      const html = await res.text()
+      // Apri in nuova tab per stampa/salvataggio
+      const win = window.open('', '_blank')
+      if (win) {
+        win.document.write(html)
+        win.document.close()
+        setTimeout(() => win.print(), 500)
+      }
+    } catch (e) {
+      console.error(e)
+    }
+    setPdfLoading(false)
+  }
 
   return (
-    <div onClick={onClick} style={{ background: S.surface, border: `1px solid ${scaduto ? S.red + '40' : S.border}`, borderRadius: 12, padding: '16px 18px', cursor: 'pointer', borderLeft: `3px solid ${cfg.color}` }}
-      onMouseEnter={e => e.currentTarget.style.borderColor = cfg.color}
-      onMouseLeave={e => e.currentTarget.style.borderColor = scaduto ? S.red + '40' : S.border}>
+    <div onClick={onClick} style={{ background: S.surface, border: `1px solid ${scaduto ? S.red + '40' : S.border}`, borderRadius: 12, padding: '16px 18px', cursor: 'pointer', borderLeft: `3px solid ${cfg.color}`, transition: 'all 0.15s' }}
+      onMouseEnter={e => { e.currentTarget.style.borderColor = cfg.color; e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.boxShadow = DS.shadow.md }}
+      onMouseLeave={e => { e.currentTarget.style.borderColor = scaduto ? S.red + '40' : S.border; e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = 'none' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
         <div style={{ flex: 1 }}>
           <div style={{ fontSize: 14, fontWeight: 700, color: S.textPrimary, marginBottom: 3 }}>{p.titolo}</div>
           {p.cliente_nome && <div style={{ fontSize: 12, color: S.textSecondary }}>{p.cliente_nome}</div>}
         </div>
-        <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexShrink: 0, marginLeft: 12 }}>
+        <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexShrink: 0, marginLeft: 12 }}>
           <span style={{ background: cfg.bg, color: cfg.color, padding: '2px 8px', borderRadius: 20, fontSize: 11, fontWeight: 700 }}>{p.stato}</span>
+          <button onClick={downloadPdf} disabled={pdfLoading} title="Scarica PDF"
+            style={{ padding: '5px 8px', background: S.background, border: `1px solid ${S.border}`, borderRadius: 7, cursor: 'pointer', fontSize: 12, color: S.textSecondary, display: 'flex', alignItems: 'center', gap: 4 }}>
+            {pdfLoading ? '...' : '📄'} PDF
+          </button>
           <button onClick={e => { e.stopPropagation(); onDelete() }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: S.textMuted, fontSize: 13 }}>✕</button>
         </div>
       </div>

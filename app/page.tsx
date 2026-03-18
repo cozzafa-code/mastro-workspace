@@ -24,6 +24,7 @@ import { PreventiviView } from '@/components/Preventivi/PreventiviView'
 import { BachecaCondivisa } from '@/components/Condivisa/BachecaCondivisa'
 import { OnboardingFlow } from '@/components/Onboarding/OnboardingFlow'
 import { GlobalSearch } from '@/components/Search/GlobalSearch'
+import { SettingsPanel } from '@/components/Settings/SettingsPanel'
 import { WorkspacePanel } from '@/components/WorkspaceIntelligence/WorkspacePanel'
 import { usePanel } from '@/context/PanelContext'
 import type { PanelObject, PanelObjectType } from '@/components/Universal/DetailPanel'
@@ -415,7 +416,7 @@ export default function Home() {
 
   const forms: any = {
     progetto: { title: 'Nuovo progetto', body: <><FI label="Nome" id="nome" placeholder="Nome progetto" /><FI label="Descrizione" id="descrizione" placeholder="Descrizione" /><G2><FI label="MRR (€/mo)" id="mrr" type="number" placeholder="0" /><FI label="Prezzo/mese (€)" id="prezzo" type="number" placeholder="0" /></G2><G2><FI label="Beta clienti" id="clienti" type="number" placeholder="0" /><FI label="Priorità (1=max)" id="priorita" options={['1','2','3','4','5']} /></G2><FI label="Stato" id="stato" options={['attivo','pausa','completato','pianificato']} /><FI label="Colore (hex)" id="colore" placeholder="#0A8A7A" /></> },
-    task: { title: 'Nuovo task', body: <><FI label="Titolo" id="titolo" placeholder="Cosa fare" /><FI label="Dettaglio" id="dettaglio" placeholder="Dettaglio" /><G2><FI label="Chi" id="chi" placeholder="Fabio / Lidia" /><FI label="Scadenza" id="scadenza" type="date" placeholder="" /></G2><G2><FI label="Priorità (1=max)" id="priorita" options={['1','2','3','4','5']} /><FI label="Stato" id="stato" options={['aperto','in_corso','completato']} /></G2></> },
+    task: { title: 'Nuovo task', body: <><FI label="Titolo" id="titolo" placeholder="Cosa fare" /><FI label="Dettaglio" id="dettaglio" placeholder="Dettaglio" /><G2><FI label="Chi" id="chi" placeholder="Fabio / Lidia" /><FI label="Scadenza" id="scadenza" type="date" placeholder="" /></G2><G2><FI label="Priorità (1=max)" id="priorita" options={['1','2','3','4','5']} /><FI label="Stato" id="stato" options={['aperto','in_corso','completato']} /></G2><G2><FI label="Ricorrenza" id="ricorrenza" options={['','giornaliera','settimanale','mensile','annuale']} /><FI label="Fine ricorrenza" id="ricorrenza_fine" type="date" placeholder="" /></G2></> },
     task_p: { title: `Task per ${selectedProject?.nome}`, body: <><FI label="Titolo" id="titolo" placeholder="Cosa fare" /><FI label="Dettaglio" id="dettaglio" placeholder="Dettaglio" /><G2><FI label="Chi" id="chi" placeholder="Fabio / Lidia" /><FI label="Scadenza" id="scadenza" type="date" placeholder="" /></G2><FI label="Priorità (1=max)" id="priorita" options={['1','2','3','4','5']} /></> },
     campagna: { title: 'Nuova campagna', body: <><FI label="Nome" id="nome" placeholder="Nome campagna" /><G2><FI label="Tipo" id="tipo" options={['email','social','whatsapp','ads','evento','altro']} /><FI label="Canale" id="canale" placeholder="Brevo / TikTok / ..." /></G2><FI label="Obiettivo" id="obiettivo" placeholder="es. 500 lead serramentisti" /><FI label="Stato" id="stato" options={['pianificata','attiva','pausa','completata']} /></> },
     cliente: { title: 'Nuovo contatto', body: <><FI label="Nome / Azienda" id="nome" placeholder="Nome" /><FI label="Ruolo" id="ruolo" placeholder="Ruolo" /><G2><FI label="Email" id="email" placeholder="email@..." /><FI label="Telefono" id="tel" placeholder="+39..." /></G2><G2><FI label="Tipo" id="tipo" options={['Lead','Cliente','Partner','Fornitore']} /><FI label="Note" id="note" placeholder="Note" /></G2></> },
@@ -491,6 +492,7 @@ export default function Home() {
 
   // Ricerca globale — CMD+K / CTRL+K
   const [showSearch, setShowSearch] = useState(false)
+  const [showSettings, setShowSettings] = useState(false)
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -569,6 +571,10 @@ export default function Home() {
               <button onClick={() => supabase.auth.signOut()}
                 style={{ width: '100%', padding: '6px 8px', border: '1px solid #F0F0F0', borderRadius: 7, background: 'transparent', cursor: 'pointer', fontFamily: 'inherit', fontSize: 11, color: '#9CA3AF', textAlign: 'left' }}>
                 → Esci
+              </button>
+              <button onClick={() => setShowSettings(true)}
+                style={{ width: '100%', padding: '6px 8px', border: '1px solid #F0F0F0', borderRadius: 7, background: 'transparent', cursor: 'pointer', fontFamily: 'inherit', fontSize: 11, color: '#9CA3AF', textAlign: 'left', marginTop: 4 }}>
+                ⚙️ Impostazioni
               </button>
             </div>
           )}
@@ -728,6 +734,9 @@ export default function Home() {
           </div>
         </div>
       )}
+      {/* Settings */}
+      {showSettings && <SettingsPanel currentUser={user} onClose={() => setShowSettings(false)} />}
+
       {/* Ricerca globale */}
       {showSearch && <GlobalSearch onNavigate={(t, extra) => { setTab(t as any); if (extra) setSelectedProject(extra) }} onClose={() => setShowSearch(false)} />}
 
