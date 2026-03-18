@@ -483,6 +483,80 @@ export default function Home() {
   const [showFab, setShowFab] = useState(false)
   const [fabSide, setFabSide] = useState<'right' | 'left'>('right')
   const [fabTop, setFabTop] = useState('40%')
+  const [fabMode, setFabMode] = useState<'ai' | null>(null)
+
+  // AI inline nel FAB
+  const WorkspacePanelAI: React.FC<{ utente: string; workspaceData: any }> = ({ utente, workspaceData }) => {
+    const [msgs, setMsgs] = React.useState<{ role: string; text: string }[]>([])
+    const [aiInput, setAiInput] = React.useState('')
+    const [aiLoading, setAiLoading] = React.useState(false)
+    const progetti = workspaceData.progetti || []
+    const tasks = (workspaceData.tasks || []).filter((t: any) => t.stato !== 'completato')
+    const totMRR = progetti.reduce((a: number, p: any) => a + (Number(p.mrr) || 0), 0)
+    const oggi = new Date().toISOString().split('T')[0]
+
+    const systemCtx = `Sei l'AI di MASTRO OS. Utente: ${utente === 'fabio' ? 'Fabio' : 'Lidia'}. Oggi: ${oggi}.
+Progetti: ${progetti.slice(0,3).map((p: any) => p.nome + ' €' + (p.mrr||0) + '/mo').join(', ')}.
+Task aperte: ${tasks.slice(0,5).map((t: any) => t.titolo||t.testo).join(', ')}.
+MRR: €${totMRR}/mo. Rispondi in italiano, breve e diretto.`
+
+    const sendAI = async () => {
+      if (!aiInput.trim() || aiLoading) return
+      const q = aiInput.trim()
+      setAiInput('')
+      setMsgs(m => [...m, { role: 'user', text: q }])
+      setAiLoading(true)
+      try {
+        const openaiKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY
+        if (openaiKey) {
+          const res = await fetch('https://api.openai.com/v1/chat/completions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${openaiKey}` },
+            body: JSON.stringify({ model: 'gpt-4o-mini', max_tokens: 600, messages: [{ role: 'system', content: systemCtx }, ...msgs.slice(-4).map(m => ({ role: m.role, content: m.text })), { role: 'user', content: q }] }),
+          })
+          const d = await res.json()
+          setMsgs(m => [...m, { role: 'assistant', text: d.choices?.[0]?.message?.content || 'Errore.' }])
+        } else {
+          setMsgs(m => [...m, { role: 'assistant', text: 'Configura NEXT_PUBLIC_OPENAI_API_KEY su Vercel per usare la AI.' }])
+        }
+      } catch { setMsgs(m => [...m, { role: 'assistant', text: 'Errore di connessione.' }]) }
+      setAiLoading(false)
+    }
+
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden' }}>
+        <div style={{ flex: 1, overflowY: 'auto', padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {msgs.length === 0 && (
+            <div style={{ textAlign: 'center', padding: '20px 0' }}>
+              <div style={{ fontSize: 28, marginBottom: 8 }}>🤖</div>
+              <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)' }}>Chiedi qualcosa sul tuo workspace</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 12 }}>
+                {['Cosa devo fare oggi?', 'Come va il MRR?', 'Task in scadenza?'].map(s => (
+                  <button key={s} onClick={() => { setAiInput(s); setTimeout(() => sendAI(), 100) }}
+                    style={{ padding: '8px 12px', background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 8, color: 'rgba(255,255,255,0.6)', fontSize: 12, cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left' }}>
+                    {s}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+          {msgs.map((m, i) => (
+            <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: m.role === 'user' ? 'flex-end' : 'flex-start' }}>
+              <div style={{ maxWidth: '85%', background: m.role === 'user' ? '#0A8A7A' : 'rgba(255,255,255,0.1)', padding: '8px 12px', borderRadius: 10, fontSize: 13, color: '#fff', lineHeight: 1.5 }}>
+                {m.text}
+              </div>
+            </div>
+          ))}
+          {aiLoading && <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', padding: '4px 0' }}>⏳ Sto pensando...</div>}
+        </div>
+        <div style={{ padding: '10px 12px', borderTop: '1px solid rgba(255,255,255,0.08)', display: 'flex', gap: 8 }}>
+          <input value={aiInput} onChange={e => setAiInput(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') sendAI() }}
+            placeholder="Chiedi..." style={{ flex: 1, background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 8, padding: '8px 12px', fontSize: 13, color: '#fff', fontFamily: 'inherit', outline: 'none' }} />
+          <button onClick={sendAI} style={{ width: 36, height: 36, background: '#0A8A7A', border: 'none', borderRadius: 8, cursor: 'pointer', color: '#fff', fontSize: 16 }}>→</button>
+        </div>
+      </div>
+    )
+  }
 
   // Onboarding — mostra solo alla prima visita
   const [showOnboarding, setShowOnboarding] = useState(() => {
@@ -642,67 +716,100 @@ export default function Home() {
           }
         </div>
 
-        {/* FAB LATERALE draggabile — mobile e tablet */}
+        {/* FAB LATERALE con AI integrata — mobile e tablet */}
         {!device.isDesktop && (
           <>
-            {showFab && <div style={{ position: 'fixed', inset: 0, zIndex: 79, background: 'rgba(0,0,0,0.3)' }} onClick={() => setShowFab(false)} />}
+            {showFab && <div style={{ position: 'fixed', inset: 0, zIndex: 79, background: 'rgba(0,0,0,0.5)' }} onClick={() => { setShowFab(false); setFabMode(null) }} />}
 
-            <div style={{ position: 'fixed', [fabSide]: 0, top: fabTop, zIndex: 80, display: 'flex', flexDirection: fabSide === 'right' ? 'row' : 'row-reverse', alignItems: 'center' }}>
-              {/* Menu espanso */}
+            <div style={{ position: 'fixed', [fabSide]: 0, top: fabTop, zIndex: 80, display: 'flex', flexDirection: fabSide === 'right' ? 'row' : 'row-reverse', alignItems: 'flex-start' }}>
+
+              {/* Pannello espanso */}
               {showFab && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 14, padding: '20px 16px 20px 20px', background: 'rgba(13,27,42,0.97)', borderRadius: fabSide === 'right' ? '16px 0 0 16px' : '0 16px 16px 0', boxShadow: '-8px 0 32px rgba(0,0,0,0.3)', backdropFilter: 'blur(10px)', maxHeight: '70vh', overflowY: 'auto' }}>
-                  {[
-                    { label: '+ Task',   color: '#2563EB', icon: <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 10l4 4 8-8" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>, action: () => { setShowForm('task'); setShowFab(false) } },
-                    { label: '+ Delega', color: '#BE185D', icon: <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 4v12M4 10h12" stroke="white" strokeWidth="2" strokeLinecap="round"/></svg>, action: () => { setTab('deleghe'); setShowFab(false) } },
-                    { label: '+ Idea',   color: '#7C3AED', icon: <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="8" r="4" stroke="white" strokeWidth="2"/><path d="M8 14h4M9 16h2" stroke="white" strokeWidth="2" strokeLinecap="round"/></svg>, action: () => { setTab('lab_idee'); setShowFab(false) } },
-                    { label: 'Agenda',   color: '#059669', icon: <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="3" y="4" width="14" height="13" rx="2" stroke="white" strokeWidth="2"/><path d="M7 2v3M13 2v3M3 9h14" stroke="white" strokeWidth="2" strokeLinecap="round"/></svg>, action: () => { setTab('calendario'); setShowFab(false) } },
-                    { label: 'Chat AI',  color: '#D97706', icon: <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 2a8 8 0 100 16 8 8 0 000-16z" stroke="white" strokeWidth="2"/><path d="M7 10h6M7 7h4" stroke="white" strokeWidth="2" strokeLinecap="round"/></svg>, action: () => setShowFab(false) },
-                    { label: user === 'fabio' ? '→ Lidia' : '→ Fabio', color: user === 'fabio' ? '#BE185D' : '#0A8A7A', icon: <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="7" r="3" stroke="white" strokeWidth="2"/><path d="M4 17c0-3.314 2.686-6 6-6s6 2.686 6 6" stroke="white" strokeWidth="2" strokeLinecap="round"/></svg>, action: () => { setUser(user === 'fabio' ? 'lidia' : 'fabio'); setShowFab(false) } },
-                  ].map(a => (
-                    <div key={a.label} onClick={a.action} style={{ display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer' }}>
-                      <div style={{ width: 48, height: 48, borderRadius: '50%', background: a.color, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: `0 4px 12px ${a.color}60` }}>{a.icon}</div>
-                      <span style={{ fontSize: 14, fontWeight: 700, color: '#fff', whiteSpace: 'nowrap' }}>{a.label}</span>
+                <div style={{ background: 'rgba(11,27,42,0.98)', borderRadius: fabSide === 'right' ? '16px 0 0 16px' : '0 16px 16px 0', boxShadow: '-8px 0 40px rgba(0,0,0,0.4)', backdropFilter: 'blur(16px)', width: 300, maxHeight: '80vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+
+                  {/* AI Mode */}
+                  {fabMode === 'ai' ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', height: '80vh' }}>
+                      <div style={{ padding: '14px 16px', borderBottom: '1px solid rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <button onClick={() => setFabMode(null)} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.5)', cursor: 'pointer', fontSize: 16 }}>←</button>
+                        <span style={{ fontSize: 13, fontWeight: 700, color: '#fff' }}>🤖 AI MASTRO</span>
+                      </div>
+                      <WorkspacePanelAI utente={user} workspaceData={data} />
                     </div>
-                  ))}
-                  <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: 10, marginTop: 2 }}>
-                    <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', marginBottom: 8 }}>
-                      {['Progetti','CRM','MRR','Finanze','Contabilità','Task'].map(m => {
-                        const id = m === 'CRM' ? 'clienti' : m === 'Finanze' ? 'spese' : m === 'Contabilità' ? 'contabilita' : m.toLowerCase().replace('à','a')
-                        return <button key={m} onClick={() => { setTab(id as Tab); setShowFab(false) }} style={{ padding: '3px 9px', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 20, fontSize: 11, color: '#fff', cursor: 'pointer', fontFamily: 'inherit' }}>{m}</button>
-                      })}
+                  ) : (
+                    <div style={{ padding: '16px', overflowY: 'auto' }}>
+                      {/* Azioni principali — grandi, touch-friendly */}
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 16 }}>
+                        {[
+                          { label: '+ Task rapida',  color: '#2563EB', emoji: '✓', action: () => { setShowForm('task'); setShowFab(false) } },
+                          { label: '→ Delega',        color: '#BE185D', emoji: '→', action: () => { setTab('deleghe'); setShowFab(false) } },
+                          { label: '💡 Nuova idea',   color: '#7C3AED', emoji: '💡', action: () => { setTab('lab_idee'); setShowFab(false) } },
+                          { label: '🤖 Chiedi alla AI', color: '#D97706', emoji: '🤖', action: () => setFabMode('ai') },
+                          { label: user === 'fabio' ? '→ Passa a Lidia' : '→ Passa a Fabio', color: user === 'fabio' ? '#BE185D' : '#0A8A7A', emoji: '👤', action: () => { setUser(user === 'fabio' ? 'lidia' : 'fabio'); setShowFab(false) } },
+                        ].map(a => (
+                          <button key={a.label} onClick={a.action}
+                            style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '13px 16px', background: a.color + '22', border: `1px solid ${a.color}40`, borderRadius: 12, cursor: 'pointer', fontFamily: 'inherit', color: '#fff', fontSize: 14, fontWeight: 600, textAlign: 'left', width: '100%' }}>
+                            <div style={{ width: 36, height: 36, borderRadius: '50%', background: a.color, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0, boxShadow: `0 4px 12px ${a.color}50` }}>{a.emoji}</div>
+                            {a.label}
+                          </button>
+                        ))}
+                      </div>
+
+                      {/* Moduli */}
+                      <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: 12 }}>
+                        <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>Moduli</div>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+                          {[
+                            { label: 'Dashboard', id: 'dashboard' },
+                            { label: 'Progetti',  id: 'progetti' },
+                            { label: 'CRM',       id: 'clienti' },
+                            { label: 'Calendario',id: 'calendario' },
+                            { label: 'Finanze',   id: 'spese' },
+                            { label: 'Team',      id: 'team' },
+                            { label: 'Preventivi',id: 'preventivi' },
+                            { label: 'Bacheca',   id: 'condivisa' },
+                          ].map(m => (
+                            <button key={m.id} onClick={() => { setTab(m.id as Tab); setShowFab(false) }}
+                              style={{ padding: '8px 10px', background: tab === m.id ? 'rgba(10,138,122,0.3)' : 'rgba(255,255,255,0.06)', border: `1px solid ${tab === m.id ? 'rgba(10,138,122,0.5)' : 'rgba(255,255,255,0.1)'}`, borderRadius: 8, cursor: 'pointer', fontSize: 12, color: tab === m.id ? '#5EEAD4' : 'rgba(255,255,255,0.6)', fontFamily: 'inherit', fontWeight: tab === m.id ? 700 : 400 }}>
+                              {m.label}
+                            </button>
+                          ))}
+                        </div>
+                        <button onClick={() => { setFabSide(s => s === 'right' ? 'left' : 'right'); setShowFab(false) }}
+                          style={{ width: '100%', marginTop: 8, padding: '6px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 7, color: 'rgba(255,255,255,0.4)', fontSize: 11, cursor: 'pointer', fontFamily: 'inherit' }}>
+                          {fabSide === 'right' ? '← Sposta a sinistra' : 'Sposta a destra →'}
+                        </button>
+                      </div>
                     </div>
-                    <button onClick={() => { setFabSide(s => s === 'right' ? 'left' : 'right'); setShowFab(false) }}
-                      style={{ width: '100%', padding: '6px', background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 7, color: 'rgba(255,255,255,0.5)', fontSize: 11, cursor: 'pointer', fontFamily: 'inherit' }}>
-                      {fabSide === 'right' ? '← Sposta a sinistra' : 'Sposta a destra →'}
-                    </button>
-                  </div>
+                  )}
                 </div>
               )}
 
-              {/* Tab verticale con frecce su/giù */}
+              {/* Tab verticale MASTRO */}
               <div style={{ display: 'flex', flexDirection: 'column' }}>
                 <button onClick={() => setFabTop(t => `${Math.max(10, parseInt(t) - 10)}%`)}
-                  style={{ width: 28, height: 20, background: '#065f46', border: 'none', borderRadius: fabSide === 'right' ? '8px 0 0 0' : '0 8px 0 0', cursor: 'pointer', color: 'rgba(255,255,255,0.8)', fontSize: 11, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>▲</button>
-                <button onClick={() => setShowFab(!showFab)}
-                  style={{ width: 28, height: 80, background: '#0A8A7A', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>
+                  style={{ width: 32, height: 24, background: '#065f46', border: 'none', borderRadius: fabSide === 'right' ? '10px 0 0 0' : '0 10px 0 0', cursor: 'pointer', color: 'rgba(255,255,255,0.8)', fontSize: 12, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>▲</button>
+                <button onClick={() => { setShowFab(!showFab); if (showFab) setFabMode(null) }}
+                  style={{ width: 32, height: 88, background: showFab ? '#0D1117' : '#0A8A7A', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0, transition: 'background 0.2s' }}>
                   <span style={{ fontSize: 9, fontWeight: 800, color: '#fff', letterSpacing: 2, textTransform: 'uppercase', writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}>
                     {showFab ? 'CHIUDI' : 'MASTRO'}
                   </span>
                 </button>
                 <button onClick={() => setFabTop(t => `${Math.min(80, parseInt(t) + 10)}%`)}
-                  style={{ width: 28, height: 20, background: '#065f46', border: 'none', borderRadius: fabSide === 'right' ? '0 0 0 8px' : '0 0 8px 0', cursor: 'pointer', color: 'rgba(255,255,255,0.8)', fontSize: 11, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>▼</button>
+                  style={{ width: 32, height: 24, background: '#065f46', border: 'none', borderRadius: fabSide === 'right' ? '0 0 0 10px' : '0 0 10px 0', cursor: 'pointer', color: 'rgba(255,255,255,0.8)', fontSize: 12, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>▼</button>
               </div>
             </div>
 
-            {/* Bottom nav 4 tab */}
-            <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: '#FFFFFF', borderTop: '1px solid #EFEFEF', display: 'flex', zIndex: 70, paddingBottom: 'env(safe-area-inset-bottom)' }}>
+            {/* Bottom nav 4 tab — più grande su mobile */}
+            <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, background: '#FFFFFF', borderTop: '1px solid #EFEFEF', display: 'flex', zIndex: 70, paddingBottom: 'env(safe-area-inset-bottom)', height: 60 }}>
               {bottomNavItems.map((item: any) => {
                 const isActive = tab === item.id
                 return (
                   <button key={item.id} onClick={() => { setTab(item.id as Tab); setSelectedProject(null) }}
-                    style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '8px 0 6px', border: 'none', background: 'none', cursor: 'pointer', color: isActive ? '#0A8A7A' : '#9CA3AF' }}>
+                    style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '8px 0 4px', border: 'none', background: 'none', cursor: 'pointer', color: isActive ? '#0A8A7A' : '#9CA3AF' }}>
                     <span style={{ opacity: isActive ? 1 : 0.5 }}>{iconSvg(item.iconKey, isActive)}</span>
-                    <span style={{ fontSize: 9, fontWeight: isActive ? 600 : 400, marginTop: 3, fontFamily: 'inherit' }}>{item.label}</span>
+                    <span style={{ fontSize: 10, fontWeight: isActive ? 700 : 400, marginTop: 4, fontFamily: 'inherit' }}>{item.label}</span>
+                    {isActive && <div style={{ width: 4, height: 4, borderRadius: '50%', background: '#0A8A7A', marginTop: 2 }} />}
                   </button>
                 )
               })}
