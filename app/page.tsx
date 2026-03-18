@@ -23,6 +23,7 @@ import { TeamView } from '@/components/Team/TeamView'
 import { PreventiviView } from '@/components/Preventivi/PreventiviView'
 import { BachecaCondivisa } from '@/components/Condivisa/BachecaCondivisa'
 import { OnboardingFlow } from '@/components/Onboarding/OnboardingFlow'
+import { GlobalSearch } from '@/components/Search/GlobalSearch'
 import { WorkspacePanel } from '@/components/WorkspaceIntelligence/WorkspacePanel'
 import { usePanel } from '@/context/PanelContext'
 import type { PanelObject, PanelObjectType } from '@/components/Universal/DetailPanel'
@@ -488,6 +489,21 @@ export default function Home() {
     return !localStorage.getItem(`mastro_onboarding_${user}`)
   })
 
+  // Ricerca globale — CMD+K / CTRL+K
+  const [showSearch, setShowSearch] = useState(false)
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault()
+        setShowSearch(s => !s)
+      }
+      if (e.key === 'Escape') setShowSearch(false)
+    }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [])
+
   const altroItems = [
     { id: 'condivisa',  iconKey: 'deleghe',   label: 'Bacheca' },
     { id: 'preventivi', iconKey: 'receipt',   label: 'Preventivi' },
@@ -579,6 +595,14 @@ export default function Home() {
               <span style={{ fontSize: device.isMobile ? 10 : 11.5, fontWeight: 500, color: '#0A8A7A' }}>live</span>
             </div>
             {!device.isMobile && <NotificheBell utente={user} />}
+            {!device.isMobile && (
+              <button onClick={() => setShowSearch(true)}
+                style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '5px 10px', border: `1px solid ${S.border}`, borderRadius: 8, background: S.background, cursor: 'pointer', fontSize: 12, color: S.textMuted, fontFamily: DS.fonts.ui }}>
+                <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="5" stroke={S.textMuted} strokeWidth="1.5"/><path d="M11 11l3 3" stroke={S.textMuted} strokeWidth="1.5" strokeLinecap="round"/></svg>
+                Cerca
+                <span style={{ fontSize: 10, background: S.borderLight, padding: '1px 5px', borderRadius: 4 }}>⌘K</span>
+              </button>
+            )}
             {device.isMobile && (
               <button onClick={() => setUser(user === 'fabio' ? 'lidia' : 'fabio')} style={{ width: 28, height: 28, borderRadius: '50%', background: user === 'fabio' ? '#0A8A7A' : '#BE185D', border: 'none', color: '#fff', fontSize: 10, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'inherit' }}>
                 {user === 'fabio' ? 'FA' : 'LI'}
@@ -704,6 +728,9 @@ export default function Home() {
           </div>
         </div>
       )}
+      {/* Ricerca globale */}
+      {showSearch && <GlobalSearch onNavigate={(t, extra) => { setTab(t as any); if (extra) setSelectedProject(extra) }} onClose={() => setShowSearch(false)} />}
+
       {/* Onboarding — prima visita */}
       {showOnboarding && <OnboardingFlow currentUser={user} onComplete={() => setShowOnboarding(false)} />}
 

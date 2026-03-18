@@ -7,6 +7,7 @@ import { ProjectHeader } from './ProjectHeader'
 import { ProjectLogPanel } from './ProjectLog'
 import { ProjectEditModal } from './ProjectEditModal'
 import { OKRTab } from './OKRTab'
+import { RichEditor } from '@/components/Editor/RichEditor'
 import { supabase } from '@/lib/supabase'
 import type { UserType } from '@/lib/types'
 
@@ -105,9 +106,7 @@ const NoteTab: FC<{ progettoId: string; progetto: any }> = ({ progettoId, proget
           {saved ? '✓ Salvato' : 'Salva'}
         </button>
       </div>
-      <textarea value={note} onChange={e => { setNote(e.target.value); setSaved(false) }}
-        placeholder="Note libere del progetto — strategie, decisioni, considerazioni, TODO, link, qualsiasi cosa..."
-        rows={16} style={{ width: '100%', padding: '12px 14px', border: `1px solid ${DS.colors.border}`, borderRadius: 9, fontSize: 14, fontFamily: DS.fonts.ui, resize: 'vertical', lineHeight: 1.7, boxSizing: 'border-box', outline: 'none', background: DS.colors.background }} />
+      <RichEditor value={note} onChange={v => { setNote(v); setSaved(false) }} placeholder="Note libere del progetto — strategie, decisioni, considerazioni, TODO, link, qualsiasi cosa..." minRows={14} />
     </div>
   )
 }

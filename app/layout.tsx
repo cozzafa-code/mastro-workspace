@@ -16,7 +16,19 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Mastro OS",
-  description: "Mastro Workspace — intelligente per team ambiziosi",
+  description: "Workspace intelligente per team ambiziosi",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "MASTRO OS",
+  },
+  other: {
+    "mobile-web-app-capable": "yes",
+    "apple-mobile-web-app-capable": "yes",
+    "apple-mobile-web-app-status-bar-style": "default",
+    "theme-color": "#0A8A7A",
+  }
 };
 
 export default function RootLayout({
