@@ -22,6 +22,7 @@ import { LabIdeeView } from '@/components/LabIdee/LabIdeeView'
 import { TeamView } from '@/components/Team/TeamView'
 import { PreventiviView } from '@/components/Preventivi/PreventiviView'
 import { BachecaCondivisa } from '@/components/Condivisa/BachecaCondivisa'
+import { OnboardingFlow } from '@/components/Onboarding/OnboardingFlow'
 import { WorkspacePanel } from '@/components/WorkspaceIntelligence/WorkspacePanel'
 import { usePanel } from '@/context/PanelContext'
 import type { PanelObject, PanelObjectType } from '@/components/Universal/DetailPanel'
@@ -481,6 +482,12 @@ export default function Home() {
   const [fabSide, setFabSide] = useState<'right' | 'left'>('right')
   const [fabTop, setFabTop] = useState('40%')
 
+  // Onboarding — mostra solo alla prima visita
+  const [showOnboarding, setShowOnboarding] = useState(() => {
+    if (typeof window === 'undefined') return false
+    return !localStorage.getItem(`mastro_onboarding_${user}`)
+  })
+
   const altroItems = [
     { id: 'condivisa',  iconKey: 'deleghe',   label: 'Bacheca' },
     { id: 'preventivi', iconKey: 'receipt',   label: 'Preventivi' },
@@ -697,6 +704,9 @@ export default function Home() {
           </div>
         </div>
       )}
+      {/* Onboarding — prima visita */}
+      {showOnboarding && <OnboardingFlow currentUser={user} onComplete={() => setShowOnboarding(false)} />}
+
       {/* Workspace Intelligence — floating button */}
       <WorkspacePanel utente={user} workspaceData={data} />
 

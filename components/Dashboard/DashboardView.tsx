@@ -200,6 +200,42 @@ export const DashboardView: FC<{ data: any; user: string; onNavigate: (tab: stri
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
 
+      {/* ── 3 PRIORITÀ DEL GIORNO ── */}
+      {(() => {
+        const priorita3 = daFareOggi.slice(0, 3)
+        if (priorita3.length === 0) return null
+        return (
+          <div style={{ background: '#0B1F2A', borderRadius: 14, padding: '16px 20px' }}>
+            <div style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 12 }}>
+              🎯 Le tue 3 priorità oggi
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {priorita3.map((t: any, i: number) => {
+                const scaduta = t.scadenza && t.scadenza < today
+                return (
+                  <div key={t.id} onClick={() => openPanel({ type: 'task', id: t.id, data: t })}
+                    style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px', background: 'rgba(255,255,255,0.06)', borderRadius: 9, cursor: 'pointer', borderLeft: `3px solid ${i === 0 ? ACCENT(user) : i === 1 ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.15)'}` }}>
+                    <div style={{ width: 22, height: 22, borderRadius: '50%', background: i === 0 ? ACCENT(user) : 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, color: '#fff', flexShrink: 0 }}>{i + 1}</div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.titolo || t.testo}</div>
+                      <div style={{ fontSize: 10, color: scaduta ? '#FCA5A5' : 'rgba(255,255,255,0.4)', marginTop: 1 }}>
+                        {scaduta ? '⚠️ Scaduta' : t.scadenza ? `📅 ${t.scadenza}` : t.tipo === 'delega' ? `📋 Delega da ${t.creato_da}` : ''}
+                      </div>
+                    </div>
+                    {Number(t.priorita) <= 2 && <span style={{ fontSize: 9, background: '#DC4444', color: '#fff', padding: '1px 6px', borderRadius: 20, fontWeight: 700, flexShrink: 0 }}>URGENTE</span>}
+                  </div>
+                )
+              })}
+            </div>
+            {daFareOggi.length > 3 && (
+              <div onClick={() => onNavigate('task')} style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginTop: 10, cursor: 'pointer', textAlign: 'center' }}>
+                +{daFareOggi.length - 3} altre task → vai ai Task
+              </div>
+            )}
+          </div>
+        )
+      })()}
+
       {/* ── BRIEFING PERSONALE ── */}
       <div style={{ background: `linear-gradient(135deg, ${ACCENT(user)}18 0%, ${S.surface} 60%)`, border: `1px solid ${ACCENT(user)}30`, borderRadius: 14, padding: '20px 22px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16, flexWrap: 'wrap', gap: 8 }}>
