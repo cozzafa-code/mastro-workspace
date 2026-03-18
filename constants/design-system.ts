@@ -19,6 +19,7 @@ export const DS = {
     textSecondary:'#374151',
     textMuted:    '#6B7280',
     textFaint:    '#9CA3AF',
+    textDisabled: '#D1D5DB',
     red:          '#DC4444',
     redLight:     '#FEF2F2',
     green:        '#0F7B5A',
