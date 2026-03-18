@@ -31,6 +31,8 @@ import type { UserType } from '@/lib/types'
 type User = UserType
 type Tab = 'dashboard' | 'progetti' | 'task' | 'campagne' | 'clienti' | 'mrr' | 'calendario' | 'gantt' | 'contabilita' | 'deleghe' | 'team' | 'preventivi' | 'condivisa' | 'lab_idee' | 'spese' | 'personale'
 
+import { LoginPage } from '@/components/Auth/LoginPage'
+
 export default function Home() {
   const S = DS.colors
   const [user, setUser] = useState<User>('fabio')
@@ -45,6 +47,25 @@ export default function Home() {
   const { panelObj, openPanel, closePanel, navigatePanel } = usePanel()
   const [showImportExport, setShowImportExport] = useState(false)
   const [showTemplatePicker, setShowTemplatePicker] = useState(false)
+
+  // Auth — controlla sessione Supabase
+  const [authChecked, setAuthChecked] = useState(false)
+  const [authUser, setAuthUser] = useState<any>(null)
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setAuthUser(session?.user ?? null)
+      setAuthChecked(true)
+    })
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
+      setAuthUser(session?.user ?? null)
+    })
+    return () => subscription.unsubscribe()
+  }, [])
+
+  // Mostra login se non autenticato (dopo check iniziale)
+  if (!authChecked) return <div style={{ display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#9CA3AF' }}>Caricamento...</div>
+  if (!authUser) return <LoginPage />
 
   const tables = ['progetti', 'tasks', 'campagne', 'clienti', 'lab_idee', 'spese_correnti', 'personale', 'mrr_snapshots']
 
@@ -514,7 +535,7 @@ export default function Home() {
           {(!device.isTablet || sidebarOpen) && (
             <div style={{ padding: '12px 10px', borderTop: '1px solid #F3F4F6' }}>
               <div style={{ fontSize: 9.5, fontWeight: 600, color: '#C4C9D4', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: 8, paddingLeft: 4 }}>Utente</div>
-              <div style={{ display: 'flex', gap: 6 }}>
+              <div style={{ display: 'flex', gap: 6, marginBottom: 6 }}>
                 {[{ id: 'fabio', label: 'Fabio', initials: 'FA', color: '#0A8A7A' }, { id: 'lidia', label: 'Lidia', initials: 'LI', color: '#BE185D' }].map(u => (
                   <button key={u.id} onClick={() => setUser(u.id as User)} style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 6, padding: '7px 8px', borderRadius: 7, border: `1px solid ${user === u.id ? u.color + '40' : '#F0F0F0'}`, background: user === u.id ? u.color + '12' : 'transparent', cursor: 'pointer', fontFamily: 'inherit' }}>
                     <div style={{ width: 20, height: 20, borderRadius: '50%', background: user === u.id ? u.color : '#E5E7EB', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 8, fontWeight: 700, color: user === u.id ? '#fff' : '#9CA3AF', flexShrink: 0 }}>{u.initials}</div>
@@ -522,6 +543,10 @@ export default function Home() {
                   </button>
                 ))}
               </div>
+              <button onClick={() => supabase.auth.signOut()}
+                style={{ width: '100%', padding: '6px 8px', border: '1px solid #F0F0F0', borderRadius: 7, background: 'transparent', cursor: 'pointer', fontFamily: 'inherit', fontSize: 11, color: '#9CA3AF', textAlign: 'left' }}>
+                → Esci
+              </button>
             </div>
           )}
         </div>
