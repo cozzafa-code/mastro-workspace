@@ -200,125 +200,121 @@ export const DashboardView: FC<{ data: any; user: string; onNavigate: (tab: stri
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
 
-      {/* ── 3 PRIORITÀ DEL GIORNO ── */}
-      {(() => {
-        const priorita3 = daFareOggi.slice(0, 3)
-        if (priorita3.length === 0) return null
-        return (
-          <div style={{ background: '#0B1F2A', borderRadius: 14, padding: '16px 20px' }}>
-            <div style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 12 }}>
-              🎯 Le tue 3 priorità oggi
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              {priorita3.map((t: any, i: number) => {
-                const scaduta = t.scadenza && t.scadenza < today
-                return (
-                  <div key={t.id} onClick={() => openPanel({ type: 'task', id: t.id, data: t })}
-                    style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px', background: 'rgba(255,255,255,0.06)', borderRadius: 9, cursor: 'pointer', borderLeft: `3px solid ${i === 0 ? ACCENT(user) : i === 1 ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.15)'}` }}>
-                    <div style={{ width: 22, height: 22, borderRadius: '50%', background: i === 0 ? ACCENT(user) : 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, color: '#fff', flexShrink: 0 }}>{i + 1}</div>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: 13, fontWeight: 600, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.titolo || t.testo}</div>
-                      <div style={{ fontSize: 10, color: scaduta ? '#FCA5A5' : 'rgba(255,255,255,0.4)', marginTop: 1 }}>
-                        {scaduta ? '⚠️ Scaduta' : t.scadenza ? `📅 ${t.scadenza}` : t.tipo === 'delega' ? `📋 Delega da ${t.creato_da}` : ''}
-                      </div>
-                    </div>
-                    {Number(t.priorita) <= 2 && <span style={{ fontSize: 9, background: '#DC4444', color: '#fff', padding: '1px 6px', borderRadius: 20, fontWeight: 700, flexShrink: 0 }}>URGENTE</span>}
-                  </div>
-                )
-              })}
-            </div>
-            {daFareOggi.length > 3 && (
-              <div onClick={() => onNavigate('task')} style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginTop: 10, cursor: 'pointer', textAlign: 'center' }}>
-                +{daFareOggi.length - 3} altre task → vai ai Task
+      {/* ── CENTRO COMANDI ── */}
+      <div style={{ background: '#0B1F2A', borderRadius: 16, overflow: 'hidden' }}>
+        {/* Header saluto */}
+        <div style={{ padding: '18px 22px 14px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div>
+              <div style={{ fontSize: isMob ? 16 : 18, fontWeight: 800, color: '#fff', letterSpacing: '-0.4px' }}>
+                {saluto}, {NOME(user)} 👋
               </div>
-            )}
-          </div>
-        )
-      })()}
-
-      {/* ── BRIEFING PERSONALE ── */}
-      <div style={{ background: `linear-gradient(135deg, ${ACCENT(user)}18 0%, ${S.surface} 60%)`, border: `1px solid ${ACCENT(user)}30`, borderRadius: 14, padding: '20px 22px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16, flexWrap: 'wrap', gap: 8 }}>
-          <div>
-            <div style={{ fontSize: 20, fontWeight: 700, color: S.textPrimary, letterSpacing: '-0.3px' }}>
-              {saluto}, {NOME(user)} 👋
+              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', marginTop: 2, textTransform: 'capitalize' }}>{giornoSettimana}</div>
             </div>
-            <div style={{ fontSize: 12, color: S.textMuted, marginTop: 3, textTransform: 'capitalize' }}>{giornoSettimana}</div>
-          </div>
-          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-            {taskScadute.length > 0 && <div style={{ background: S.redLight, border: `1px solid ${S.red}40`, borderRadius: 8, padding: '6px 12px', fontSize: 12, fontWeight: 700, color: S.red }}>{taskScadute.length} scadute</div>}
-            {delegateAme.length > 0 && <div style={{ background: ACCENT(altro) + '20', border: `1px solid ${ACCENT(altro)}40`, borderRadius: 8, padding: '6px 12px', fontSize: 12, fontWeight: 700, color: ACCENT(altro) }}>{delegateAme.length} delegate da {NOME(altro)}</div>}
-            {scaduteNonPagate.length > 0 && <div style={{ background: S.amberLight, border: `1px solid ${S.amber}40`, borderRadius: 8, padding: '6px 12px', fontSize: 12, fontWeight: 700, color: S.amber }}>{scaduteNonPagate.length} pagamenti scaduti</div>}
+            {/* Alert badges */}
+            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+              {taskScadute.length > 0 && (
+                <div onClick={() => onNavigate('task')} style={{ background: '#DC4444', borderRadius: 20, padding: '4px 10px', fontSize: 11, fontWeight: 700, color: '#fff', cursor: 'pointer' }}>
+                  ⚠️ {taskScadute.length} scadute
+                </div>
+              )}
+              {scaduteNonPagate.length > 0 && (
+                <div onClick={() => onNavigate('contabilita')} style={{ background: '#B45309', borderRadius: 20, padding: '4px 10px', fontSize: 11, fontWeight: 700, color: '#fff', cursor: 'pointer' }}>
+                  💳 {scaduteNonPagate.length} pagamenti
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: isMob ? '1fr' : '1fr 1fr', gap: 14 }}>
-          {/* DA FARE OGGI */}
-          <div>
-            <div style={{ fontSize: 11, fontWeight: 700, color: ACCENT(user), textTransform: 'uppercase', letterSpacing: 0.6, marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
-              <span style={{ width: 6, height: 6, borderRadius: '50%', background: ACCENT(user), display: 'inline-block' }} />
-              Le tue priorità oggi
-            </div>
-            {daFareOggi.length === 0 ? (
-              <div style={{ fontSize: 13, color: S.textMuted, padding: '12px 14px', background: S.greenLight, borderRadius: 9, fontWeight: 500 }}>
-                🎉 Nessuna priorità urgente — ottimo lavoro!
+        {/* Cosa fare ADESSO */}
+        <div style={{ padding: '14px 22px' }}>
+          {daFareOggi.length === 0 ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px', background: 'rgba(15,123,90,0.2)', borderRadius: 10, border: '1px solid rgba(15,123,90,0.3)' }}>
+              <span style={{ fontSize: 24 }}>🎉</span>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: '#6EE7B7' }}>Tutto in ordine!</div>
+                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginTop: 1 }}>Nessuna priorità urgente per oggi</div>
               </div>
-            ) : daFareOggi.map((t: any, i: number) => {
-              const isDelega = t.creato_da && t.creato_da !== user
-              const isScaduta = t.scadenza && t.scadenza < today
-              return (
-                <div key={t.id || i} onClick={() => openPanel({ type: 'task', id: t.id, data: t })}
-                  style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '9px 12px', background: S.surface, border: `1px solid ${isScaduta ? S.red + '40' : S.border}`, borderRadius: 8, marginBottom: 6, cursor: 'pointer' }}>
-                  <div style={{ width: 20, height: 20, borderRadius: '50%', background: ACCENT(user) + '20', color: ACCENT(user), fontSize: 11, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>{i + 1}</div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: S.textPrimary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.titolo || t.testo}</div>
-                    <div style={{ display: 'flex', gap: 8, marginTop: 2, flexWrap: 'wrap' }}>
-                      {isDelega && <span style={{ fontSize: 10, color: ACCENT(t.creato_da), fontWeight: 700 }}>da {NOME(t.creato_da)}</span>}
-                      {t.scadenza && <span style={{ fontSize: 10, color: isScaduta ? S.red : S.textMuted, fontWeight: isScaduta ? 700 : 400 }}>{isScaduta ? '⚠ ' : ''}📅 {t.scadenza}</span>}
-                      {t.progetto && <span style={{ fontSize: 10, color: S.textMuted }}>{t.progetto}</span>}
-                      {Number(t.priorita) <= 2 && <span style={{ fontSize: 9, background: S.redLight, color: S.red, padding: '1px 5px', borderRadius: 20, fontWeight: 700 }}>URG</span>}
+            </div>
+          ) : (
+            <div>
+              <div style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 10 }}>
+                🎯 Fai questo adesso
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                {daFareOggi.slice(0, 3).map((t: any, i: number) => {
+                  const scaduta = t.scadenza && t.scadenza < today
+                  const isDelega = t.creato_da && t.creato_da !== user
+                  return (
+                    <div key={t.id || i} onClick={() => openPanel({ type: 'task', id: t.id, data: t })}
+                      style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', background: i === 0 ? `${ACCENT(user)}22` : 'rgba(255,255,255,0.04)', borderRadius: 9, cursor: 'pointer', border: `1px solid ${i === 0 ? ACCENT(user) + '40' : 'transparent'}`, transition: 'all 0.15s' }}
+                      onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.08)'}
+                      onMouseLeave={e => e.currentTarget.style.background = i === 0 ? `${ACCENT(user)}22` : 'rgba(255,255,255,0.04)'}>
+                      <div style={{ width: 22, height: 22, borderRadius: '50%', background: i === 0 ? ACCENT(user) : 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 800, color: '#fff', flexShrink: 0 }}>{i + 1}</div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: 13, fontWeight: 600, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.titolo || t.testo}</div>
+                        <div style={{ fontSize: 10, marginTop: 1, color: scaduta ? '#FCA5A5' : isDelega ? '#C4B5FD' : 'rgba(255,255,255,0.35)' }}>
+                          {scaduta ? '⚠️ Scaduta' : isDelega ? `📋 da ${NOME(t.creato_da)}` : t.scadenza ? `📅 ${t.scadenza}` : ''}
+                        </div>
+                      </div>
+                      {Number(t.priorita) <= 2 && <span style={{ fontSize: 8, background: '#DC4444', color: '#fff', padding: '2px 6px', borderRadius: 20, fontWeight: 800, flexShrink: 0, letterSpacing: 0.5 }}>URG</span>}
+                      <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.2)', flexShrink: 0 }}>→</span>
                     </div>
-                  </div>
+                  )
+                })}
+              </div>
+              {daFareOggi.length > 3 && (
+                <div onClick={() => onNavigate('task')} style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', marginTop: 8, cursor: 'pointer', textAlign: 'center', padding: '6px' }}>
+                  +{daFareOggi.length - 3} altre → Tutti i task
                 </div>
-              )
-            })}
-          </div>
+              )}
+            </div>
+          )}
+        </div>
 
-          {/* COSA FA L'ALTRO */}
-          <div>
-            <div style={{ fontSize: 11, fontWeight: 700, color: ACCENT(altro), textTransform: 'uppercase', letterSpacing: 0.6, marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
-              <span style={{ width: 6, height: 6, borderRadius: '50%', background: ACCENT(altro), display: 'inline-block' }} />
-              Cosa sta facendo {NOME(altro)}
+        {/* Cosa sta facendo l'altro + azioni rapide */}
+        <div style={{ display: 'grid', gridTemplateColumns: isMob ? '1fr' : '1fr 1fr', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+          {/* Cosa fa l'altro */}
+          <div style={{ padding: '14px 22px', borderRight: isMob ? 'none' : '1px solid rgba(255,255,255,0.06)' }}>
+            <div style={{ fontSize: 10, fontWeight: 700, color: ACCENT(altro), textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>
+              • {NOME(altro)} sta lavorando a
             </div>
             {taskAltro.length === 0 && delegateAltro.length === 0 ? (
-              <div style={{ fontSize: 12, color: S.textMuted, padding: '12px 14px', background: S.surface, border: `1px solid ${S.border}`, borderRadius: 9 }}>
-                Nessuna task assegnata a {NOME(altro)}
+              <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.25)', fontStyle: 'italic' }}>Nessuna task attiva</div>
+            ) : [...taskAltro, ...delegateAltro].slice(0, 3).map((t: any, i: number) => (
+              <div key={t.id || i} style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)', padding: '3px 0', display: 'flex', alignItems: 'center', gap: 6 }}>
+                <span style={{ width: 4, height: 4, borderRadius: '50%', background: ACCENT(altro), flexShrink: 0 }} />
+                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.titolo || t.testo}</span>
               </div>
-            ) : (
-              <>
-                {taskAltro.map((t: any) => (
-                  <div key={t.id} style={{ padding: '8px 12px', background: S.surface, border: `1px solid ${ACCENT(altro)}20`, borderRadius: 8, marginBottom: 6, borderLeft: `3px solid ${ACCENT(altro)}` }}>
-                    <div style={{ fontSize: 12, fontWeight: 500, color: S.textPrimary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.titolo || t.testo}</div>
-                    <div style={{ display: 'flex', gap: 8, marginTop: 2 }}>
-                      {t.scadenza && <span style={{ fontSize: 10, color: S.textMuted }}>📅 {t.scadenza}</span>}
-                      {t.progetto && <span style={{ fontSize: 10, color: S.textMuted }}>{t.progetto}</span>}
-                      <span style={{ fontSize: 10, color: ACCENT(altro), fontWeight: 600 }}>{t.stato}</span>
-                    </div>
-                  </div>
-                ))}
-                {delegateAltro.length > 0 && (
-                  <div style={{ padding: '8px 12px', background: ACCENT(altro) + '10', border: `1px solid ${ACCENT(altro)}20`, borderRadius: 8, marginBottom: 6 }}>
-                    <div style={{ fontSize: 11, fontWeight: 600, color: ACCENT(altro), marginBottom: 4 }}>Hai delegato a {NOME(altro)}:</div>
-                    {delegateAltro.map((t: any) => (
-                      <div key={t.id} style={{ fontSize: 12, color: S.textSecondary, padding: '2px 0' }}>· {t.titolo}</div>
-                    ))}
-                  </div>
-                )}
-              </>
-            )}
+            ))}
+          </div>
+
+          {/* Azioni rapide */}
+          <div style={{ padding: '14px 22px' }}>
+            <div style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>
+              Azioni rapide
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+              {[
+                { icon: '✓', label: '+ Task', color: '#2563EB', action: () => onNavigate('task') },
+                { icon: '→', label: 'Delega', color: ACCENT(altro), action: () => onNavigate('deleghe') },
+                { icon: '💡', label: '+ Idea', color: '#7C3AED', action: () => onNavigate('lab_idee') },
+                { icon: '📋', label: 'Preventivo', color: '#B45309', action: () => onNavigate('preventivi') },
+              ].map(a => (
+                <button key={a.label} onClick={a.action}
+                  style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 10px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 8, cursor: 'pointer', fontFamily: DS.fonts.ui, color: 'rgba(255,255,255,0.7)', fontSize: 11, fontWeight: 600 }}
+                  onMouseEnter={e => { e.currentTarget.style.background = a.color + '30'; e.currentTarget.style.borderColor = a.color + '60' }}
+                  onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)' }}>
+                  <span style={{ fontSize: 13 }}>{a.icon}</span> {a.label}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       </div>
+
+      {/* ── METEO FINANZIARIO ── */}
       <MeteoFinanziario ricavi={fattureMese.ricavi} costi={fattureMese.costi} runway={runwayMesi} ivaDebito={fattureMese.ivaDebito} />
 
       {/* ── KPI PRINCIPALI ── */}
