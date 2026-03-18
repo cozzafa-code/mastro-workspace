@@ -46,42 +46,42 @@ export default function ImportPage() {
           nome: p.name,
           colore: p.color,
           stato: p.status,
-          mrr: p.mrr,
-          mrr_target: p.target_mrr,
+          obiettivo_mrr: p.target_mrr,
           data_lancio: p.launch_date,
-          descrizione: p.description,
+          descrizione: p.descrizione,
         }, { onConflict: "id" })
         if (error) addLog(false, "Errore progetto: " + error.message)
         else addLog(true, "Progetto OK: " + p.name)
       }
 
-      // 3. UPSERT SPESE
+      // 3. INSERT SPESE
       addLog(true, "Inserimento costi mensili...")
       for (const c of data.costs) {
-        const { error } = await supabase.from("spese_correnti").upsert({
-          nome: c.name,
+        const { error } = await supabase.from("spese_correnti").insert({
+          descrizione: c.name,
           importo: c.amount,
-          valuta: c.currency,
           categoria: c.category,
-          ricorrenza: c.recurring,
+          frequenza: c.recurring,
+          fornitore: c.name,
+          attiva: true,
           note: c.note || null,
-        }, { onConflict: "nome" })
+        })
         if (error) addLog(false, "Errore spesa " + c.name + ": " + error.message)
         else addLog(true, "Spesa OK: " + c.name)
       }
 
-      // 4. UPSERT TASK
+      // 4. INSERT TASK
       addLog(true, "Inserimento task...")
       for (const t of data.tasks) {
         const { error } = await supabase.from("tasks").upsert({
           id: t.id,
-          titolo: t.title,
-          assegnato_a: t.owner,
+          testo: t.title,
+          chi: t.owner,
           progetto_id: t.project,
           priorita: t.priority,
           stato: t.status,
           scadenza: t.due_date || null,
-          tags: t.tags,
+          nota: t.tags ? t.tags.join(", ") : null,
         }, { onConflict: "id" })
         if (error) addLog(false, "Errore task " + t.id + ": " + error.message)
         else addLog(true, "Task OK: " + t.title)
@@ -91,13 +91,10 @@ export default function ImportPage() {
       addLog(true, "Inserimento task ricorrenti...")
       for (const r of data.recurring_tasks) {
         const { error } = await supabase.from("tasks").insert({
-          titolo: r.title,
-          assegnato_a: r.owner,
-          ricorrente: true,
-          frequenza: r.frequency,
-          giorno: r.day || null,
-          tags: r.tags,
-          stato: "open",
+          testo: r.title,
+          chi: r.owner,
+          stato: "aperto",
+          nota: r.tags ? r.tags.join(", ") : null,
         })
         if (error) addLog(false, "Errore ricorrente " + r.title + ": " + error.message)
         else addLog(true, "Ricorrente OK: " + r.title)
