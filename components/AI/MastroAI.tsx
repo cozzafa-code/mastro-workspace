@@ -135,7 +135,7 @@ async function parseAndExecuteActions(content: string, user: User, onUpdate?: (i
 }
 
 function cleanContent(content: string): string {
-  return content.replace(/<action>.*?<\/action>/gs, '').trim()
+  return content.replace(/<action>[\s\S]*?<\/action>/g, '').trim()
 }
 
 export function MastroAI({ currentUser, onUpdateTask }: Props) {
