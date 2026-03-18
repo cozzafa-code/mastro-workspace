@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { DS } from '@/constants/design-system'
@@ -776,4 +776,3 @@ export default function Home() {
     </div>
   )
 }
-
