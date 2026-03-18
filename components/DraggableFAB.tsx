@@ -127,11 +127,12 @@ const DraggableFAB: FC<Props> = ({ fabOpen, setFabOpen, acc, children }) => {
             onTouchEnd={onTouchEnd}
             onMouseDown={onMouseDown}
             style={{
-              width: TAB_W,
-              height: 90,
+              width: fabOpen ? 44 : TAB_W,
+              height: fabOpen ? 112 : 90,
               background: fabOpen ? '#1a3a4a' : acc,
               display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 5,
-              cursor: 'pointer', transition: 'background 0.2s',
+              cursor: 'pointer', transition: 'all 0.2s ease',
+              borderRadius: fabOpen ? (isRight ? '10px 0 0 10px' : '0 10px 10px 0') : 0,
             }}>
             {fabOpen ? (
               <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
