@@ -21,6 +21,7 @@ import { DelegheView } from '@/components/Deleghe/DelegheView'
 import { LabIdeeView } from '@/components/LabIdee/LabIdeeView'
 import { TeamView } from '@/components/Team/TeamView'
 import { PreventiviView } from '@/components/Preventivi/PreventiviView'
+import { BachecaCondivisa } from '@/components/Condivisa/BachecaCondivisa'
 import { WorkspacePanel } from '@/components/WorkspaceIntelligence/WorkspacePanel'
 import { usePanel } from '@/context/PanelContext'
 import type { PanelObject, PanelObjectType } from '@/components/Universal/DetailPanel'
@@ -28,7 +29,7 @@ import { useDevice } from '@/hooks/useDevice'
 import type { UserType } from '@/lib/types'
 
 type User = UserType
-type Tab = 'dashboard' | 'progetti' | 'task' | 'campagne' | 'clienti' | 'mrr' | 'calendario' | 'gantt' | 'contabilita' | 'deleghe' | 'team' | 'preventivi' | 'lab_idee' | 'spese' | 'personale'
+type Tab = 'dashboard' | 'progetti' | 'task' | 'campagne' | 'clienti' | 'mrr' | 'calendario' | 'gantt' | 'contabilita' | 'deleghe' | 'team' | 'preventivi' | 'condivisa' | 'lab_idee' | 'spese' | 'personale'
 
 export default function Home() {
   const S = DS.colors
@@ -412,6 +413,7 @@ export default function Home() {
     { id: 'task',      iconKey: 'tasks',     label: 'Task' },
     { id: 'deleghe',   iconKey: 'deleghe',   label: 'Deleghe' },
     { id: 'team',        iconKey: 'clients',   label: 'Team',        section: 'Team' },
+    { id: 'condivisa',   iconKey: 'deleghe',   label: 'Condivisa',   section: 'Team' },
     { id: 'preventivi',  iconKey: 'receipt',   label: 'Preventivi',  section: 'Finanze' },
     { id: 'campagne',  iconKey: 'campaigns', label: 'Campagne' },
     { id: 'clienti',   iconKey: 'clients',   label: 'Pipeline CRM' },
@@ -427,7 +429,7 @@ export default function Home() {
   const tabTitles: any = {
     dashboard: 'Dashboard', progetti: selectedProject ? selectedProject.nome : 'Progetti',
     task: 'Task', campagne: 'Campagne', clienti: 'Pipeline CRM',
-    mrr: 'MRR Tracker', calendario: 'Calendario', gantt: 'Gantt Timeline', contabilita: 'Contabilità', deleghe: 'Deleghe', team: 'Team', preventivi: 'Preventivi', lab_idee: 'Lab Idee', spese: 'Finanze', personale: 'La mia area'
+    mrr: 'MRR Tracker', calendario: 'Calendario', gantt: 'Gantt Timeline', contabilita: 'Contabilità', deleghe: 'Deleghe', team: 'Team', condivisa: '📋 Bacheca Condivisa', preventivi: 'Preventivi', lab_idee: 'Lab Idee', spese: 'Finanze', personale: 'La mia area'
   }
   const cf = showForm ? forms[showForm] : null
 
@@ -463,6 +465,7 @@ export default function Home() {
   const [fabTop, setFabTop] = useState('40%')
 
   const altroItems = [
+    { id: 'condivisa',  iconKey: 'deleghe',   label: 'Bacheca' },
     { id: 'preventivi', iconKey: 'receipt',   label: 'Preventivi' },
     { id: 'progetti',   iconKey: 'projects',  label: 'Progetti' },
     { id: 'deleghe',    iconKey: 'deleghe',   label: 'Deleghe' },
@@ -568,6 +571,7 @@ export default function Home() {
               {tab === 'contabilita' && <ContabilitaView />}
               {tab === 'deleghe' && <DelegheView currentUser={user} progetti={data.progetti || []} />}
               {tab === 'team' && <TeamView currentUser={user} />}
+              {tab === 'condivisa' && <BachecaCondivisa currentUser={user} />}
               {tab === 'preventivi' && <PreventiviView currentUser={user} clienti={data.clienti || []} progetti={data.progetti || []} />}
               {tab === 'lab_idee' && <LabIdeeView currentUser={user} progetti={data.progetti || []} />}
               {tab === 'spese' && renderSpese()}
