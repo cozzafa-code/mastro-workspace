@@ -5,6 +5,7 @@ export const DS = {
     teal:         '#0A8A7A',
     tealLight:    '#E6F4F2',
     tealDark:     '#076D62',
+    tealMid:      '#0D9E8E',
     dark:         '#0B1F2A',
     darkMid:      '#122535',
     darkLight:    '#1a3040',
