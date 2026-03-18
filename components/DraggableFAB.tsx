@@ -116,7 +116,7 @@ const DraggableFAB: FC<Props> = ({ fabOpen, setFabOpen, acc, children }) => {
           <div
             onTouchStart={e => { e.stopPropagation(); setPosY(p => clampY(p - 8)) }}
             onClick={() => setPosY(p => clampY(p - 8))}
-            style={{ width: TAB_W, height: 22, background: '#065f46', borderRadius: isRight ? '8px 0 0 0' : '0 8px 0 0', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+            style={{ width: fabOpen ? 44 : TAB_W, height: 28, background: '#065f46', borderRadius: isRight ? '8px 0 0 0' : '0 8px 0 0', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
             <svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 5L5 1L9 5" stroke="rgba(255,255,255,0.7)" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>
           </div>
 
@@ -135,9 +135,12 @@ const DraggableFAB: FC<Props> = ({ fabOpen, setFabOpen, acc, children }) => {
               borderRadius: fabOpen ? (isRight ? '10px 0 0 10px' : '0 10px 10px 0') : 0,
             }}>
             {fabOpen ? (
-              <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
-                <path d="M2 2l9 9M11 2l-9 9" stroke="white" strokeWidth="2" strokeLinecap="round"/>
-              </svg>
+              <>
+                <svg width="15" height="10" viewBox="0 0 15 10" fill="none">
+                  <path d="M1 9L4.5 1l3 5 3-5L14 9" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+                <span style={{ fontSize: 8, fontWeight: 800, color: 'rgba(255,255,255,0.95)', letterSpacing: 2, writingMode: 'vertical-rl', transform: 'rotate(180deg)', textTransform: 'uppercase', fontFamily: 'system-ui,sans-serif' }}>OS</span>
+              </>
             ) : (
               <>
                 <svg width="15" height="10" viewBox="0 0 15 10" fill="none">
@@ -152,7 +155,7 @@ const DraggableFAB: FC<Props> = ({ fabOpen, setFabOpen, acc, children }) => {
           <div
             onTouchStart={e => { e.stopPropagation(); setPosY(p => clampY(p + 8)) }}
             onClick={() => setPosY(p => clampY(p + 8))}
-            style={{ width: TAB_W, height: 22, background: '#065f46', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+            style={{ width: fabOpen ? 44 : TAB_W, height: 28, background: '#065f46', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
             <svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="rgba(255,255,255,0.7)" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>
           </div>
 
@@ -160,7 +163,7 @@ const DraggableFAB: FC<Props> = ({ fabOpen, setFabOpen, acc, children }) => {
           <div
             onTouchStart={e => { e.stopPropagation(); setSide(s => s === 'right' ? 'left' : 'right'); setFabOpen(false) }}
             onClick={() => { setSide(s => s === 'right' ? 'left' : 'right'); setFabOpen(false) }}
-            style={{ width: TAB_W, height: 22, background: '#0a2a1a', borderRadius: isRight ? '0 0 0 8px' : '0 0 8px 0', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', marginTop: 1 }}>
+            style={{ width: fabOpen ? 44 : TAB_W, height: 28, background: '#0a2a1a', borderRadius: isRight ? '0 0 0 8px' : '0 0 8px 0', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', marginTop: 1 }}>
             <svg width="12" height="8" viewBox="0 0 12 8" fill="none">
               <path d={isRight ? "M8 1l3 3-3 3M1 4h10" : "M4 1L1 4l3 3M11 4H1"} stroke="rgba(255,255,255,0.5)" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
