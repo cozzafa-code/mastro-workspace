@@ -11,24 +11,33 @@ const S = DS.colors
 // ── Mini components ───────────────────────────────────────
 const KpiCard: FC<{ value: string; label: string; sub?: string; color?: string; bg?: string; onClick?: () => void; alert?: boolean; trend?: string }> =
   ({ value, label, sub, color, bg, onClick, alert, trend }) => (
-  <div onClick={onClick} style={{ background: bg || S.surface, border: `1px solid ${alert ? S.red + '50' : S.border}`, borderRadius: DS.radius.md, padding: '14px 16px', cursor: onClick ? 'pointer' : 'default', flex: 1, minWidth: 120 }}>
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-      <div style={{ fontSize: 22, fontWeight: 700, color: color || S.textPrimary, fontFamily: DS.fonts.mono, letterSpacing: '-0.5px', lineHeight: 1 }}>{value}</div>
-      {trend && <span style={{ fontSize: 11, color: trend.startsWith('+') ? S.green : S.red, fontWeight: 600 }}>{trend}</span>}
+  <div onClick={onClick}
+    style={{ background: bg || S.surface, border: `1px solid ${alert ? S.red + '40' : S.border}`, borderRadius: DS.radius.md, padding: '16px 18px', cursor: onClick ? 'pointer' : 'default', flex: 1, minWidth: 100, transition: 'all 0.15s' }}
+    onMouseEnter={e => { if (onClick) { e.currentTarget.style.borderColor = S.teal; e.currentTarget.style.boxShadow = '0 2px 12px rgba(10,138,122,0.1)' } }}
+    onMouseLeave={e => { e.currentTarget.style.borderColor = alert ? S.red + '40' : S.border; e.currentTarget.style.boxShadow = 'none' }}>
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
+      <div style={{ fontSize: 24, fontWeight: 800, color: S.textPrimary, fontFamily: DS.fonts.mono, letterSpacing: '-1px', lineHeight: 1 }}>{value}</div>
+      {trend && <span style={{ fontSize: 11, color: trend.startsWith('+') ? S.green : S.red, fontWeight: 700, background: trend.startsWith('+') ? S.greenLight : S.redLight, padding: '2px 6px', borderRadius: 20 }}>{trend}</span>}
     </div>
-    <div style={{ fontSize: 11, fontWeight: 600, color: S.textPrimary, marginTop: 6 }}>{label}</div>
-    {sub && <div style={{ fontSize: 10, color: S.textMuted, marginTop: 2 }}>{sub}</div>}
+    <div style={{ fontSize: 12, fontWeight: 600, color: S.textSecondary }}>{label}</div>
+    {sub && <div style={{ fontSize: 10, color: S.textFaint, marginTop: 3 }}>{sub}</div>}
   </div>
 )
 
 const SectionHeader: FC<{ title: string; count?: number; action?: { label: string; onClick: () => void }; color?: string }> =
   ({ title, count, action, color }) => (
-  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-    <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-      <span style={{ fontSize: 10, fontWeight: 700, color: color || S.textMuted, textTransform: 'uppercase', letterSpacing: 0.6 }}>{title}</span>
-      {count !== undefined && <span style={{ fontSize: 10, background: S.borderLight, color: S.textMuted, padding: '0 5px', borderRadius: 20, fontWeight: 600 }}>{count}</span>}
+  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+      <span style={{ fontSize: 11, fontWeight: 700, color: color || S.textMuted, textTransform: 'uppercase', letterSpacing: 0.8 }}>{title}</span>
+      {count !== undefined && count > 0 && <span style={{ fontSize: 10, background: S.tealLight, color: S.teal, padding: '1px 7px', borderRadius: 20, fontWeight: 700 }}>{count}</span>}
     </div>
-    {action && <button onClick={action.onClick} style={{ fontSize: 11, color: S.teal, background: 'none', border: 'none', cursor: 'pointer', fontFamily: DS.fonts.ui, fontWeight: 600 }}>{action.label} →</button>}
+    {action && (
+      <button onClick={action.onClick}
+        style={{ fontSize: 11, color: S.teal, background: 'none', border: 'none', cursor: 'pointer', fontFamily: DS.fonts.ui, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 3 }}>
+        {action.label}
+        <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5h6M6 3l2 2-2 2" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/></svg>
+      </button>
+    )}
   </div>
 )
 
@@ -297,16 +306,17 @@ export const DashboardView: FC<{ data: any; user: string; onNavigate: (tab: stri
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
               {[
-                { icon: '✓', label: '+ Task', color: '#2563EB', action: () => onNavigate('task') },
-                { icon: '→', label: 'Delega', color: ACCENT(altro), action: () => onNavigate('deleghe') },
-                { icon: '💡', label: '+ Idea', color: '#7C3AED', action: () => onNavigate('lab_idee') },
-                { icon: '📋', label: 'Preventivo', color: '#B45309', action: () => onNavigate('preventivi') },
+                { label: '+ Task', color: '#2563EB', icon: <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7l3 3 7-7" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>, action: () => onNavigate('task') },
+                { label: 'Delega', color: ACCENT(altro), icon: <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 2v10M2 7h10" stroke="white" strokeWidth="1.8" strokeLinecap="round"/></svg>, action: () => onNavigate('deleghe') },
+                { label: '+ Idea', color: '#7C3AED', icon: <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1.5a3.5 3.5 0 013.5 3.5c0 1.3-.7 2.45-1.75 3.06V9.5H5.25V8.06A3.5 3.5 0 017 1.5z" stroke="white" strokeWidth="1.4"/><path d="M5.25 11h3.5" stroke="white" strokeWidth="1.4" strokeLinecap="round"/></svg>, action: () => onNavigate('lab_idee') },
+                { label: 'Preventivo', color: '#B45309', icon: <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="2.5" y="1.5" width="9" height="11" rx="1.5" stroke="white" strokeWidth="1.4"/><path d="M5 5h4M5 7.5h4M5 10h2" stroke="white" strokeWidth="1.4" strokeLinecap="round"/></svg>, action: () => onNavigate('preventivi') },
               ].map(a => (
                 <button key={a.label} onClick={a.action}
-                  style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 10px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 8, cursor: 'pointer', fontFamily: DS.fonts.ui, color: 'rgba(255,255,255,0.7)', fontSize: 11, fontWeight: 600 }}
-                  onMouseEnter={e => { e.currentTarget.style.background = a.color + '30'; e.currentTarget.style.borderColor = a.color + '60' }}
+                  style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 10px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 9, cursor: 'pointer', fontFamily: DS.fonts.ui, color: 'rgba(255,255,255,0.75)', fontSize: 12, fontWeight: 600, transition: 'all 0.15s' }}
+                  onMouseEnter={e => { e.currentTarget.style.background = a.color + '35'; e.currentTarget.style.borderColor = a.color + '70' }}
                   onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)' }}>
-                  <span style={{ fontSize: 13 }}>{a.icon}</span> {a.label}
+                  <div style={{ width: 24, height: 24, borderRadius: 7, background: a.color, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{a.icon}</div>
+                  {a.label}
                 </button>
               ))}
             </div>
@@ -321,10 +331,10 @@ export const DashboardView: FC<{ data: any; user: string; onNavigate: (tab: stri
       <div>
         <SectionHeader title="KPI Business" />
         <div style={col3}>
-          <KpiCard value={`€${totMRR.toLocaleString('it-IT')}`} label="MRR Totale" sub={`${Math.round(totMRR / targetOdense * 100)}% target Odense`} color={S.green} onClick={() => onNavigate('mrr')} />
-          <KpiCard value={String(totClienti)} label="Clienti totali" sub={`${targetOdense / 248 - totClienti > 0 ? targetOdense / 248 - totClienti + ' al target' : 'target raggiunto'}`} color={S.blue} onClick={() => onNavigate('mrr')} />
-          <KpiCard value={`-€${burnRate.toLocaleString('it-IT')}`} label="Burn rate/mese" sub="spese correnti" color={S.red} onClick={() => onNavigate('spese')} />
-          <KpiCard value={runwayMesi > 99 ? '∞' : `${runwayMesi}m`} label="Runway" sub="mesi di cassa" color={runwayMesi < 3 ? S.red : runwayMesi < 6 ? S.amber : S.green} alert={runwayMesi < 3} />
+          <KpiCard value={`€${totMRR.toLocaleString('it-IT')}`} label="MRR Totale" sub={`${Math.round(totMRR / targetOdense * 100)}% target Odense`} onClick={() => onNavigate('mrr')} />
+          <KpiCard value={String(totClienti)} label="Clienti totali" sub={`${Math.max(0, Math.round(targetOdense / 248) - totClienti)} al target`} onClick={() => onNavigate('mrr')} />
+          <KpiCard value={`€${burnRate.toLocaleString('it-IT')}`} label="Burn rate/mese" sub="spese correnti" alert={burnRate > totMRR} onClick={() => onNavigate('spese')} />
+          <KpiCard value={runwayMesi > 99 ? '∞' : `${runwayMesi}m`} label="Runway" sub="mesi di cassa" alert={runwayMesi < 3} onClick={() => onNavigate('spese')} />
         </div>
       </div>
 
