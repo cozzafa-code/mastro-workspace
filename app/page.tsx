@@ -695,6 +695,17 @@ export default function Home() {
                 <svg width="14" height="10" viewBox="0 0 16 12" fill="none"><path d="M1 10L5 1l4 7 4-7 3 9" stroke={DS.colors.teal} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
               </div>
             )}
+            {/* Tasto indietro — visibile quando non sei in dashboard */}
+            {tab !== 'dashboard' && (
+              <button
+                onClick={() => { setTab('dashboard'); setSelectedProject(null) }}
+                style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '5px 10px', border: `1px solid ${DS.colors.border}`, borderRadius: 8, background: DS.colors.surface, cursor: 'pointer', fontFamily: DS.fonts.ui, fontSize: 12, color: DS.colors.textMuted, flexShrink: 0, transition: 'all 0.15s' }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = DS.colors.teal; e.currentTarget.style.color = DS.colors.teal }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = DS.colors.border; e.currentTarget.style.color = DS.colors.textMuted }}>
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M8 2L4 6l4 4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                {!device.isMobile && 'Home'}
+              </button>
+            )}
             <div>
               {!device.isMobile && <div style={{ fontSize: 11, color: DS.colors.textFaint, marginBottom: 1 }}>Workspace</div>}
               <div style={{ fontSize: device.isMobile ? 15 : 15, fontWeight: 700, color: DS.colors.textPrimary, letterSpacing: '-0.2px' }}>{tabTitles[tab]}</div>
