@@ -22,7 +22,9 @@ import { LabIdeeView } from '@/components/LabIdee/LabIdeeView'
 import { TeamView } from '@/components/Team/TeamView'
 import { PreventiviView } from '@/components/Preventivi/PreventiviView'
 import { BachecaCondivisa } from '@/components/Condivisa/BachecaCondivisa'
+import { OperationsView } from '@/components/Operations/OperationsView'
 import { OnboardingFlow } from '@/components/Onboarding/OnboardingFlow'
+import { LidiaOpsView } from '@/components/LidiaOps/LidiaOpsView'
 import { GlobalSearch } from '@/components/Search/GlobalSearch'
 import { SettingsPanel } from '@/components/Settings/SettingsPanel'
 import { FabAI } from '@/components/WorkspaceIntelligence/FabAI'
@@ -33,7 +35,7 @@ import { useDevice } from '@/hooks/useDevice'
 import type { UserType } from '@/lib/types'
 
 type User = UserType
-type Tab = 'dashboard' | 'progetti' | 'task' | 'campagne' | 'clienti' | 'mrr' | 'calendario' | 'gantt' | 'contabilita' | 'deleghe' | 'team' | 'preventivi' | 'condivisa' | 'lab_idee' | 'spese' | 'personale'
+type Tab = 'dashboard' | 'progetti' | 'task' | 'campagne' | 'clienti' | 'mrr' | 'calendario' | 'gantt' | 'contabilita' | 'deleghe' | 'team' | 'preventivi' | 'condivisa' | 'lab_idee' | 'spese' | 'personale' | 'operations' | 'lidiaops'
 
 import { LoginPage } from '@/components/Auth/LoginPage'
 
@@ -450,7 +452,11 @@ export default function Home() {
   const tabTitles: any = {
     dashboard: 'Dashboard', progetti: selectedProject ? selectedProject.nome : 'Progetti',
     task: 'Task', campagne: 'Campagne', clienti: 'Pipeline CRM',
-    mrr: 'MRR Tracker', calendario: 'Calendario', gantt: 'Gantt Timeline', contabilita: 'Contabilità', deleghe: 'Deleghe', team: 'Team', condivisa: '📋 Bacheca Condivisa', preventivi: 'Preventivi', lab_idee: 'Lab Idee', spese: 'Finanze', personale: 'La mia area'
+    mrr: 'MRR Tracker', calendario: 'Calendario', gantt: 'Gantt Timeline',
+    contabilita: 'Contabilità', deleghe: 'Deleghe', team: 'Team',
+    condivisa: 'Bacheca Condivisa', preventivi: 'Preventivi',
+    lab_idee: 'Lab Idee', spese: 'Finanze', personale: 'La mia area', operations: 'Operations',
+    lidiaops: 'Operations',
   }
   const cf = showForm ? forms[showForm] : null
 
@@ -604,7 +610,9 @@ export default function Home() {
                     { id: 'lab_idee',   iconKey: 'ideas',     label: 'Lab Idee' },
                     { id: 'team',       iconKey: 'clients',   label: 'Team' },
                     { id: 'gantt',      iconKey: 'gantt',     label: 'Gantt' },
+                    { id: 'lidiaops',   iconKey: 'finance',   label: 'Operations' },
                     { id: 'personale',  iconKey: 'personal',  label: 'La mia area' },
+                    { id: 'operations',  iconKey: 'finance',   label: 'Operations' },
                   ]
                 },
               ]
@@ -763,6 +771,8 @@ export default function Home() {
               {tab === 'lab_idee' && <LabIdeeView currentUser={user} progetti={data.progetti || []} />}
               {tab === 'spese' && renderSpese()}
               {tab === 'personale' && <PersonaleView currentUser={user} />}
+              {tab === 'operations' && <OperationsView currentUser={user} />}
+              {tab === 'lidiaops' && <LidiaOpsView />}
             </>
           }
         </div>
