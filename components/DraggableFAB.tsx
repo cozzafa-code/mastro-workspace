@@ -9,70 +9,48 @@ interface Props {
   children?: React.ReactNode
 }
 
-const W = 58
-const H = 58
-const PAD = 16
-
 const DraggableFAB: FC<Props> = ({ fabOpen, setFabOpen, acc, children }) => {
-  const [pos, setPos] = useState({ x: -1, y: -1 })
-  const [dragging, setDragging] = useState(false)
+  const [posY, setPosY] = useState(40) // percentuale dall'alto
   const dragged = useRef(false)
-  const origin = useRef({ x: 0, y: 0, px: 0, py: 0 })
+  const origin = useRef({ y: 0, py: 0 })
 
-  useEffect(() => {
-    if (pos.x === -1) {
-      setPos({
-        x: window.innerWidth - W - PAD,
-        y: window.innerHeight - H - 80,
-      })
-    }
-  }, [])
+  const clampY = (y: number) => Math.max(8, Math.min(78, y))
 
-  const clamp = (x: number, y: number) => ({
-    x: Math.max(PAD, Math.min(window.innerWidth - W - PAD, x)),
-    y: Math.max(PAD, Math.min(window.innerHeight - H - 70, y)),
-  })
-
+  // ── TOUCH sul tab ─────────────────────────────────────
   const onTouchStart = (e: React.TouchEvent) => {
-    const t = e.touches[0]
     dragged.current = false
-    origin.current = { x: t.clientX, y: t.clientY, px: pos.x, py: pos.y }
+    origin.current = { y: e.touches[0].clientY, py: posY }
   }
 
   const onTouchMove = (e: React.TouchEvent) => {
     e.preventDefault()
-    const t = e.touches[0]
-    const dx = t.clientX - origin.current.x
-    const dy = t.clientY - origin.current.y
-    if (Math.hypot(dx, dy) > 5) {
+    const dy = e.touches[0].clientY - origin.current.y
+    const pct = (dy / window.innerHeight) * 100
+    if (Math.abs(pct) > 0.5) {
       dragged.current = true
-      setDragging(true)
-      if (fabOpen) setFabOpen(false)
-      setPos(clamp(origin.current.px + dx, origin.current.py + dy))
+      setPosY(clampY(origin.current.py + pct))
     }
   }
 
   const onTouchEnd = () => {
-    setDragging(false)
     if (!dragged.current) setFabOpen(!fabOpen)
   }
 
+  // ── MOUSE sul tab ─────────────────────────────────────
   const onMouseDown = (e: React.MouseEvent) => {
     e.preventDefault()
     dragged.current = false
-    origin.current = { x: e.clientX, y: e.clientY, px: pos.x, py: pos.y }
+    origin.current = { y: e.clientY, py: posY }
+
     const onMove = (ev: MouseEvent) => {
-      const dx = ev.clientX - origin.current.x
       const dy = ev.clientY - origin.current.y
-      if (Math.hypot(dx, dy) > 5) {
+      const pct = (dy / window.innerHeight) * 100
+      if (Math.abs(pct) > 0.5) {
         dragged.current = true
-        setDragging(true)
-        if (fabOpen) setFabOpen(false)
-        setPos(clamp(origin.current.px + dx, origin.current.py + dy))
+        setPosY(clampY(origin.current.py + pct))
       }
     }
     const onUp = () => {
-      setDragging(false)
       if (!dragged.current) setFabOpen(!fabOpen)
       window.removeEventListener('mousemove', onMove)
       window.removeEventListener('mouseup', onUp)
@@ -81,73 +59,131 @@ const DraggableFAB: FC<Props> = ({ fabOpen, setFabOpen, acc, children }) => {
     window.addEventListener('mouseup', onUp)
   }
 
-  if (pos.x === -1) return null
-
-  const menuAbove = pos.y > window.innerHeight * 0.55
-
   return (
     <>
+      {/* Overlay chiude menu */}
       {fabOpen && (
-        <div onClick={() => setFabOpen(false)}
-          style={{ position: 'fixed', inset: 0, zIndex: 88, background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(3px)' }} />
+        <div
+          onClick={() => setFabOpen(false)}
+          style={{ position: 'fixed', inset: 0, zIndex: 88, background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(3px)' }}
+        />
       )}
 
-      <div style={{ position: 'fixed', left: pos.x, top: pos.y, zIndex: 90, touchAction: 'none', userSelect: 'none' }}>
+      {/* Container posizionato sul bordo destro */}
+      <div style={{
+        position: 'fixed',
+        right: 0,
+        top: `${posY}%`,
+        zIndex: 90,
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+        touchAction: 'none',
+      }}>
 
+        {/* Pannello menu — appare a sinistra del tab */}
         {fabOpen && (
           <div style={{
-            position: 'absolute',
-            [menuAbove ? 'bottom' : 'top']: H + 12,
-            right: 0,
-            width: 260,
+            width: 270,
+            maxHeight: '75vh',
             background: '#0B1F2A',
-            borderRadius: 16,
-            padding: 10,
-            boxShadow: '0 16px 48px rgba(0,0,0,0.5)',
-            animation: 'fabIn 0.18s ease',
+            borderRadius: '14px 0 0 14px',
+            overflow: 'hidden',
+            display: 'flex',
+            flexDirection: 'column',
+            boxShadow: '-8px 0 40px rgba(0,0,0,0.5)',
+            animation: 'slideIn 0.18s ease',
           }}>
-            <style>{`@keyframes fabIn{from{opacity:0;transform:scale(0.92)}to{opacity:1;transform:scale(1)}}`}</style>
-            {children}
+            <style>{`@keyframes slideIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}`}</style>
+            <div style={{ overflowY: 'auto', padding: '14px 12px', flex: 1 }}>
+              {children}
+            </div>
           </div>
         )}
 
+        {/* Tab verticale — bordo destro */}
         <div
           onTouchStart={onTouchStart}
           onTouchMove={onTouchMove}
           onTouchEnd={onTouchEnd}
           onMouseDown={onMouseDown}
           style={{
-            width: W, height: H,
-            borderRadius: 18,
-            background: fabOpen
-              ? 'linear-gradient(135deg, #0B1F2A, #1a3a4a)'
-              : `linear-gradient(135deg, ${acc}, ${acc}cc)`,
-            boxShadow: dragging ? `0 16px 40px ${acc}70` : fabOpen ? '0 4px 20px rgba(0,0,0,0.5)' : `0 6px 20px ${acc}60`,
-            cursor: dragging ? 'grabbing' : 'pointer',
-            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2,
-            transition: dragging ? 'none' : 'all 0.2s ease',
-            transform: dragging ? 'scale(1.08)' : fabOpen ? 'scale(0.96)' : 'scale(1)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            cursor: 'pointer',
+            userSelect: 'none',
           }}
         >
-          {fabOpen ? (
-            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-              <path d="M4 4l10 10M14 4L4 14" stroke="white" strokeWidth="2.2" strokeLinecap="round"/>
+          {/* Freccia su */}
+          <div style={{
+            width: 28,
+            height: 20,
+            background: '#065f46',
+            borderRadius: '8px 0 0 0',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}>
+            <svg width="10" height="6" viewBox="0 0 10 6" fill="none">
+              <path d="M1 5L5 1L9 5" stroke="rgba(255,255,255,0.7)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
-          ) : (
-            <>
-              <svg width="22" height="14" viewBox="0 0 22 14" fill="none">
-                <path d="M1 13L6 1l5 8 5-8 5 12" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-              <span style={{ fontSize: 8, fontWeight: 800, color: 'rgba(255,255,255,0.85)', letterSpacing: 2.5, fontFamily: 'system-ui,sans-serif' }}>OS</span>
-            </>
-          )}
-        </div>
-
-        {!fabOpen && !dragging && (
-          <div style={{ position: 'absolute', bottom: -8, left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: 3 }}>
-            {[0,1,2].map(i => <div key={i} style={{ width: 3, height: 3, borderRadius: '50%', background: 'rgba(255,255,255,0.2)' }} />)}
           </div>
-        )}
+
+          {/* Tab principale con scritto OS */}
+          <div style={{
+            width: 28,
+            height: 86,
+            background: fabOpen ? '#1a3a4a' : acc,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 6,
+            transition: 'background 0.2s',
+          }}>
+            {fabOpen ? (
+              // X quando aperto
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <path d="M2 2l8 8M10 2l-8 8" stroke="white" strokeWidth="1.8" strokeLinecap="round"/>
+              </svg>
+            ) : (
+              <>
+                {/* Logo M */}
+                <svg width="14" height="10" viewBox="0 0 14 10" fill="none">
+                  <path d="M1 9L4 1l3 5 3-5 3 8" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+                {/* Scritta OS verticale */}
+                <span style={{
+                  fontSize: 7,
+                  fontWeight: 800,
+                  color: 'rgba(255,255,255,0.9)',
+                  letterSpacing: 2,
+                  writingMode: 'vertical-rl',
+                  transform: 'rotate(180deg)',
+                  textTransform: 'uppercase',
+                  fontFamily: 'system-ui, sans-serif',
+                  lineHeight: 1,
+                }}>OS</span>
+              </>
+            )}
+          </div>
+
+          {/* Freccia giù */}
+          <div style={{
+            width: 28,
+            height: 20,
+            background: '#065f46',
+            borderRadius: '0 0 0 8px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}>
+            <svg width="10" height="6" viewBox="0 0 10 6" fill="none">
+              <path d="M1 1L5 5L9 1" stroke="rgba(255,255,255,0.7)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </div>
+        </div>
       </div>
     </>
   )
