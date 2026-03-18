@@ -6,6 +6,7 @@ import { useProjectDetail } from '@/hooks/useProjectDetail'
 import { ProjectHeader } from './ProjectHeader'
 import { ProjectLogPanel } from './ProjectLog'
 import { ProjectEditModal } from './ProjectEditModal'
+import { OKRTab } from './OKRTab'
 import { supabase } from '@/lib/supabase'
 import type { UserType } from '@/lib/types'
 
@@ -209,6 +210,7 @@ export const ProjectDetailView: FC<Props> = ({ progettoId, currentUser, onBack }
         <TabBtn active={detail.activeTab === 'campagne'} onClick={() => detail.setActiveTab('campagne')}>Campagne {detail.campagne.length > 0 && `(${detail.campagne.length})`}</TabBtn>
         <TabBtn active={detail.activeTab === 'file'} onClick={() => detail.setActiveTab('file' as any)}>📁 File</TabBtn>
         <TabBtn active={detail.activeTab === 'note'} onClick={() => detail.setActiveTab('note' as any)}>📝 Note</TabBtn>
+        <TabBtn active={detail.activeTab === 'okr'} onClick={() => detail.setActiveTab('okr' as any)}>🎯 OKR</TabBtn>
       </div>
 
       {/* Tab content */}
@@ -283,6 +285,12 @@ export const ProjectDetailView: FC<Props> = ({ progettoId, currentUser, onBack }
 
       {(detail.activeTab as string) === 'note' && (
         <NoteTab progettoId={progettoId} progetto={detail.progetto} />
+      )}
+
+      {(detail.activeTab as string) === 'okr' && (
+        <div style={{ background: DS.colors.surface, border: `1px solid ${DS.colors.border}`, borderRadius: DS.radius.lg, padding: 20 }}>
+          <OKRTab progettoId={progettoId} />
+        </div>
       )}
 
       {/* Edit modal */}

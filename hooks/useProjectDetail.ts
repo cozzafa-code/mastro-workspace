@@ -9,7 +9,7 @@ interface ProjectDetailState {
   tasks: Task[]
   campagne: Campagna[]
   loading: boolean
-  activeTab: 'overview' | 'log' | 'task' | 'campagne' | 'file' | 'note'
+  activeTab: 'overview' | 'log' | 'task' | 'campagne' | 'file' | 'note' | 'okr'
   showLogForm: boolean
   logForm: Partial<ProjectLog>
   editingProject: boolean

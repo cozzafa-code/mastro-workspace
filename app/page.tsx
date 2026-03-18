@@ -20,6 +20,7 @@ import { DashboardView } from '@/components/Dashboard/DashboardView'
 import { DelegheView } from '@/components/Deleghe/DelegheView'
 import { LabIdeeView } from '@/components/LabIdee/LabIdeeView'
 import { TeamView } from '@/components/Team/TeamView'
+import { PreventiviView } from '@/components/Preventivi/PreventiviView'
 import { WorkspacePanel } from '@/components/WorkspaceIntelligence/WorkspacePanel'
 import { usePanel } from '@/context/PanelContext'
 import type { PanelObject, PanelObjectType } from '@/components/Universal/DetailPanel'
@@ -27,7 +28,7 @@ import { useDevice } from '@/hooks/useDevice'
 import type { UserType } from '@/lib/types'
 
 type User = UserType
-type Tab = 'dashboard' | 'progetti' | 'task' | 'campagne' | 'clienti' | 'mrr' | 'calendario' | 'gantt' | 'contabilita' | 'deleghe' | 'team' | 'lab_idee' | 'spese' | 'personale'
+type Tab = 'dashboard' | 'progetti' | 'task' | 'campagne' | 'clienti' | 'mrr' | 'calendario' | 'gantt' | 'contabilita' | 'deleghe' | 'team' | 'preventivi' | 'lab_idee' | 'spese' | 'personale'
 
 export default function Home() {
   const S = DS.colors
@@ -75,31 +76,44 @@ export default function Home() {
   const totSpese = (data.spese_correnti || []).filter((s: any) => s.tipo !== 'entrata').reduce((a: number, s: any) => a + (Number(s.importo) || 0), 0)
 
   const Badge = ({ text, color }: { text: string, color: string }) => {
-    const c: any = { teal: 'bg-teal-100 text-teal-800', blue: 'bg-blue-100 text-blue-800', red: 'bg-red-100 text-red-800', amber: 'bg-amber-100 text-amber-800', gray: 'bg-gray-100 text-gray-600', green: 'bg-green-100 text-green-800', purple: 'bg-purple-100 text-purple-800' }
-    return <span className={`text-xs px-2 py-1 rounded-full font-medium whitespace-nowrap ${c[color] || c.gray}`}>{text}</span>
+    const c: any = {
+      teal:   { bg: S.tealLight,   text: S.teal },
+      blue:   { bg: S.blueLight,   text: S.blue },
+      red:    { bg: S.redLight,    text: S.red },
+      amber:  { bg: '#FEF3C7',     text: '#B45309' },
+      gray:   { bg: S.borderLight, text: S.textMuted },
+      green:  { bg: S.greenLight,  text: S.green },
+      purple: { bg: '#EDE9FE',     text: '#6D28D9' },
+    }
+    const cfg = c[color] || c.gray
+    return <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 20, fontWeight: 600, whiteSpace: 'nowrap', background: cfg.bg, color: cfg.text }}>{text}</span>
   }
 
   const Card = ({ children, onClick }: { children: React.ReactNode, onClick?: () => void }) => (
-    <div className={`bg-white border border-gray-200 rounded-xl p-4 mb-3 hover:shadow-sm transition-shadow ${onClick ? 'cursor-pointer hover:border-teal-300' : ''}`} onClick={onClick}>{children}</div>
+    <div onClick={onClick} style={{ background: S.surface, border: `1px solid ${S.border}`, borderRadius: 10, padding: 14, marginBottom: 10, cursor: onClick ? 'pointer' : 'default' }}
+      onMouseEnter={e => { if (onClick) e.currentTarget.style.borderColor = S.teal }}
+      onMouseLeave={e => { if (onClick) e.currentTarget.style.borderColor = S.border }}>
+      {children}
+    </div>
   )
 
   const StatCard = ({ num, label, sub, color }: any) => (
-    <div className="bg-white border border-gray-200 rounded-xl p-4">
-      <div className={`text-2xl font-semibold ${color || 'text-gray-900'}`}>{num}</div>
-      <div className="text-xs text-gray-500 mt-1 font-medium">{label}</div>
-      <div className="text-xs text-gray-400 mt-2 pt-2 border-t border-gray-100">{sub}</div>
+    <div style={{ background: S.surface, border: `1px solid ${S.border}`, borderRadius: DS.radius.md, padding: '14px 16px' }}>
+      <div style={{ fontSize: 22, fontWeight: 700, color: color || S.textPrimary, fontFamily: DS.fonts.mono }}>{num}</div>
+      <div style={{ fontSize: 11, color: S.textPrimary, marginTop: 4, fontWeight: 600 }}>{label}</div>
+      {sub && <div style={{ fontSize: 11, color: S.textMuted, marginTop: 6, paddingTop: 6, borderTop: `1px solid ${S.borderLight}` }}>{sub}</div>}
     </div>
   )
 
   const SH = ({ title, onAdd }: { title: string, onAdd?: () => void }) => (
-    <div className="flex items-center justify-between mb-4">
-      <h2 className="text-sm font-semibold text-gray-900">{title}</h2>
-      {onAdd && <button onClick={onAdd} className="px-3 py-1.5 bg-teal-500 text-white text-xs rounded-lg hover:bg-teal-600 font-medium">+ Aggiungi</button>}
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+      <div style={{ fontSize: 13, fontWeight: 700, color: S.textPrimary }}>{title}</div>
+      {onAdd && <button onClick={onAdd} style={{ padding: '5px 12px', background: S.teal, color: '#fff', border: 'none', borderRadius: 7, fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: DS.fonts.ui }}>+ Aggiungi</button>}
     </div>
   )
 
   const Sep = ({ label }: { label: string }) => (
-    <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mt-5 mb-3 pb-2 border-b border-gray-100">{label}</div>
+    <div style={{ fontSize: 10, fontWeight: 700, color: S.textMuted, textTransform: 'uppercase', letterSpacing: 0.6, marginTop: 20, marginBottom: 10, paddingBottom: 6, borderBottom: `1px solid ${S.borderLight}` }}>{label}</div>
   )
 
   const sc = (s: string) => { if (!s) return 'gray'; const sl = s.toLowerCase(); if (['attivo','completato','fatto'].includes(sl)) return 'green'; if (['in corso','aperto','in_corso'].includes(sl)) return 'blue'; if (['pausa','bloccato'].includes(sl)) return 'amber'; if (['urgente','alta'].includes(sl)) return 'red'; return 'gray' }
@@ -355,10 +369,12 @@ export default function Home() {
   }
 
   const FI = ({ label, id, placeholder, type = 'text', options }: any) => (
-    <div className="mb-3">
-      <label className="block text-xs font-medium text-gray-500 mb-1">{label}</label>
-      {options ? <select id={id} value={form[id] || ''} onChange={e => setForm({ ...form, [id]: e.target.value })} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-teal-400"><option value="">Seleziona...</option>{options.map((o: string) => <option key={o}>{o}</option>)}</select>
-        : <input id={id} type={type} value={form[id] || ''} onChange={e => setForm({ ...form, [id]: e.target.value })} placeholder={placeholder} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-teal-400" />}
+    <div style={{ marginBottom: 10 }}>
+      <label style={{ display: 'block', fontSize: 10, fontWeight: 700, color: S.textMuted, textTransform: 'uppercase' as const, letterSpacing: 0.4, marginBottom: 3 }}>{label}</label>
+      {options
+        ? <select id={id} value={form[id] || ''} onChange={e => setForm({ ...form, [id]: e.target.value })} style={{ width: '100%', padding: '7px 9px', border: `1px solid ${S.border}`, borderRadius: 7, fontSize: 13, fontFamily: DS.fonts.ui, background: S.surface, boxSizing: 'border-box' as const }}><option value="">Seleziona...</option>{options.map((o: string) => <option key={o}>{o}</option>)}</select>
+        : <input id={id} type={type} value={form[id] || ''} onChange={e => setForm({ ...form, [id]: e.target.value })} placeholder={placeholder} style={{ width: '100%', padding: '7px 9px', border: `1px solid ${S.border}`, borderRadius: 7, fontSize: 13, fontFamily: DS.fonts.ui, background: S.surface, boxSizing: 'border-box' as const }} />
+      }
     </div>
   )
 
@@ -373,17 +389,21 @@ export default function Home() {
     else if (showForm?.startsWith('p_')) addItem('personale', { utente: user, tipo_item: showForm.replace('p_', ''), titolo: f.titolo, contenuto: f.contenuto, tag: f.tag, priorita: f.priorita, stato: f.stato, scadenza: f.scadenza })
   }
 
+  const G2 = ({ children }: { children: React.ReactNode }) => (
+    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>{children}</div>
+  )
+
   const forms: any = {
-    progetto: { title: 'Nuovo progetto', body: <><FI label="Nome" id="nome" placeholder="Nome progetto" /><FI label="Descrizione" id="descrizione" placeholder="Descrizione" /><div className="grid grid-cols-2 gap-2"><FI label="MRR (€/mo)" id="mrr" type="number" placeholder="0" /><FI label="Prezzo/mese (€)" id="prezzo" type="number" placeholder="0" /></div><div className="grid grid-cols-2 gap-2"><FI label="Beta clienti" id="clienti" type="number" placeholder="0" /><FI label="Priorità (1=max)" id="priorita" options={['1','2','3','4','5']} /></div><FI label="Stato" id="stato" options={['attivo','pausa','completato','pianificato']} /><FI label="Colore (hex)" id="colore" placeholder="#14B8A6" /></> },
-    task: { title: 'Nuovo task', body: <><FI label="Titolo" id="titolo" placeholder="Cosa fare" /><FI label="Dettaglio" id="dettaglio" placeholder="Dettaglio" /><div className="grid grid-cols-2 gap-2"><FI label="Chi" id="chi" placeholder="Fabio / Lidia" /><FI label="Scadenza" id="scadenza" placeholder="gg/mm/aaaa" /></div><div className="grid grid-cols-2 gap-2"><FI label="Priorità (1=max)" id="priorita" options={['1','2','3','4','5']} /><FI label="Stato" id="stato" options={['aperto','in_corso','completato']} /></div></> },
-    task_p: { title: `Task per ${selectedProject?.nome}`, body: <><FI label="Titolo" id="titolo" placeholder="Cosa fare" /><FI label="Dettaglio" id="dettaglio" placeholder="Dettaglio" /><div className="grid grid-cols-2 gap-2"><FI label="Chi" id="chi" placeholder="Fabio / Lidia" /><FI label="Scadenza" id="scadenza" placeholder="gg/mm/aaaa" /></div><FI label="Priorità (1=max)" id="priorita" options={['1','2','3','4','5']} /></> },
-    campagna: { title: 'Nuova campagna', body: <><FI label="Nome" id="nome" placeholder="Nome campagna" /><div className="grid grid-cols-2 gap-2"><FI label="Tipo" id="tipo" options={['email','social','whatsapp','ads','evento','altro']} /><FI label="Canale" id="canale" placeholder="Brevo / TikTok / ..." /></div><FI label="Obiettivo" id="obiettivo" placeholder="es. 500 lead serramentisti" /><FI label="Stato" id="stato" options={['pianificata','attiva','pausa','completata']} /></> },
-    cliente: { title: 'Nuovo contatto', body: <><FI label="Nome / Azienda" id="nome" placeholder="Nome" /><FI label="Ruolo" id="ruolo" placeholder="Ruolo" /><div className="grid grid-cols-2 gap-2"><FI label="Email" id="email" placeholder="email@..." /><FI label="Telefono" id="tel" placeholder="+39..." /></div><div className="grid grid-cols-2 gap-2"><FI label="Tipo" id="tipo" options={['Lead','Cliente','Partner','Fornitore']} /><FI label="Note" id="note" placeholder="Note" /></div></> },
-    idea: { title: 'Nuova idea', body: <><FI label="Titolo" id="titolo" placeholder="Titolo idea" /><FI label="Descrizione" id="descrizione" placeholder="Descrizione" /><div className="grid grid-cols-2 gap-2"><FI label="Categoria" id="categoria" placeholder="SaaS / Marketing / ..." /><FI label="Chi" id="chi" placeholder="Fabio / Lidia" /></div><div className="grid grid-cols-2 gap-2"><FI label="Priorità (1=max)" id="priorita" options={['1','2','3','4','5']} /><FI label="Stato" id="stato" options={['aperto','in_corso','completato']} /></div></> },
-    spesa: { title: 'Nuova voce finanziaria', body: <><FI label="Nome" id="nome" placeholder="es. Vercel Pro" /><div className="grid grid-cols-2 gap-2"><FI label="Importo €" id="importo" type="number" placeholder="0" /><FI label="Tipo" id="tipo" options={['uscita','entrata']} /></div><div className="grid grid-cols-2 gap-2"><FI label="Frequenza" id="freq" options={['mensile','annuale','una_tantum']} /><FI label="Categoria" id="cat" placeholder="Tech / Marketing..." /></div></> },
-    p_task: { title: 'Task personale', body: <><FI label="Titolo" id="titolo" placeholder="Cosa fare" /><FI label="Contenuto" id="contenuto" placeholder="Dettaglio" /><div className="grid grid-cols-2 gap-2"><FI label="Priorità" id="priorita" options={['Alta','Media','Bassa']} /><FI label="Scadenza" id="scadenza" placeholder="gg/mm/aaaa" /></div><FI label="Stato" id="stato" options={['Aperto','In corso','Fatto']} /></> },
+    progetto: { title: 'Nuovo progetto', body: <><FI label="Nome" id="nome" placeholder="Nome progetto" /><FI label="Descrizione" id="descrizione" placeholder="Descrizione" /><G2><FI label="MRR (€/mo)" id="mrr" type="number" placeholder="0" /><FI label="Prezzo/mese (€)" id="prezzo" type="number" placeholder="0" /></G2><G2><FI label="Beta clienti" id="clienti" type="number" placeholder="0" /><FI label="Priorità (1=max)" id="priorita" options={['1','2','3','4','5']} /></G2><FI label="Stato" id="stato" options={['attivo','pausa','completato','pianificato']} /><FI label="Colore (hex)" id="colore" placeholder="#0A8A7A" /></> },
+    task: { title: 'Nuovo task', body: <><FI label="Titolo" id="titolo" placeholder="Cosa fare" /><FI label="Dettaglio" id="dettaglio" placeholder="Dettaglio" /><G2><FI label="Chi" id="chi" placeholder="Fabio / Lidia" /><FI label="Scadenza" id="scadenza" type="date" placeholder="" /></G2><G2><FI label="Priorità (1=max)" id="priorita" options={['1','2','3','4','5']} /><FI label="Stato" id="stato" options={['aperto','in_corso','completato']} /></G2></> },
+    task_p: { title: `Task per ${selectedProject?.nome}`, body: <><FI label="Titolo" id="titolo" placeholder="Cosa fare" /><FI label="Dettaglio" id="dettaglio" placeholder="Dettaglio" /><G2><FI label="Chi" id="chi" placeholder="Fabio / Lidia" /><FI label="Scadenza" id="scadenza" type="date" placeholder="" /></G2><FI label="Priorità (1=max)" id="priorita" options={['1','2','3','4','5']} /></> },
+    campagna: { title: 'Nuova campagna', body: <><FI label="Nome" id="nome" placeholder="Nome campagna" /><G2><FI label="Tipo" id="tipo" options={['email','social','whatsapp','ads','evento','altro']} /><FI label="Canale" id="canale" placeholder="Brevo / TikTok / ..." /></G2><FI label="Obiettivo" id="obiettivo" placeholder="es. 500 lead serramentisti" /><FI label="Stato" id="stato" options={['pianificata','attiva','pausa','completata']} /></> },
+    cliente: { title: 'Nuovo contatto', body: <><FI label="Nome / Azienda" id="nome" placeholder="Nome" /><FI label="Ruolo" id="ruolo" placeholder="Ruolo" /><G2><FI label="Email" id="email" placeholder="email@..." /><FI label="Telefono" id="tel" placeholder="+39..." /></G2><G2><FI label="Tipo" id="tipo" options={['Lead','Cliente','Partner','Fornitore']} /><FI label="Note" id="note" placeholder="Note" /></G2></> },
+    idea: { title: 'Nuova idea', body: <><FI label="Titolo" id="titolo" placeholder="Titolo idea" /><FI label="Descrizione" id="descrizione" placeholder="Descrizione" /><G2><FI label="Categoria" id="categoria" placeholder="SaaS / Marketing / ..." /><FI label="Chi" id="chi" placeholder="Fabio / Lidia" /></G2><G2><FI label="Priorità (1=max)" id="priorita" options={['1','2','3','4','5']} /><FI label="Stato" id="stato" options={['aperto','in_corso','completato']} /></G2></> },
+    spesa: { title: 'Nuova voce finanziaria', body: <><FI label="Nome" id="nome" placeholder="es. Vercel Pro" /><G2><FI label="Importo €" id="importo" type="number" placeholder="0" /><FI label="Tipo" id="tipo" options={['uscita','entrata']} /></G2><G2><FI label="Frequenza" id="freq" options={['mensile','annuale','una_tantum']} /><FI label="Categoria" id="cat" placeholder="Tech / Marketing..." /></G2></> },
+    p_task: { title: 'Task personale', body: <><FI label="Titolo" id="titolo" placeholder="Cosa fare" /><FI label="Contenuto" id="contenuto" placeholder="Dettaglio" /><G2><FI label="Priorità" id="priorita" options={['Alta','Media','Bassa']} /><FI label="Scadenza" id="scadenza" type="date" placeholder="" /></G2><FI label="Stato" id="stato" options={['Aperto','In corso','Fatto']} /></> },
     p_note: { title: 'Nota personale', body: <><FI label="Titolo" id="titolo" placeholder="Titolo" /><FI label="Contenuto" id="contenuto" placeholder="Scrivi qui..." /><FI label="Tag" id="tag" placeholder="Tag" /></> },
-    p_idee: { title: 'Idea personale', body: <><FI label="Titolo" id="titolo" placeholder="Titolo" /><FI label="Contenuto" id="contenuto" placeholder="Descrizione" /><div className="grid grid-cols-2 gap-2"><FI label="Priorità" id="priorita" options={['Alta','Media','Bassa']} /><FI label="Stato" id="stato" options={['Aperto','In corso','Fatto']} /></div></> },
+    p_idee: { title: 'Idea personale', body: <><FI label="Titolo" id="titolo" placeholder="Titolo" /><FI label="Contenuto" id="contenuto" placeholder="Descrizione" /><G2><FI label="Priorità" id="priorita" options={['Alta','Media','Bassa']} /><FI label="Stato" id="stato" options={['Aperto','In corso','Fatto']} /></G2></> },
   }
 
   const navItems = [
@@ -391,7 +411,8 @@ export default function Home() {
     { id: 'progetti',  iconKey: 'projects',  label: 'Progetti',  section: 'Lavoro' },
     { id: 'task',      iconKey: 'tasks',     label: 'Task' },
     { id: 'deleghe',   iconKey: 'deleghe',   label: 'Deleghe' },
-    { id: 'team',      iconKey: 'clients',   label: 'Team',        section: 'Team' },
+    { id: 'team',        iconKey: 'clients',   label: 'Team',        section: 'Team' },
+    { id: 'preventivi',  iconKey: 'receipt',   label: 'Preventivi',  section: 'Finanze' },
     { id: 'campagne',  iconKey: 'campaigns', label: 'Campagne' },
     { id: 'clienti',   iconKey: 'clients',   label: 'Pipeline CRM' },
     { id: 'mrr',       iconKey: 'mrr',       label: 'MRR Tracker', section: 'Metriche' },
@@ -406,7 +427,7 @@ export default function Home() {
   const tabTitles: any = {
     dashboard: 'Dashboard', progetti: selectedProject ? selectedProject.nome : 'Progetti',
     task: 'Task', campagne: 'Campagne', clienti: 'Pipeline CRM',
-    mrr: 'MRR Tracker', calendario: 'Calendario', gantt: 'Gantt Timeline', contabilita: 'Contabilità', deleghe: 'Deleghe', team: 'Team', lab_idee: 'Lab Idee', spese: 'Finanze', personale: 'La mia area'
+    mrr: 'MRR Tracker', calendario: 'Calendario', gantt: 'Gantt Timeline', contabilita: 'Contabilità', deleghe: 'Deleghe', team: 'Team', preventivi: 'Preventivi', lab_idee: 'Lab Idee', spese: 'Finanze', personale: 'La mia area'
   }
   const cf = showForm ? forms[showForm] : null
 
@@ -442,6 +463,7 @@ export default function Home() {
   const [fabTop, setFabTop] = useState('40%')
 
   const altroItems = [
+    { id: 'preventivi', iconKey: 'receipt',   label: 'Preventivi' },
     { id: 'progetti',   iconKey: 'projects',  label: 'Progetti' },
     { id: 'deleghe',    iconKey: 'deleghe',   label: 'Deleghe' },
     { id: 'campagne',   iconKey: 'campaigns', label: 'Campagne' },
@@ -546,6 +568,7 @@ export default function Home() {
               {tab === 'contabilita' && <ContabilitaView />}
               {tab === 'deleghe' && <DelegheView currentUser={user} progetti={data.progetti || []} />}
               {tab === 'team' && <TeamView currentUser={user} />}
+              {tab === 'preventivi' && <PreventiviView currentUser={user} clienti={data.clienti || []} progetti={data.progetti || []} />}
               {tab === 'lab_idee' && <LabIdeeView currentUser={user} progetti={data.progetti || []} />}
               {tab === 'spese' && renderSpese()}
               {tab === 'personale' && <PersonaleView currentUser={user} />}
