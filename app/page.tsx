@@ -651,7 +651,6 @@ export default function Home() {
               fabOpen={showFab}
               setFabOpen={setShowFab}
               acc={user === 'fabio' ? '#0A8A7A' : '#BE185D'}
-              onVoice={() => { setShowFab(false); setFabMode('ai') }}
             >
               {/* Contenuto menu FAB */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
